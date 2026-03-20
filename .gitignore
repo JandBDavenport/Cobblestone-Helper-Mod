@@ -51,3 +51,4 @@ test_latest.log
 
 *.md
 !README.md
+SHAPE_METHODS_QUICK_REFERENCE.txt

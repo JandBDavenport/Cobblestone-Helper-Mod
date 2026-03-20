@@ -70,10 +70,16 @@ public class CobblestoneHelper implements ClientModInitializer {
 			e.printStackTrace();
 		}
 
-		// Register farm warps keybind handler
+		// Register farm warps keybind handler (toggle open/close)
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (farmWarpsKey.wasPressed()) {
-				client.setScreen(new FarmWarpScreen());
+				if (client.currentScreen instanceof FarmWarpScreen) {
+					// Farm warps screen is open, close it
+					client.setScreen(null);
+				} else {
+					// Farm warps screen is closed, open it
+					client.setScreen(new FarmWarpScreen());
+				}
 			}
 		});
 		System.out.println("[CobblestoneHelper] ✓ Registered farm warps tick event");
@@ -131,5 +137,9 @@ public class CobblestoneHelper implements ClientModInitializer {
 		System.out.println("[CobblestoneHelper] ✓ Registered command: /clearbazaarcache");
 
 		System.out.println("[CobblestoneHelper] ========== MOD INITIALIZATION COMPLETE ==========");
+	}
+
+	public static KeyBinding getFarmWarpsKey() {
+		return farmWarpsKey;
 	}
 }

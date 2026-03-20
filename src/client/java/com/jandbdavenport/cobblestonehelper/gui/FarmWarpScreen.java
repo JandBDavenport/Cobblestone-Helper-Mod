@@ -1,5 +1,6 @@
 package com.jandbdavenport.cobblestonehelper.gui;
 
+import com.jandbdavenport.cobblestonehelper.CobblestoneHelper;
 import com.jandbdavenport.cobblestonehelper.data.FarmData;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
 import java.util.ArrayList;
@@ -243,6 +244,16 @@ public class FarmWarpScreen extends Screen {
 	@Override
 	public boolean shouldCloseOnEsc() {
 		return true;
+	}
+
+	@Override
+	public boolean keyPressed(net.minecraft.client.input.KeyInput key) {
+		// Close on farm warps keybind press
+		if (CobblestoneHelper.getFarmWarpsKey().matchesKey(key)) {
+			this.close();
+			return true;
+		}
+		return super.keyPressed(key);
 	}
 
 	// Simple drawable for crop items with hover animations

@@ -193,15 +193,19 @@ public class BazaarManager {
 			bestSellPrice = 0.0;
 			finishedThisCollection = false;
 			isFreshBazaarOpen = true;
-		} else if (collectionState == CollectionState.COLLECTING && !finishedThisCollection) {
-			// Incomplete collection session - bazaar was closed before finishing, restart fresh
+		} else if (collectionState == CollectionState.COLLECTING && !finishedThisCollection && bazaarOpenedTimeMs == 0) {
+			// Incomplete collection session AND fresh bazaar open - bazaar was closed before finishing, restart fresh
 			System.out.println("[BazaarManager] Incomplete previous session, restarting from scratch");
 			cropSellPrices.clear();
 			bestCrop = "";
 			bestSellPrice = 0.0;
 			finishedThisCollection = false;
 			isFreshBazaarOpen = true;
-		} else if (collectionState == CollectionState.COLLECTING) {
+		} else if (collectionState == CollectionState.COLLECTING && !finishedThisCollection && bazaarOpenedTimeMs != 0) {
+			// Page change during ongoing collection - continue collecting without resetting
+			System.out.println("[BazaarManager] Page change detected, continuing collection...");
+			isFreshBazaarOpen = false;
+		} else if (collectionState == CollectionState.COLLECTING && finishedThisCollection) {
 			// Already collecting and was completed - continue accumulating (don't clear!)
 			System.out.println("[BazaarManager] Continuing collection...");
 			isFreshBazaarOpen = false;

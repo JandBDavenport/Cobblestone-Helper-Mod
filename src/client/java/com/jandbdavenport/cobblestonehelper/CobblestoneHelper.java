@@ -1,0 +1,135 @@
+package com.jandbdavenport.cobblestonehelper;
+
+import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
+import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
+import com.jandbdavenport.cobblestonehelper.features.ShadySummonerManager;
+import com.jandbdavenport.cobblestonehelper.gui.FarmWarpScreen;
+import com.jandbdavenport.cobblestonehelper.gui.HudPositionScreen;
+import com.mojang.brigadier.Command;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
+
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+
+public class CobblestoneHelper implements ClientModInitializer {
+	public static final String MOD_ID = "cobblestonehelper";
+
+	private static KeyBinding hidePlayersKey;
+	private static KeyBinding farmWarpsKey;
+	private static KeyBinding.Category customCategory;
+
+	@Override
+	public void onInitializeClient() {
+		System.out.println("[CobblestoneHelper] ========== MOD INITIALIZATION START ==========");
+		System.out.println("[CobblestoneHelper] Version: " + MOD_ID);
+		System.out.println("[CobblestoneHelper] Initializing client features...");
+
+		try {
+			// Create custom keybinding category
+			customCategory = new KeyBinding.Category(Identifier.of(MOD_ID, "category"));
+			System.out.println("[CobblestoneHelper] ✓ Created keybinding category");
+
+			// Register keybinds
+			hidePlayersKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+				"key.cobblestonehelper.hideplayers",
+				GLFW.GLFW_KEY_H,
+				customCategory
+			));
+			System.out.println("[CobblestoneHelper] ✓ Registered 'Hide Players' keybind (H)");
+
+			farmWarpsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+				"key.cobblestonehelper.farmwarps",
+				GLFW.GLFW_KEY_R,
+				customCategory
+			));
+			System.out.println("[CobblestoneHelper] ✓ Registered 'Farm Warps' keybind (R)");
+
+			// Initialize player hiding feature with keybind
+			System.out.println("[CobblestoneHelper] Initializing PlayerHidingManager...");
+			PlayerHidingManager.init(hidePlayersKey);
+			System.out.println("[CobblestoneHelper] ✓ PlayerHidingManager initialized");
+
+			// Initialize Shady Summoner manager
+			System.out.println("[CobblestoneHelper] Initializing ShadySummonerManager...");
+			ShadySummonerManager.init();
+			System.out.println("[CobblestoneHelper] ✓ ShadySummonerManager initialized");
+
+			// Initialize Bazaar manager
+			System.out.println("[CobblestoneHelper] Initializing BazaarManager...");
+			BazaarManager.init();
+			System.out.println("[CobblestoneHelper] ✓ BazaarManager initialized");
+		} catch (Exception e) {
+			System.out.println("[CobblestoneHelper] ✗ Error during feature initialization!");
+			e.printStackTrace();
+		}
+
+		// Register farm warps keybind handler
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			while (farmWarpsKey.wasPressed()) {
+				client.setScreen(new FarmWarpScreen());
+			}
+		});
+		System.out.println("[CobblestoneHelper] ✓ Registered farm warps tick event");
+
+		// Register /wf command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("wf").executes(ctx -> {
+				MinecraftClient.getInstance().send(() ->
+					MinecraftClient.getInstance().setScreen(new FarmWarpScreen()));
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /wf");
+
+		// Register /hideplayers command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("hideplayers").executes(ctx -> {
+				MinecraftClient c = MinecraftClient.getInstance();
+				c.send(() -> PlayerHidingManager.toggleHidePlayers(c));
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /hideplayers");
+
+		// Register /shadypos command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("shadypos").executes(ctx -> {
+				MinecraftClient.getInstance().send(() ->
+					MinecraftClient.getInstance().setScreen(new HudPositionScreen(ShadySummonerManager.WIDGET)));
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /shadypos");
+
+		// Register /bazaarpos command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("bazaarpos").executes(ctx -> {
+				MinecraftClient.getInstance().send(() ->
+					MinecraftClient.getInstance().setScreen(new HudPositionScreen(BazaarManager.WIDGET)));
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /bazaarpos");
+
+		// Register /clearbazaarcache command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("clearbazaarcache").executes(ctx -> {
+				MinecraftClient.getInstance().send(() -> {
+					BazaarManager.clearCache();
+					MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§6Bazaar cache cleared! The best crop will be recalculated next time you open the bazaar."));
+				});
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /clearbazaarcache");
+
+		System.out.println("[CobblestoneHelper] ========== MOD INITIALIZATION COMPLETE ==========");
+	}
+}

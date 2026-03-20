@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.example.mixin.planthitbox.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "PlantHitboxMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

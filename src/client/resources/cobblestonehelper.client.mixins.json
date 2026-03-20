@@ -1,0 +1,19 @@
+{
+  "required": false,
+  "package": "com.jandbdavenport.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "entity.HideHiddenEntitiesMixin",
+    "rendering.SuppressPlayerFeaturesMixin",
+    "rendering.SuppressEntityFeaturesMixin",
+    "rendering.SuppressNameplateMixin",
+    "rendering.RenderBodySafeguardMixin",
+    "rendering.SuppressGlowOutlineMixin",
+    "rendering.ShadySummonerHudMixin",
+    "rendering.BazaarOverlayMixin",
+    "particles.SuppressHiddenEntityParticlesMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

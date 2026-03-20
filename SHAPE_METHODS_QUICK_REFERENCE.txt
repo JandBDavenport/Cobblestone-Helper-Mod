@@ -1,0 +1,70 @@
+MINECRAFT 1.21.11 BLOCK SHAPE METHODS - QUICK REFERENCE
+========================================================
+
+SELECTION/OUTLINE BOX (What the player sees when looking at a block):
+- getOutlineShape(BlockView, BlockPos)
+- getOutlineShape(BlockView, BlockPos, ShapeContext)
+
+RAYCAST HITBOX (What can be clicked/targeted):
+- getRaycastShape(BlockView, BlockPos)
+
+ENTITY COLLISION (Physical collision for movement):
+- getCollisionShape(BlockView, BlockPos)
+- getCollisionShape(BlockView, BlockPos, ShapeContext)
+
+ENTITY INSIDE COLLISION (When entity is inside block):
+- getInsideCollisionShape(BlockView, BlockPos, Entity)
+
+CAMERA COLLISION (Prevents camera clipping through blocks):
+- getCameraCollisionShape(BlockView, BlockPos, ShapeContext)
+
+VISUAL/RENDERING CULLING (Performance - face visibility):
+- getCullingShape(BlockView, BlockPos)
+- getCullingFace(Direction)
+
+SIDE SHAPE:
+- getSidesShape(BlockView, BlockPos)
+
+SURFACE DETECTION:
+- hasSolidTopSurface(BlockView, BlockPos) -> boolean
+- isSolidSurface(BlockView, BlockPos, Entity, Direction) -> boolean
+- exceedsCube() -> boolean
+
+SHAPE CREATION UTILITIES (on Block class):
+- Block.createCuboidShape(minX, minY, minZ, maxX, maxY, maxZ)
+- Block.createCubeShape(radius)
+- Block.isShapeFullCube(VoxelShape) -> boolean
+- Block.isFaceFullSquare(VoxelShape, Direction) -> boolean
+- Block.shouldDrawSide(BlockState, BlockView, BlockPos, Direction, VoxelShape) -> boolean
+
+VOXELSHAPE METHODS:
+- raycast(Vec3d start, Vec3d end, BlockPos pos)
+- getClosestPointTo(Vec3d pos) -> double
+- offset(Vec3d/Vec3i/x,y,z)
+- simplify() -> VoxelShape
+- asCuboid() -> VoxelShape
+- getMin(Axis) / getMax(Axis) -> double
+- getBoundingBox() -> Box
+- getBoundingBoxes() -> List<Box>
+- isEmpty() -> boolean
+- forEachBox(BoxConsumer)
+- forEachEdge(BoxConsumer)
+
+SHAPECONTEXT FACTORY METHODS:
+- ShapeContext.absent()
+- ShapeContext.absentTreatingFluidAsCube()
+- ShapeContext.of(Entity)
+- ShapeContext.of(Entity, boolean treatFluidAsCube)
+- ShapeContext.ofPlacement(PlayerEntity)
+- ShapeContext.ofCollision(Entity, double y)
+
+SHAPECONTEXT INSTANCE METHODS:
+- isDescending() -> boolean
+- isAbove(VoxelShape, BlockPos, boolean) -> boolean
+- isHolding(Item) -> boolean
+- shouldTreatFluidAsCube() -> boolean
+- canWalkOnFluid(FluidState, FluidState) -> boolean
+- isPlacement() -> boolean
+- getCollisionShape(BlockState, CollisionView, BlockPos) -> VoxelShape
+
+For detailed descriptions, see MINECRAFT_BLOCK_SHAPE_METHODS.md

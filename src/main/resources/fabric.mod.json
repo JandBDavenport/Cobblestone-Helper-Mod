@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "cobblestonehelper",
+	"version": "${version}",
+	"name": "Cobblestone Helper Mod",
+	"description": "several utility features for the play.cobblestone.gg server",
+	"authors": [
+		"JandBDavenport"
+	],
+	"license": "CC0-1.0",
+	"icon": "assets/cobblestonehelper/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+
+		],
+		"client": [
+			"com.jandbdavenport.cobblestonehelper.CobblestoneHelper"
+		]
+	},
+	"mixins": [
+		"cobblestonehelper.mixins.json",
+		{
+			"config": "cobblestonehelper.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

@@ -11,7 +11,8 @@
     "rendering.SuppressGlowOutlineMixin",
     "rendering.ShadySummonerHudMixin",
     "rendering.BazaarOverlayMixin",
-    "particles.SuppressHiddenEntityParticlesMixin"
+    "particles.SuppressHiddenEntityParticlesMixin",
+    "network.ScoreboardTeamSyncMixin"
   ],
   "injectors": {
     "defaultRequire": 1

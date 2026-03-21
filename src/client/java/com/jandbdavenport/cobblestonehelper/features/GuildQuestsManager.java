@@ -206,6 +206,34 @@ public class GuildQuestsManager {
 	}
 
 	/**
+	 * Reset quest state when quests refresh on the server.
+	 * Called when "New guild quests have become available!" message is detected.
+	 */
+	private static void resetQuestState() {
+		dataState = DataState.NO_DATA;
+		questResetMs = 0;
+		lastTimerSyncMs = 0;
+		boss1Target = "";
+		boss2Target = "";
+		crop3kTarget = "";
+		crop7500Target = "";
+		boss1ActionLine = "";
+		boss2ActionLine = "";
+		crop3kActionLine = "";
+		crop7500ActionLine = "";
+		prevBoss1ActionLine = "";
+		prevBoss2ActionLine = "";
+		prevCrop3kActionLine = "";
+		prevCrop7500ActionLine = "";
+		boss1Complete = false;
+		boss2Complete = false;
+		crop3kComplete = false;
+		crop7500Complete = false;
+		scraped = false;  // Reset scrape flag so we re-scrape when GUI opens
+		saveConfig();
+	}
+
+	/**
 	 * Add buttons to the Guild Quests screen.
 	 */
 	private static void addGuildQuestsButtons(Screen screen) {
@@ -286,10 +314,17 @@ public class GuildQuestsManager {
 			}
 		});
 
-		// Register chat message listener for quest completion
+		// Register chat message listener for quest completion and reset
 		ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
 			if (!overlay) {
-				handleQuestCompleteMessage(message);
+				String text = message.getString();
+				// Check for quest reset message
+				if (text.contains("GUILDS") && text.contains("New guild quests have become available")) {
+					resetQuestState();
+				} else {
+					// Check for quest completion message
+					handleQuestCompleteMessage(message);
+				}
 			}
 		});
 	}

@@ -71,6 +71,7 @@ public class ConfigScreen extends Screen {
 		sectionExpanded.put("guildQuests", false);
 		sectionExpanded.put("farmWarps", false);
 		sectionExpanded.put("plantHitbox", false);
+		sectionExpanded.put("themes", false);
 	}
 
 	// Section Y positions for rendering background cards
@@ -84,6 +85,8 @@ public class ConfigScreen extends Screen {
 	private int farmWarpsSectionEnd = 0;
 	private int plantHitboxSectionStart = 0;
 	private int plantHitboxSectionEnd = 0;
+	private int themesSectionStart = 0;
+	private int themesSectionEnd = 0;
 
 	// Color picker widgets (indexed by feature)
 	private final Map<String, HexColorPickerWidget> colorPickers = new HashMap<>();
@@ -129,6 +132,8 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += sectionExpanded.get("farmWarps") ? 150 : 0;
 		estimatedHeight += 50; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 100 : 0;
+		estimatedHeight += 50; // Themes section
+		estimatedHeight += sectionExpanded.get("themes") ? 150 : 0;
 
 		// Content box height is fixed; content scrolls inside it
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
@@ -163,6 +168,10 @@ public class ConfigScreen extends Screen {
 		yPos = buildPlantHitboxSection(centerX, yPos);
 		plantHitboxSectionEnd = yPos;
 
+		// THEMES SECTION
+		themesSectionStart = yPos;
+		yPos = buildThemesSection(centerX, yPos);
+		themesSectionEnd = yPos;
 
 		// Add all color picker fields as drawable children
 		for (HexColorPickerWidget picker : colorPickers.values()) {
@@ -277,9 +286,6 @@ public class ConfigScreen extends Screen {
 			ModConfig.saveConfig();
 		});
 
-		// Theme presets
-		yPos = drawThemePresets(centerX, yPos, "Shady Summoner Theme:", "shadySummoner");
-
 		return yPos;
 	}
 
@@ -339,9 +345,6 @@ public class ConfigScreen extends Screen {
 			ModConfig.saveConfig();
 		}, BUTTON_TYPE_NORMAL);
 		yPos += 25;
-
-		// Theme presets
-		yPos = drawThemePresets(centerX, yPos, "Bazaar Theme:", "bazaar");
 
 		return yPos;
 	}
@@ -412,9 +415,6 @@ public class ConfigScreen extends Screen {
 			ModConfig.saveConfig();
 		}, BUTTON_TYPE_NORMAL);
 		yPos += 25;
-
-		// Theme presets
-		yPos = drawThemePresets(centerX, yPos, "Guild Quests Theme:", "guildQuests");
 
 		return yPos;
 	}
@@ -498,6 +498,35 @@ public class ConfigScreen extends Screen {
 				this.init();
 			});
 		yPos += 25;
+
+		return yPos;
+	}
+
+	/**
+	 * Build Themes section with preset buttons for all features
+	 */
+	private int buildThemesSection(int centerX, int yPos) {
+		// Section header (collapsible)
+		boolean expanded = sectionExpanded.get("themes");
+		String headerText = (expanded ? "▼" : "▶") + " Themes";
+		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
+			sectionExpanded.put("themes", !sectionExpanded.get("themes"));
+			this.init();
+		});
+		yPos += 25;
+
+		if (!expanded) {
+			return yPos;
+		}
+
+		// Theme presets for Shady Summoner
+		yPos = drawThemePresets(centerX, yPos, "Shady Summoner:", "shadySummoner");
+
+		// Theme presets for Bazaar
+		yPos = drawThemePresets(centerX, yPos, "Bazaar:", "bazaar");
+
+		// Theme presets for Guild Quests
+		yPos = drawThemePresets(centerX, yPos, "Guild Quests:", "guildQuests");
 
 		return yPos;
 	}

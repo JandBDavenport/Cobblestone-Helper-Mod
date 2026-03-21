@@ -11,6 +11,7 @@ import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -535,7 +536,7 @@ public class ConfigScreen extends Screen {
 		yPos += 10;
 
 		// Define global themes - each applies coordinated colors to all features
-		Map<String, Map<String, Integer>> globalThemes = new HashMap<>();
+		Map<String, Map<String, Integer>> globalThemes = new LinkedHashMap<>();
 
 		// Default theme (original colors)
 		globalThemes.put("Default", Map.ofEntries(
@@ -549,7 +550,10 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorHeader", 0xFF55FF55),
 			Map.entry("gqColorLabel", 0xFF55FF55),
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFFFFFF00)
+			Map.entry("gqColorUnknown", 0xFFFFFF00),
+			Map.entry("fwColorBackground", 0xF2111111),
+			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
 		// Purple theme (default)
@@ -564,7 +568,10 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorHeader", 0xFFBB77FF),
 			Map.entry("gqColorLabel", 0xFFBB77FF),
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFFFF4444)
+			Map.entry("gqColorUnknown", 0xFFFF4444),
+			Map.entry("fwColorBackground", 0xF2111111),
+			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
 		// Green theme
@@ -579,7 +586,10 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorHeader", 0xFF55FF55),
 			Map.entry("gqColorLabel", 0xFF55FF55),
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFF00AA00)
+			Map.entry("gqColorUnknown", 0xFF00AA00),
+			Map.entry("fwColorBackground", 0xF2111111),
+			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
 		// Blue theme
@@ -594,7 +604,10 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorHeader", 0xFF5599FF),
 			Map.entry("gqColorLabel", 0xFF5599FF),
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFF00CCFF)
+			Map.entry("gqColorUnknown", 0xFF00CCFF),
+			Map.entry("fwColorBackground", 0xF2111111),
+			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
 		// Warm theme (orange/red)
@@ -609,7 +622,10 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorHeader", 0xFFFFDD00),
 			Map.entry("gqColorLabel", 0xFFFFDD00),
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFFFF6600)
+			Map.entry("gqColorUnknown", 0xFFFF6600),
+			Map.entry("fwColorBackground", 0xF2111111),
+			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
 		// Draw theme buttons (2 per row)
@@ -642,6 +658,10 @@ public class ConfigScreen extends Screen {
 							else if ("gqColorLabel".equals(colorKey)) ModConfig.gqColorLabel = color;
 							else if ("gqColorTarget".equals(colorKey)) ModConfig.gqColorTarget = color;
 							else if ("gqColorUnknown".equals(colorKey)) ModConfig.gqColorUnknown = color;
+						} else if (colorKey.startsWith("fw")) {
+							if ("fwColorBackground".equals(colorKey)) ModConfig.fwColorBackground = color;
+							else if ("fwColorAccent".equals(colorKey)) ModConfig.fwColorAccent = color;
+							else if ("fwColorSlot".equals(colorKey)) ModConfig.fwColorSlot = color;
 						}
 					}
 					ModConfig.saveConfig();

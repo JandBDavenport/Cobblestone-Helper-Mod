@@ -155,14 +155,22 @@ public class GuildQuestsManager {
 		// Check boss quests - need to map boss names to their crops
 		if (!boss1Complete && !boss1Target.isEmpty()) {
 			String bossTarget = getBossCropName(boss1Target);
-			if (bossTarget.equalsIgnoreCase(name)) {
+			if (!bossTarget.isEmpty() && bossTarget.equalsIgnoreCase(name)) {
 				return "boss-red";
+			}
+			// Debug: log if we're checking pitcher plant
+			if (name.equalsIgnoreCase("Pitcher Plant")) {
+				System.out.println("[GuildQuestsManager] Checking boss1: target='" + boss1Target + "', mapped='" + bossTarget + "', comparing to '" + name + "'");
 			}
 		}
 		if (!boss2Complete && !boss2Target.isEmpty()) {
 			String bossTarget = getBossCropName(boss2Target);
-			if (bossTarget.equalsIgnoreCase(name)) {
+			if (!bossTarget.isEmpty() && bossTarget.equalsIgnoreCase(name)) {
 				return "boss-red";
+			}
+			// Debug: log if we're checking pitcher plant
+			if (name.equalsIgnoreCase("Pitcher Plant")) {
+				System.out.println("[GuildQuestsManager] Checking boss2: target='" + boss2Target + "', mapped='" + bossTarget + "', comparing to '" + name + "'");
 			}
 		}
 

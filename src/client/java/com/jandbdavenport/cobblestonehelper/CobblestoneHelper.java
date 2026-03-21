@@ -5,6 +5,7 @@ import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
 import com.jandbdavenport.cobblestonehelper.features.ShadySummonerManager;
+import com.jandbdavenport.cobblestonehelper.gui.ConfigScreen;
 import com.jandbdavenport.cobblestonehelper.gui.FarmWarpScreen;
 import com.jandbdavenport.cobblestonehelper.gui.HudPositionScreen;
 import com.mojang.brigadier.Command;
@@ -128,6 +129,16 @@ public class CobblestoneHelper implements ClientModInitializer {
 			}))
 		);
 		System.out.println("[CobblestoneHelper] ✓ Registered command: /clearbazaarcache");
+
+		// Register /chconfig command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("chconfig").executes(ctx -> {
+				MinecraftClient.getInstance().send(() ->
+					MinecraftClient.getInstance().setScreen(new ConfigScreen(MinecraftClient.getInstance().currentScreen)));
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /chconfig");
 
 		System.out.println("[CobblestoneHelper] ========== MOD INITIALIZATION COMPLETE ==========");
 	}

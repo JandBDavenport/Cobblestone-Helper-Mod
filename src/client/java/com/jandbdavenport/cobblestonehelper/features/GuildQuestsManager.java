@@ -772,15 +772,19 @@ public class GuildQuestsManager {
 					}
 					if (questData.has("boss1ActionLine")) {
 						boss1ActionLine = questData.get("boss1ActionLine").getAsString();
+						prevBoss1ActionLine = boss1ActionLine;  // Initialize prev for change detection
 					}
 					if (questData.has("boss2ActionLine")) {
 						boss2ActionLine = questData.get("boss2ActionLine").getAsString();
+						prevBoss2ActionLine = boss2ActionLine;  // Initialize prev for change detection
 					}
 					if (questData.has("crop3kActionLine")) {
 						crop3kActionLine = questData.get("crop3kActionLine").getAsString();
+						prevCrop3kActionLine = crop3kActionLine;  // Initialize prev for change detection
 					}
 					if (questData.has("crop7500ActionLine")) {
 						crop7500ActionLine = questData.get("crop7500ActionLine").getAsString();
+						prevCrop7500ActionLine = crop7500ActionLine;  // Initialize prev for change detection
 					}
 					if (questData.has("boss1Complete")) {
 						boss1Complete = questData.get("boss1Complete").getAsBoolean();

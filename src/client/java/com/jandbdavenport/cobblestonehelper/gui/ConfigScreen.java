@@ -135,7 +135,7 @@ public class ConfigScreen extends Screen {
 		int contentBoxHeight = contentBottomY - CONTENT_START_Y;
 		maxScroll = Math.max(0, estimatedHeight - contentBoxHeight);
 
-		int centerX = this.width / 2;
+	int centerX = this.width / 2 - 4;  // Shift left 4px to account for scrollbar visual offset
 
 		// SHADY SUMMONER SECTION
 		int yPos = CONTENT_START_Y + 5 - scrollOffset;  // 5px padding inside box
@@ -163,12 +163,6 @@ public class ConfigScreen extends Screen {
 		yPos = buildPlantHitboxSection(centerX, yPos);
 		plantHitboxSectionEnd = yPos;
 
-		// CLOSE BUTTON (fixed at bottom of content box, not scrollable)
-		ButtonWidget closeBtn = ButtonWidget.builder(Text.literal("Close"), button -> this.close())
-			.dimensions(centerX - 50, contentBottomY - 25, 100, 20)
-			.build();
-		buttonTypes.put(closeBtn, BUTTON_TYPE_NORMAL);
-		this.addDrawableChild(closeBtn);
 
 		// Add all color picker fields as drawable children
 		for (HexColorPickerWidget picker : colorPickers.values()) {
@@ -377,6 +371,12 @@ public class ConfigScreen extends Screen {
 				this.init();
 			});
 		yPos += 25;
+	
+	// Set Position button
+	addStyledButton(centerX - 140, yPos, 280, 20, Text.literal("Set Position..."), button ->
+		this.client.setScreen(new HudPositionScreen(GuildQuestsManager.WIDGET, this)),
+		BUTTON_TYPE_NORMAL);
+	yPos += 25;
 
 		// Scale buttons
 		yPos = drawScaleButtons(centerX, yPos, "Guild Quests Scale:", ModConfig.gqScale, newScale -> {
@@ -964,22 +964,22 @@ public class ConfigScreen extends Screen {
 			// Main color (match accent purple)
 			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + scrollbarW - 1, thumbEnd - 1, ACCENT);
 			// Light accent on left
-			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + 2, thumbEnd - 1, 0xFF9977DD);
+			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + 2, thumbEnd - 1, 0xFF7A6A8C);
 			// Dark accent on right
-			context.fill(scrollbarX + scrollbarW - 1, thumbY + 1, scrollbarX + scrollbarW, thumbEnd - 1, 0xFF5A3D88);
+			context.fill(scrollbarX + scrollbarW - 1, thumbY + 1, scrollbarX + scrollbarW, thumbEnd - 1, 0xFF4A3B6E);
 			// Light bevel on top
-			context.fill(scrollbarX + 1, thumbY, scrollbarX + scrollbarW - 1, thumbY + 1, 0xFF9977DD);
+			context.fill(scrollbarX + 1, thumbY, scrollbarX + scrollbarW - 1, thumbY + 1, 0xFF7A6A8C);
 			// Dark bevel on bottom
-			context.fill(scrollbarX + 1, thumbEnd - 1, scrollbarX + scrollbarW - 1, thumbEnd, 0xFF5A3D88);
+			context.fill(scrollbarX + 1, thumbEnd - 1, scrollbarX + scrollbarW - 1, thumbEnd, 0xFF4A3B6E);
 		} else {
 			// Full scrollbar when nothing to scroll
 			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + scrollbarW - 1, scrollbarEndY - 1, ACCENT);
-			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + 2, scrollbarEndY - 1, 0xFF9977DD);
-			context.fill(scrollbarX + scrollbarW - 1, scrollbarY + 1, scrollbarX + scrollbarW, scrollbarEndY - 1, 0xFF5A3D88);
+			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + 2, scrollbarEndY - 1, 0xFF7A6A8C);
+			context.fill(scrollbarX + scrollbarW - 1, scrollbarY + 1, scrollbarX + scrollbarW, scrollbarEndY - 1, 0xFF4A3B6E);
 			// Light bevel on top
-			context.fill(scrollbarX + 1, scrollbarY, scrollbarX + scrollbarW - 1, scrollbarY + 1, 0xFF9977DD);
+			context.fill(scrollbarX + 1, scrollbarY, scrollbarX + scrollbarW - 1, scrollbarY + 1, 0xFF7A6A8C);
 			// Dark bevel on bottom
-			context.fill(scrollbarX + 1, scrollbarEndY - 1, scrollbarX + scrollbarW - 1, scrollbarEndY, 0xFF5A3D88);
+			context.fill(scrollbarX + 1, scrollbarEndY - 1, scrollbarX + scrollbarW - 1, scrollbarEndY, 0xFF4A3B6E);
 		}
 	}
 

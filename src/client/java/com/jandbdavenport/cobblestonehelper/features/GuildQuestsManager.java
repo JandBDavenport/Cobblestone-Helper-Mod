@@ -3,6 +3,7 @@ package com.jandbdavenport.cobblestonehelper.features;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.gui.HudPositionScreen;
 import com.jandbdavenport.cobblestonehelper.util.ContainerScreenUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -55,12 +56,12 @@ public class GuildQuestsManager {
 
 		@Override
 		public int getWidgetWidth() {
-			return WIDGET_WIDTH;
+			return (int)(WIDGET_WIDTH * ModConfig.gqScale);
 		}
 
 		@Override
 		public int getWidgetHeight() {
-			return WIDGET_HEIGHT;
+			return (int)(WIDGET_HEIGHT * ModConfig.gqScale);
 		}
 
 		@Override
@@ -74,10 +75,15 @@ public class GuildQuestsManager {
 		}
 
 		@Override
-		public void saveConfig() {
-			GuildQuestsManager.saveConfig();
-		}
-	};
+	public int getDefaultHudY() {
+		return 60;
+	}
+
+	@Override
+	public void saveConfig() {
+		GuildQuestsManager.saveConfig();
+	}
+};
 
 	private enum DataState {
 		NO_DATA, KNOWN
@@ -128,12 +134,6 @@ public class GuildQuestsManager {
 
 	// Flag to disable HUD rendering when positioning screen is open
 	private static boolean hudRenderingDisabled = false;
-
-	// Colors (ARGB format)
-	private static final int COLOR_LIME = 0xFF55FF55;
-	private static final int COLOR_WHITE = 0xFFFFFFFF;
-	private static final int COLOR_YELLOW = 0xFFFFFF00;
-	private static final int COLOR_GREY = 0xFF888888;
 
 	// Config file path
 	private static final String CONFIG_DIR = "config";
@@ -670,75 +670,13 @@ public class GuildQuestsManager {
 	 * Render the HUD widget at the configured position.
 	 */
 	public static void renderHud(DrawContext context) {
-		// Don't render if disabled (e.g., positioning screen is open)
-		if (hudRenderingDisabled) {
+		// Don't render if disabled or feature disabled
+		if (hudRenderingDisabled || !ModConfig.guildQuestsEnabled) {
 			return;
 		}
 
 		MinecraftClient client = MinecraftClient.getInstance();
-		int y = hudY;
-
-		// Reset to NO_DATA if timer has expired
-		if (dataState == DataState.KNOWN && questResetMs > 0 && System.currentTimeMillis() >= questResetMs) {
-			dataState = DataState.NO_DATA;
-			questResetMs = 0;
-			// Clear quest data when timer expires
-			boss1Target = "";
-			boss2Target = "";
-			crop3kTarget = "";
-			crop7500Target = "";
-			boss1ActionLine = "";
-			boss2ActionLine = "";
-			crop3kActionLine = "";
-			crop7500ActionLine = "";
-			boss1Complete = false;
-			boss2Complete = false;
-			crop3kComplete = false;
-			crop7500Complete = false;
-			saveConfig();
-		}
-
-		if (dataState == DataState.NO_DATA) {
-			// Show "Unknown" state message
-			context.drawTextWithShadow(client.textRenderer, Text.literal("Guild Quests: Unknown"), hudX, y, COLOR_YELLOW);
-			y += 10;
-			context.drawTextWithShadow(client.textRenderer, Text.literal("Open the Quests Menu"), hudX, y, COLOR_GREY);
-		} else {
-			// Show header with timer
-			String timerText = formatTimer();
-			context.drawTextWithShadow(client.textRenderer, Text.literal("Guild Quests  [" + timerText + "]"), hudX, y, COLOR_LIME);
-			y += 10;
-
-			// Show each quest
-			if (!boss1Complete && boss1Target.length() > 0) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Boss 1: "), hudX, y, COLOR_LIME);
-				context.drawTextWithShadow(client.textRenderer, Text.literal(boss1Target), hudX + client.textRenderer.getWidth("Boss 1: "), y, COLOR_WHITE);
-				y += 10;
-			}
-
-			if (!boss2Complete && boss2Target.length() > 0) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Boss 2: "), hudX, y, COLOR_LIME);
-				context.drawTextWithShadow(client.textRenderer, Text.literal(boss2Target), hudX + client.textRenderer.getWidth("Boss 2: "), y, COLOR_WHITE);
-				y += 10;
-			}
-
-			if (!crop3kComplete && crop3kTarget.length() > 0) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Farm 1: "), hudX, y, COLOR_LIME);
-				context.drawTextWithShadow(client.textRenderer, Text.literal(crop3kTarget), hudX + client.textRenderer.getWidth("Farm 1: "), y, COLOR_WHITE);
-				y += 10;
-			}
-
-			if (!crop7500Complete && crop7500Target.length() > 0) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Farm 2: "), hudX, y, COLOR_LIME);
-				context.drawTextWithShadow(client.textRenderer, Text.literal(crop7500Target), hudX + client.textRenderer.getWidth("Farm 2: "), y, COLOR_WHITE);
-				y += 10;
-			}
-
-			// If all quests complete, show message
-			if (boss1Complete && boss2Complete && crop3kComplete && crop7500Complete) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("All quests complete!"), hudX, y, COLOR_LIME);
-			}
-		}
+	// Apply scale transformation
 	}
 
 	/**

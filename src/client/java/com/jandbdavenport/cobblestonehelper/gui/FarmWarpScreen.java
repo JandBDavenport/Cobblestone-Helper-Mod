@@ -1,6 +1,7 @@
 package com.jandbdavenport.cobblestonehelper.gui;
 
 import com.jandbdavenport.cobblestonehelper.CobblestoneHelper;
+import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.data.FarmData;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
@@ -24,13 +25,10 @@ public class FarmWarpScreen extends Screen {
 	private static final int GRID_COLS = 9;
 	private static final int GRID_START_Y = 30;
 
-	// Color palette (ARGB format)
-	private static final int COLOR_ORANGE       = 0xFFFF8C00;
-	private static final int COLOR_ORANGE_MID   = 0x80FF8C00;
-	private static final int COLOR_ORANGE_DIM   = 0x40FF8C00;
-	private static final int COLOR_BG_OUTER     = 0xF2111111;
+	// Color palette (ARGB format - most colors now come from ModConfig)
+	private static final int COLOR_ACCENT_MID   = 0x80FF8C00;
+	private static final int COLOR_ACCENT_DIM   = 0x40FF8C00;
 	private static final int COLOR_BG_INNER     = 0xFF1A1A1A;
-	private static final int COLOR_SLOT_BG      = 0xFF222222;
 	private static final int COLOR_SLOT_BORDER  = 0xFF383838;
 	private static final int COLOR_TEXT_WHITE   = 0xFFFFFFFF;
 
@@ -110,8 +108,8 @@ public class FarmWarpScreen extends Screen {
 				.build();
 
 				this.addDrawableChild(cropButton);
-				boolean isBestCrop = displayName.equals(BazaarManager.getBestCrop());
-				String questHighlight = GuildQuestsManager.getQuestHighlightType(displayName);
+				boolean isBestCrop = ModConfig.farmWarpsShowBazaarHighlight && displayName.equals(BazaarManager.getBestCrop());
+				String questHighlight = ModConfig.farmWarpsGuildQuestHighlight ? GuildQuestsManager.getQuestHighlightType(displayName) : "";
 				cropWidgets.add(new CropItemWidget(x, y, entry.itemId(), displayName, isBestCrop, questHighlight));
 
 				col++;
@@ -150,21 +148,21 @@ public class FarmWarpScreen extends Screen {
 		int panelBottom = this.contentHeight;
 
 		// 1. Draw orange border (1px thick as 4 fill strips for rounded corners)
-		context.fill(panelLeft, this.panelTop, panelRight, this.panelTop + 1, COLOR_ORANGE); // top
-		context.fill(panelLeft, panelBottom - 1, panelRight, panelBottom, COLOR_ORANGE); // bottom
-		context.fill(panelLeft, this.panelTop + 1, panelLeft + 1, panelBottom - 1, COLOR_ORANGE); // left
-		context.fill(panelRight - 1, this.panelTop + 1, panelRight, panelBottom - 1, COLOR_ORANGE); // right
+		context.fill(panelLeft, this.panelTop, panelRight, this.panelTop + 1, ModConfig.fwColorAccent); // top
+		context.fill(panelLeft, panelBottom - 1, panelRight, panelBottom, ModConfig.fwColorAccent); // bottom
+		context.fill(panelLeft, this.panelTop + 1, panelLeft + 1, panelBottom - 1, ModConfig.fwColorAccent); // left
+		context.fill(panelRight - 1, this.panelTop + 1, panelRight, panelBottom - 1, ModConfig.fwColorAccent); // right
 
 		// 2. Draw rounded panel interior using staircase pattern for smooth corners
 		int panelW = panelRight - panelLeft;
 		int panelH = panelBottom - this.panelTop;
-		fillRounded(context, panelLeft + 1, this.panelTop + 1, panelW - 2, panelH - 2, COLOR_BG_OUTER);
+		fillRounded(context, panelLeft + 1, this.panelTop + 1, panelW - 2, panelH - 2, ModConfig.fwColorBackground);
 
 		// 3. Draw title bar strip (slightly lighter bg, 30px tall)
 		context.fill(panelLeft + 1, this.panelTop + 1, panelRight - 1, this.panelTop + 31, COLOR_BG_INNER);
 
 		// 4. Draw orange divider line under title bar
-		context.fill(panelLeft + 1, this.panelTop + 31, panelRight - 1, this.panelTop + 32, COLOR_ORANGE);
+		context.fill(panelLeft + 1, this.panelTop + 31, panelRight - 1, this.panelTop + 32, ModConfig.fwColorAccent);
 
 		// 5. Draw gradient in content area (much more visible: light gray to very dark)
 		context.fillGradient(panelLeft + 1, this.panelTop + 32, panelRight - 1, panelBottom - 1, 0xFF2A2A2A, 0xFF0A0A0A);
@@ -186,7 +184,7 @@ public class FarmWarpScreen extends Screen {
 			context.fill(headerX - 7, headerY - 2, headerX - 4, headerY + 7, accentColor);
 
 			// Category name in orange
-			context.drawTextWithShadow(this.textRenderer, Text.literal(header.name()), headerX, headerY, COLOR_ORANGE);
+			context.drawTextWithShadow(this.textRenderer, Text.literal(header.name()), headerX, headerY, ModConfig.fwColorAccent);
 		}
 
 		// 8. Render crop item widgets (they handle their own hover states)
@@ -196,7 +194,7 @@ public class FarmWarpScreen extends Screen {
 
 		// 9. Draw separator lines between categories
 		for (Integer separatorY : separatorYs) {
-			context.fill(this.gridStartX, separatorY, this.gridStartX + rowWidth, separatorY + 1, COLOR_ORANGE_MID);
+			context.fill(this.gridStartX, separatorY, this.gridStartX + rowWidth, separatorY + 1, COLOR_ACCENT_MID);
 		}
 	}
 
@@ -396,7 +394,7 @@ public class FarmWarpScreen extends Screen {
 			context.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, borderColor);
 
 			// Draw square slot background
-			context.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, COLOR_SLOT_BG);
+			context.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, ModConfig.fwColorSlot);
 
 			// Draw animated overlay (only if visible)
 			if (overlayAlpha > 0) {

@@ -47,4 +47,18 @@ public interface RepositionableWidget {
 	 * Save the current configuration (position, etc.) to disk.
 	 */
 	void saveConfig();
+
+	/**
+	 * Get the default HUD X position (used when restoring).
+	 */
+	default int getDefaultHudX() {
+		return 5;
+	}
+
+	/**
+	 * Get the default HUD Y position (used when restoring).
+	 */
+	default int getDefaultHudY() {
+		return 5;
+	}
 }

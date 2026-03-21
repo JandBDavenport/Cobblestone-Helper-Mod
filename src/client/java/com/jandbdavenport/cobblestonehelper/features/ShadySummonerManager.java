@@ -3,6 +3,7 @@ package com.jandbdavenport.cobblestonehelper.features;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.jandbdavenport.cobblestonehelper.ModConfig;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -43,12 +44,12 @@ public class ShadySummonerManager {
 
 		@Override
 		public int getWidgetWidth() {
-			return WIDGET_WIDTH;
+			return (int)(WIDGET_WIDTH * ModConfig.ssScale);
 		}
 
 		@Override
 		public int getWidgetHeight() {
-			return WIDGET_HEIGHT;
+			return (int)(WIDGET_HEIGHT * ModConfig.ssScale);
 		}
 
 		@Override
@@ -320,22 +321,22 @@ public class ShadySummonerManager {
 	 * Render the HUD widget at the configured position.
 	 */
 	public static void renderHud(DrawContext context) {
-		// Don't render if disabled (e.g., positioning screen is open)
-		if (hudRenderingDisabled) {
+		// Don't render if disabled or feature disabled
+		if (hudRenderingDisabled || !ModConfig.shadySummonerEnabled) {
 			return;
 		}
 
-		MinecraftClient client = MinecraftClient.getInstance();
-		String stateText = getStateText();
-		int stateColor = getStateColor();
+	MinecraftClient client = MinecraftClient.getInstance();
+	String stateText = getStateText();
+	int stateColor = getStateColor();
 
-		// Draw label in light purple
-		context.drawTextWithShadow(client.textRenderer, Text.literal("Shady Summoner: "), hudX, hudY, COLOR_TEXT_PURPLE);
+	// Draw label
+	context.drawTextWithShadow(client.textRenderer, Text.literal("Shady Summoner: "), hudX, hudY, ModConfig.ssColorLabel);
 
-		// Draw state in appropriate color right after the label
-		int stateX = hudX + client.textRenderer.getWidth("Shady Summoner: ");
-		context.drawTextWithShadow(client.textRenderer, Text.literal(stateText), stateX, hudY, stateColor);
-	}
+	// Draw state in appropriate color right after the label
+	int stateX = hudX + client.textRenderer.getWidth("Shady Summoner: ");
+	context.drawTextWithShadow(client.textRenderer, Text.literal(stateText), stateX, hudY, stateColor);
+}
 
 	/**
 	 * Get the text representation of the current state.
@@ -391,18 +392,18 @@ public class ShadySummonerManager {
 	private static int getStateColor() {
 		switch (state) {
 			case UNKNOWN:
-				return COLOR_TEXT_GREY;
+				return ModConfig.ssColorUnknown;
 			case ACTIVE:
-				return COLOR_TEXT_GREEN;
+				return ModConfig.ssColorActive;
 			case COUNTDOWN:
 				long now = System.currentTimeMillis();
 				long remainingMs = countdownEndMs - now;
 				long remainingSeconds = Math.max(0, remainingMs / 1000);
-				return remainingSeconds < 90 ? COLOR_TEXT_RED : COLOR_TEXT_YELLOW;
+				return remainingSeconds < 90 ? ModConfig.ssColorWarning : ModConfig.ssColorNormal;
 			case SOON:
-				return COLOR_TEXT_YELLOW;
+				return ModConfig.ssColorNormal;
 			default:
-				return COLOR_TEXT_GREY;
+				return ModConfig.ssColorUnknown;
 		}
 	}
 
@@ -549,7 +550,7 @@ public class ShadySummonerManager {
 	}
 
 	public static int getWidgetHeight() {
-		return WIDGET_HEIGHT;
+		return (int)(WIDGET_HEIGHT * ModConfig.ssScale);
 	}
 
 	// Debug methods for testing

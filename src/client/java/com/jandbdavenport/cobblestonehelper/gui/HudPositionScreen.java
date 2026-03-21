@@ -49,8 +49,10 @@ public class HudPositionScreen extends Screen {
 		ButtonWidget restoreButton = ButtonWidget.builder(
 			Text.literal("Restore to Default Position"),
 			button -> {
-				this.previewX = 5;
-				this.previewY = 5;
+				this.previewX = widget.getDefaultHudX();
+				this.previewY = widget.getDefaultHudY();
+				this.previewX = widget.getDefaultHudX();
+				this.previewY = widget.getDefaultHudY();
 			}
 		)
 		.dimensions(this.width / 2 - 100, this.height - 40, 200, 20)

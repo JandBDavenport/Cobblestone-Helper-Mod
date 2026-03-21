@@ -3,6 +3,7 @@ package com.jandbdavenport.cobblestonehelper.features;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.util.ContainerScreenUtils;
 import com.jandbdavenport.cobblestonehelper.util.HudRepositionHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -53,12 +54,12 @@ public class BazaarManager {
 
 		@Override
 		public int getWidgetWidth() {
-			return 160;
+			return (int)(160 * ModConfig.bzScale);
 		}
 
 		@Override
 		public int getWidgetHeight() {
-			return 10;
+			return (int)(10 * ModConfig.bzScale);
 		}
 
 		@Override
@@ -68,7 +69,9 @@ public class BazaarManager {
 
 		@Override
 		public void renderWidgetPreview(DrawContext context) {
-			renderBazaarOverlay(context);
+			previewMode = true;
+		renderBazaarOverlay(context);
+		previewMode = false;
 		}
 
 		@Override
@@ -98,6 +101,9 @@ public class BazaarManager {
 
 	// Flag to disable HUD rendering when positioning screen is open
 	private static boolean hudRenderingDisabled = false;
+
+	// Flag to indicate preview mode (for HudPositionScreen)
+	public static boolean previewMode = false;
 
 	// Track if bazaar screen is currently open
 	private static boolean isBazaarScreenOpen = false;
@@ -264,7 +270,7 @@ public class BazaarManager {
 		// Don't set scrapedThisPage = true yet - only set it if we actually find items or give up
 
 		try {
-			Inventory inventory = screen.getScreenHandler().getInventory();
+			Inventory inventory = currentBazaarScreen.getScreenHandler().getInventory();
 			int itemsProcessed = 0;
 			int pricesFound = 0;
 
@@ -389,6 +395,10 @@ public class BazaarManager {
 	 * Add a gear button to the screen for positioning the overlay.
 	 */
 	private static void addPositionButton(Screen screen) {
+		if (!ModConfig.bazaarEnabled) {
+			return;
+		}
+
 		// Create clear cache button at top-right
 		ButtonWidget clearCacheButton = ButtonWidget.builder(Text.literal("R"), button -> {
 			clearCache();
@@ -446,30 +456,37 @@ public class BazaarManager {
 	 * Called from BazaarOverlayMixin when rendering the GenericContainerScreen.
 	 */
 	public static void renderBazaarOverlay(DrawContext context) {
-		// Verify we're still in the CORRECT bazaar screen
+		// Don't render if feature disabled
+		if (!ModConfig.bazaarEnabled) {
+			return;
+		}
+
 		MinecraftClient client = MinecraftClient.getInstance();
 		Screen currentScreen = client.currentScreen;
 
-		// Only render if current screen is the exact same bazaar screen we opened
-		if (currentScreen != currentBazaarScreen) {
-			isBazaarScreenOpen = false;
-			currentBazaarScreen = null;
-			return;
-		}
+		// In preview mode, skip screen checks; otherwise verify we're in the correct bazaar screen
+		if (!previewMode) {
+			// Only render if current screen is the exact same bazaar screen we opened
+			if (currentScreen != currentBazaarScreen) {
+				isBazaarScreenOpen = false;
+				currentBazaarScreen = null;
+				return;
+			}
 
-		// Double-check it's still a bazaar
-		if (!(currentScreen instanceof GenericContainerScreen)) {
-			isBazaarScreenOpen = false;
-			currentBazaarScreen = null;
-			return;
-		}
+			// Double-check it's still a bazaar
+			if (!(currentScreen instanceof GenericContainerScreen)) {
+				isBazaarScreenOpen = false;
+				currentBazaarScreen = null;
+				return;
+			}
 
-		GenericContainerScreen screen = (GenericContainerScreen) currentScreen;
-		String titleStr = screen.getTitle().getString();
-		if (!titleStr.contains("Bazaar: Crops Market")) {
-			isBazaarScreenOpen = false;
-			currentBazaarScreen = null;
-			return;
+			GenericContainerScreen screen = (GenericContainerScreen) currentScreen;
+			String titleStr = screen.getTitle().getString();
+			if (!titleStr.contains("Bazaar: Crops Market")) {
+				isBazaarScreenOpen = false;
+				currentBazaarScreen = null;
+				return;
+			}
 		}
 
 		// Don't render if disabled or no data
@@ -478,7 +495,7 @@ public class BazaarManager {
 		}
 
 		// Per-render page-change detection via nav button hash
-		Inventory inventory = screen.getScreenHandler().getInventory();
+		Inventory inventory = currentBazaarScreen.getScreenHandler().getInventory();
 		int currentHash = ContainerScreenUtils.navButtonHash(inventory);
 		if (currentHash != -1) {
 			if (lastNavButtonHash != -1 && currentHash != lastNavButtonHash) {
@@ -498,33 +515,34 @@ public class BazaarManager {
 		if (bazaarOpenedTimeMs > 0 && timeSinceBazaarOpened < INITIAL_WAIT_MS && isFreshBazaarOpen) {
 			long remainingMs = INITIAL_WAIT_MS - timeSinceBazaarOpened;
 			valueText = "Loading prices... (" + (remainingMs / 1000 + 1) + "s)";
-			valueColor = COLOR_TEXT_YELLOW;
+			valueColor = ModConfig.bzColorLoading;
 		} else if (bazaarOpenedTimeMs > 0 && !initialWaitScrapeScheduled && collectionState == CollectionState.COLLECTING) {
 			initialWaitScrapeScheduled = true;
 			System.out.println("[BazaarManager] 1-second wait complete, starting price scrape");
 			scrapeItemsFromScreen((GenericContainerScreen) currentScreen);
 			valueText = "Scanning page 1... Found " + cropSellPrices.size() + " crops";
-			valueColor = COLOR_TEXT_YELLOW;
+			valueColor = ModConfig.bzColorLoading;
 		} else if (!scrapedThisPage && collectionState == CollectionState.COLLECTING && initialWaitScrapeScheduled) {
 			System.out.println("[BazaarManager] Scraping new page");
 			scrapeItemsFromScreen((GenericContainerScreen) currentScreen);
 			valueText = "Scanning pages... Found " + cropSellPrices.size() + " crops total";
-			valueColor = COLOR_TEXT_YELLOW;
+			valueColor = ModConfig.bzColorLoading;
 		} else if (collectionState == CollectionState.COLLECTING) {
 			valueText = "Scanning bazaar... Found " + cropSellPrices.size() + " crops (turn the page →)";
-			valueColor = COLOR_TEXT_YELLOW;
+			valueColor = ModConfig.bzColorLoading;
 		} else if (collectionState == CollectionState.COMPLETE) {
 			String priceStr = String.format("%.3f", bestSellPrice).replaceAll("0+$", "").replaceAll("\\.$", "");
 			valueText = "✓ Best: " + bestCrop + " ⛁" + priceStr + "/unit";
-			valueColor = COLOR_TEXT_GREEN;
+			valueColor = ModConfig.bzColorComplete;
 		}
 
-		if (valueText.isEmpty()) {
-			return;
-		}
+	if (valueText.isEmpty()) {
+		return;
+	}
 
-		// Draw value text
-		context.drawTextWithShadow(client.textRenderer, Text.literal(valueText), hudX, hudY, valueColor);
+	// Draw value text
+	context.drawTextWithShadow(client.textRenderer, Text.literal(valueText), hudX, hudY, valueColor);
+
 
 		// Handle in-place repositioning mode
 		if (repositionHelper.isActive()) {

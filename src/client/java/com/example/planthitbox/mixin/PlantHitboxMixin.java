@@ -1,5 +1,6 @@
 package com.example.mixin.planthitbox.mixin;
 
+import com.jandbdavenport.cobblestonehelper.ModConfig;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -37,6 +38,7 @@ public class PlantHitboxMixin {
     // Inject into all getRaycastShape overloads
     @Inject(method = "getRaycastShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void enlargeRaycastShape1(BlockView world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
+        if (!ModConfig.plantHitboxEnabled) return;
         BlockState state = (BlockState) (Object) this;
         if (isTargetPlant(state.getBlock())) {
             cir.setReturnValue(getFullCube());
@@ -48,6 +50,7 @@ public class PlantHitboxMixin {
     // Inject into all getOutlineShape overloads
     @Inject(method = "getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void enlargeOutlineShape1(BlockView world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
+        if (!ModConfig.plantHitboxEnabled) return;
         BlockState state = (BlockState) (Object) this;
         if (isTargetPlant(state.getBlock())) {
             cir.setReturnValue(getFullCube());
@@ -58,6 +61,7 @@ public class PlantHitboxMixin {
 
     @Inject(method = "getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void enlargeOutlineShape2(BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
+        if (!ModConfig.plantHitboxEnabled) return;
         BlockState state = (BlockState) (Object) this;
         if (isTargetPlant(state.getBlock())) {
             cir.setReturnValue(getFullCube());

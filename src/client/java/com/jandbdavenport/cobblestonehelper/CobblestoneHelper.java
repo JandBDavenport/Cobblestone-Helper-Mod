@@ -1,5 +1,6 @@
 package com.jandbdavenport.cobblestonehelper;
 
+import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
@@ -31,6 +32,9 @@ public class CobblestoneHelper implements ClientModInitializer {
 		System.out.println("[CobblestoneHelper] ========== MOD INITIALIZATION START ==========");
 		System.out.println("[CobblestoneHelper] Version: " + MOD_ID);
 		System.out.println("[CobblestoneHelper] Initializing client features...");
+
+		// Initialize config first
+		ModConfig.init();
 
 		try {
 			// Create custom keybinding category
@@ -100,45 +104,6 @@ public class CobblestoneHelper implements ClientModInitializer {
 		);
 		System.out.println("[CobblestoneHelper] ✓ Registered command: /wf");
 
-		// Register /hideplayers command
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-			dispatcher.register(literal("hideplayers").executes(ctx -> {
-				MinecraftClient c = MinecraftClient.getInstance();
-				c.send(() -> PlayerHidingManager.toggleHidePlayers(c));
-				return Command.SINGLE_SUCCESS;
-			}))
-		);
-		System.out.println("[CobblestoneHelper] ✓ Registered command: /hideplayers");
-
-		// Register /shadypos command
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-			dispatcher.register(literal("shadypos").executes(ctx -> {
-				MinecraftClient.getInstance().send(() ->
-					MinecraftClient.getInstance().setScreen(new HudPositionScreen(ShadySummonerManager.WIDGET)));
-				return Command.SINGLE_SUCCESS;
-			}))
-		);
-		System.out.println("[CobblestoneHelper] ✓ Registered command: /shadypos");
-
-		// Register /bazaarpos command
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-			dispatcher.register(literal("bazaarpos").executes(ctx -> {
-				MinecraftClient.getInstance().send(() ->
-					MinecraftClient.getInstance().setScreen(new HudPositionScreen(BazaarManager.WIDGET)));
-				return Command.SINGLE_SUCCESS;
-			}))
-		);
-		System.out.println("[CobblestoneHelper] ✓ Registered command: /bazaarpos");
-
-		// Register /guildpos command
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-			dispatcher.register(literal("guildpos").executes(ctx -> {
-				MinecraftClient.getInstance().send(() ->
-					MinecraftClient.getInstance().setScreen(new HudPositionScreen(GuildQuestsManager.WIDGET)));
-				return Command.SINGLE_SUCCESS;
-			}))
-		);
-		System.out.println("[CobblestoneHelper] ✓ Registered command: /guildpos");
 
 		// Register /clearguildquestscache command
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->

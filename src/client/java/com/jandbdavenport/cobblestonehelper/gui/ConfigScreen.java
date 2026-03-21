@@ -122,18 +122,18 @@ public class ConfigScreen extends Screen {
 
 		// Estimate content height for scroll calculation
 		int estimatedHeight = 0;
-		estimatedHeight += 50; // Shady Summoner section
-		estimatedHeight += sectionExpanded.get("shadySummoner") ? 200 : 0;
-		estimatedHeight += 50; // Bazaar section
-		estimatedHeight += sectionExpanded.get("bazaar") ? 200 : 0;
-		estimatedHeight += 50; // Guild Quests section
-		estimatedHeight += sectionExpanded.get("guildQuests") ? 200 : 0;
-		estimatedHeight += 50; // Farm Warps section
-		estimatedHeight += sectionExpanded.get("farmWarps") ? 150 : 0;
-		estimatedHeight += 50; // Plant Hitbox section
-		estimatedHeight += sectionExpanded.get("plantHitbox") ? 100 : 0;
-		estimatedHeight += 50; // Themes section
-		estimatedHeight += sectionExpanded.get("themes") ? 150 : 0;
+		estimatedHeight += 30; // Shady Summoner section
+		estimatedHeight += sectionExpanded.get("shadySummoner") ? 150 : 0;
+		estimatedHeight += 30; // Bazaar section
+		estimatedHeight += sectionExpanded.get("bazaar") ? 150 : 0;
+		estimatedHeight += 30; // Guild Quests section
+		estimatedHeight += sectionExpanded.get("guildQuests") ? 150 : 0;
+		estimatedHeight += 30; // Farm Warps section
+		estimatedHeight += sectionExpanded.get("farmWarps") ? 100 : 0;
+		estimatedHeight += 30; // Plant Hitbox section
+		estimatedHeight += sectionExpanded.get("plantHitbox") ? 80 : 0;
+		estimatedHeight += 30; // Themes section
+		estimatedHeight += sectionExpanded.get("themes") ? 50 : 0;
 
 		// Content box height is fixed; content scrolls inside it
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
@@ -537,6 +537,21 @@ public class ConfigScreen extends Screen {
 		// Define global themes - each applies coordinated colors to all features
 		Map<String, Map<String, Integer>> globalThemes = new HashMap<>();
 
+		// Default theme (original colors)
+		globalThemes.put("Default", Map.ofEntries(
+			Map.entry("ssColorLabel", 0xFFBB77FF),
+			Map.entry("ssColorActive", 0xFF00CC00),
+			Map.entry("ssColorWarning", 0xFFFF4444),
+			Map.entry("ssColorNormal", 0xFFFFCC00),
+			Map.entry("ssColorUnknown", 0xFF888888),
+			Map.entry("bzColorLoading", 0xFFFFCC00),
+			Map.entry("bzColorComplete", 0xFF00CC00),
+			Map.entry("gqColorHeader", 0xFF55FF55),
+			Map.entry("gqColorLabel", 0xFF55FF55),
+			Map.entry("gqColorTarget", 0xFFFFFFFF),
+			Map.entry("gqColorUnknown", 0xFFFFFF00)
+		));
+
 		// Purple theme (default)
 		globalThemes.put("Purple", Map.ofEntries(
 			Map.entry("ssColorLabel", 0xFFBB77FF),
@@ -598,12 +613,12 @@ public class ConfigScreen extends Screen {
 		));
 
 		// Draw theme buttons (2 per row)
-		int buttonWidth = 65;
-		int buttonSpacing = 70;
+		int buttonWidth = 52;
+		int buttonSpacing = 56;
 		int themeIndex = 0;
 		for (String themeName : globalThemes.keySet()) {
-			int xOffset = (themeIndex % 2) * buttonSpacing;
-			int yOffset = (themeIndex / 2) * 25;
+			int xOffset = themeIndex * buttonSpacing;
+			int yOffset = 0;
 
 			final Map<String, Integer> themeColors = globalThemes.get(themeName);
 			addStyledButton(centerX - 140 + xOffset, yPos + yOffset, buttonWidth, 20,
@@ -637,7 +652,7 @@ public class ConfigScreen extends Screen {
 			themeIndex++;
 		}
 
-		return yPos + ((themeIndex / 2 + 1) * 25);
+		return yPos + 25;
 	}
 	private int drawScaleButtons(int centerX, int yPos, String label, float currentScale, Consumer<Float> onChanged) {
 		yPos += 5;
@@ -792,12 +807,12 @@ public class ConfigScreen extends Screen {
 		}
 
 		// Draw theme buttons (2 per row)
-		int buttonWidth = 65;
-		int buttonSpacing = 70;
+		int buttonWidth = 52;
+		int buttonSpacing = 56;
 		int themeIndex = 0;
 		for (String themeName : themes.keySet()) {
-			int xOffset = (themeIndex % 2) * buttonSpacing;
-			int yOffset = (themeIndex / 2) * 25;
+			int xOffset = themeIndex * buttonSpacing;
+			int yOffset = 0;
 
 			final Map<String, Integer> themeColors = themes.get(themeName);
 			addStyledButton(centerX - 140 + xOffset, yPos + yOffset, buttonWidth, 20,
@@ -830,7 +845,7 @@ public class ConfigScreen extends Screen {
 			themeIndex++;
 		}
 
-		return yPos + ((themeIndex / 2 + 1) * 25);
+		return yPos + 25;
 	}
 
 	@Override

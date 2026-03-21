@@ -505,6 +505,9 @@ public class ConfigScreen extends Screen {
 	/**
 	 * Build Themes section with preset buttons for all features
 	 */
+	/**
+	 * Build Themes section with global theme presets for all features
+	 */
 	private int buildThemesSection(int centerX, int yPos) {
 		// Section header (collapsible)
 		boolean expanded = sectionExpanded.get("themes");
@@ -519,21 +522,123 @@ public class ConfigScreen extends Screen {
 			return yPos;
 		}
 
-		// Theme presets for Shady Summoner
-		yPos = drawThemePresets(centerX, yPos, "Shady Summoner:", "shadySummoner");
-
-		// Theme presets for Bazaar
-		yPos = drawThemePresets(centerX, yPos, "Bazaar:", "bazaar");
-
-		// Theme presets for Guild Quests
-		yPos = drawThemePresets(centerX, yPos, "Guild Quests:", "guildQuests");
+		// Global theme presets that apply to all features
+		yPos = drawGlobalThemePresets(centerX, yPos);
 
 		return yPos;
 	}
 
 	/**
-	 * Draw scale buttons (0.75x, 1.0x, 1.25x, 1.5x) with modern styling
+	 * Draw global theme presets that apply colors to all features at once
 	 */
+	private int drawGlobalThemePresets(int centerX, int yPos) {
+		yPos += 10;
+
+		// Define global themes - each applies coordinated colors to all features
+		Map<String, Map<String, Integer>> globalThemes = new HashMap<>();
+
+		// Purple theme (default)
+		globalThemes.put("Purple", Map.ofEntries(
+			Map.entry("ssColorLabel", 0xFFBB77FF),
+			Map.entry("ssColorActive", 0xFF00CC00),
+			Map.entry("ssColorWarning", 0xFFFF4444),
+			Map.entry("ssColorNormal", 0xFFFFCC00),
+			Map.entry("ssColorUnknown", 0xFF888888),
+			Map.entry("bzColorLoading", 0xFFBB77FF),
+			Map.entry("bzColorComplete", 0xFF00CC00),
+			Map.entry("gqColorHeader", 0xFFBB77FF),
+			Map.entry("gqColorLabel", 0xFFBB77FF),
+			Map.entry("gqColorTarget", 0xFFFFFFFF),
+			Map.entry("gqColorUnknown", 0xFFFF4444)
+		));
+
+		// Green theme
+		globalThemes.put("Green", Map.ofEntries(
+			Map.entry("ssColorLabel", 0xFF55FF55),
+			Map.entry("ssColorActive", 0xFF00FF00),
+			Map.entry("ssColorWarning", 0xFFFF0000),
+			Map.entry("ssColorNormal", 0xFFFFFF00),
+			Map.entry("ssColorUnknown", 0xFF777777),
+			Map.entry("bzColorLoading", 0xFF00FF00),
+			Map.entry("bzColorComplete", 0xFF00AA00),
+			Map.entry("gqColorHeader", 0xFF55FF55),
+			Map.entry("gqColorLabel", 0xFF55FF55),
+			Map.entry("gqColorTarget", 0xFFFFFFFF),
+			Map.entry("gqColorUnknown", 0xFF00AA00)
+		));
+
+		// Blue theme
+		globalThemes.put("Blue", Map.ofEntries(
+			Map.entry("ssColorLabel", 0xFF5599FF),
+			Map.entry("ssColorActive", 0xFF0099FF),
+			Map.entry("ssColorWarning", 0xFFFF6600),
+			Map.entry("ssColorNormal", 0xFFFFFF99),
+			Map.entry("ssColorUnknown", 0xFF666666),
+			Map.entry("bzColorLoading", 0xFF0099FF),
+			Map.entry("bzColorComplete", 0xFF00CCFF),
+			Map.entry("gqColorHeader", 0xFF5599FF),
+			Map.entry("gqColorLabel", 0xFF5599FF),
+			Map.entry("gqColorTarget", 0xFFFFFFFF),
+			Map.entry("gqColorUnknown", 0xFF00CCFF)
+		));
+
+		// Warm theme (orange/red)
+		globalThemes.put("Warm", Map.ofEntries(
+			Map.entry("ssColorLabel", 0xFFFF8844),
+			Map.entry("ssColorActive", 0xFFFFCC00),
+			Map.entry("ssColorWarning", 0xFFFF0000),
+			Map.entry("ssColorNormal", 0xFFFFDD00),
+			Map.entry("ssColorUnknown", 0xFFCC6600),
+			Map.entry("bzColorLoading", 0xFFFF6600),
+			Map.entry("bzColorComplete", 0xFFFF3300),
+			Map.entry("gqColorHeader", 0xFFFFDD00),
+			Map.entry("gqColorLabel", 0xFFFFDD00),
+			Map.entry("gqColorTarget", 0xFFFFFFFF),
+			Map.entry("gqColorUnknown", 0xFFFF6600)
+		));
+
+		// Draw theme buttons (2 per row)
+		int buttonWidth = 65;
+		int buttonSpacing = 70;
+		int themeIndex = 0;
+		for (String themeName : globalThemes.keySet()) {
+			int xOffset = (themeIndex % 2) * buttonSpacing;
+			int yOffset = (themeIndex / 2) * 25;
+
+			final Map<String, Integer> themeColors = globalThemes.get(themeName);
+			addStyledButton(centerX - 140 + xOffset, yPos + yOffset, buttonWidth, 20,
+				Text.literal(themeName), button -> {
+					// Apply theme colors to all features
+					for (Map.Entry<String, Integer> entry : themeColors.entrySet()) {
+						String colorKey = entry.getKey();
+						int color = entry.getValue();
+
+						if (colorKey.startsWith("ss")) {
+							if ("ssColorLabel".equals(colorKey)) ModConfig.ssColorLabel = color;
+							else if ("ssColorActive".equals(colorKey)) ModConfig.ssColorActive = color;
+							else if ("ssColorWarning".equals(colorKey)) ModConfig.ssColorWarning = color;
+							else if ("ssColorNormal".equals(colorKey)) ModConfig.ssColorNormal = color;
+							else if ("ssColorUnknown".equals(colorKey)) ModConfig.ssColorUnknown = color;
+						} else if (colorKey.startsWith("bz")) {
+							if ("bzColorLoading".equals(colorKey)) ModConfig.bzColorLoading = color;
+							else if ("bzColorComplete".equals(colorKey)) ModConfig.bzColorComplete = color;
+						} else if (colorKey.startsWith("gq")) {
+							if ("gqColorHeader".equals(colorKey)) ModConfig.gqColorHeader = color;
+							else if ("gqColorLabel".equals(colorKey)) ModConfig.gqColorLabel = color;
+							else if ("gqColorTarget".equals(colorKey)) ModConfig.gqColorTarget = color;
+							else if ("gqColorUnknown".equals(colorKey)) ModConfig.gqColorUnknown = color;
+						}
+					}
+					ModConfig.saveConfig();
+					this.init();
+				},
+				BUTTON_TYPE_NORMAL);
+
+			themeIndex++;
+		}
+
+		return yPos + ((themeIndex / 2 + 1) * 25);
+	}
 	private int drawScaleButtons(int centerX, int yPos, String label, float currentScale, Consumer<Float> onChanged) {
 		yPos += 5;
 

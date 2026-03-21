@@ -671,13 +671,16 @@ public class GuildQuestsManager {
 		if (boss1ActionLine.length() > 0 && description.contains(boss1ActionLine.trim())) {
 			boss1Complete = true;
 			saveConfig();
-		} else if (boss2ActionLine.length() > 0 && description.contains(boss2ActionLine.trim())) {
+		}
+		if (boss2ActionLine.length() > 0 && description.contains(boss2ActionLine.trim())) {
 			boss2Complete = true;
 			saveConfig();
-		} else if (crop3kActionLine.length() > 0 && description.contains(crop3kActionLine.trim())) {
+		}
+		if (crop3kActionLine.length() > 0 && description.contains(crop3kActionLine.trim())) {
 			crop3kComplete = true;
 			saveConfig();
-		} else if (crop7500ActionLine.length() > 0 && description.contains(crop7500ActionLine.trim())) {
+		}
+		if (crop7500ActionLine.length() > 0 && description.contains(crop7500ActionLine.trim())) {
 			crop7500Complete = true;
 			saveConfig();
 		}

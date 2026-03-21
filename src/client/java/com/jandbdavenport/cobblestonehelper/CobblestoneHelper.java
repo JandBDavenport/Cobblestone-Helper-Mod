@@ -1,6 +1,7 @@
 package com.jandbdavenport.cobblestonehelper;
 
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
+import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
 import com.jandbdavenport.cobblestonehelper.features.ShadySummonerManager;
 import com.jandbdavenport.cobblestonehelper.gui.FarmWarpScreen;
@@ -65,6 +66,11 @@ public class CobblestoneHelper implements ClientModInitializer {
 			System.out.println("[CobblestoneHelper] Initializing BazaarManager...");
 			BazaarManager.init();
 			System.out.println("[CobblestoneHelper] ✓ BazaarManager initialized");
+
+			// Initialize Guild Quests manager
+			System.out.println("[CobblestoneHelper] Initializing GuildQuestsManager...");
+			GuildQuestsManager.init();
+			System.out.println("[CobblestoneHelper] ✓ GuildQuestsManager initialized");
 		} catch (Exception e) {
 			System.out.println("[CobblestoneHelper] ✗ Error during feature initialization!");
 			e.printStackTrace();
@@ -123,6 +129,28 @@ public class CobblestoneHelper implements ClientModInitializer {
 			}))
 		);
 		System.out.println("[CobblestoneHelper] ✓ Registered command: /bazaarpos");
+
+		// Register /guildpos command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("guildpos").executes(ctx -> {
+				MinecraftClient.getInstance().send(() ->
+					MinecraftClient.getInstance().setScreen(new HudPositionScreen(GuildQuestsManager.WIDGET)));
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /guildpos");
+
+		// Register /clearguildquestscache command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+			dispatcher.register(literal("clearguildquestscache").executes(ctx -> {
+				MinecraftClient.getInstance().send(() -> {
+					GuildQuestsManager.clearCache();
+					MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§6Guild quests cache cleared! Open the Quests menu to rescan."));
+				});
+				return Command.SINGLE_SUCCESS;
+			}))
+		);
+		System.out.println("[CobblestoneHelper] ✓ Registered command: /clearguildquestscache");
 
 		// Register /clearbazaarcache command
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->

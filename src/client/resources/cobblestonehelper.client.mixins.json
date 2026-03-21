@@ -10,6 +10,7 @@
     "rendering.RenderBodySafeguardMixin",
     "rendering.SuppressGlowOutlineMixin",
     "rendering.ShadySummonerHudMixin",
+    "rendering.GuildQuestsHudMixin",
     "rendering.BazaarOverlayMixin",
     "particles.SuppressHiddenEntityParticlesMixin",
     "network.ScoreboardTeamSyncMixin"

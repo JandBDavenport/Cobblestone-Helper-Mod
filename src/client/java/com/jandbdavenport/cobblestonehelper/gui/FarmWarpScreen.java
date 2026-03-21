@@ -3,6 +3,7 @@ package com.jandbdavenport.cobblestonehelper.gui;
 import com.jandbdavenport.cobblestonehelper.CobblestoneHelper;
 import com.jandbdavenport.cobblestonehelper.data.FarmData;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
+import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.MinecraftClient;
@@ -110,7 +111,8 @@ public class FarmWarpScreen extends Screen {
 
 				this.addDrawableChild(cropButton);
 				boolean isBestCrop = displayName.equals(BazaarManager.getBestCrop());
-				cropWidgets.add(new CropItemWidget(x, y, entry.itemId(), displayName, isBestCrop));
+				String questHighlight = GuildQuestsManager.getQuestHighlightType(displayName);
+				cropWidgets.add(new CropItemWidget(x, y, entry.itemId(), displayName, isBestCrop, questHighlight));
 
 				col++;
 				if (col >= GRID_COLS) {
@@ -263,20 +265,26 @@ public class FarmWarpScreen extends Screen {
 		private final ItemStack stack;
 		private final String displayName;
 		private final boolean isBestCrop;
+		private final String questHighlight;
 
 		private long hoverEnterTime = Long.MIN_VALUE;
 		private long hoverExitTime = Long.MIN_VALUE;
 		private boolean wasHovering = false;
 
 		CropItemWidget(int x, int y, String itemId, String displayName) {
-			this(x, y, itemId, displayName, false);
+			this(x, y, itemId, displayName, false, "");
 		}
 
 		CropItemWidget(int x, int y, String itemId, String displayName, boolean isBestCrop) {
+			this(x, y, itemId, displayName, isBestCrop, "");
+		}
+
+		CropItemWidget(int x, int y, String itemId, String displayName, boolean isBestCrop, String questHighlight) {
 			this.x = x;
 			this.y = y;
 			this.displayName = displayName;
 			this.isBestCrop = isBestCrop;
+			this.questHighlight = questHighlight;
 
 			ItemStack tempStack;
 			try {
@@ -350,6 +358,40 @@ public class FarmWarpScreen extends Screen {
 				context.fill(x - 1, y, x - 1, y + SLOT_SIZE, glowColor); // left (adjusted to be just top border)
 			}
 
+			// Handle quest highlights (crop green or boss red)
+			String questHighlightChar = "";
+			int questCharColor = 0;
+			if (!questHighlight.isEmpty()) {
+				float glowPulse = (float)((Math.sin(now / 1500.0 * 2 * Math.PI) + 1) / 2) * 0.5f + 0.5f;
+				int glowAlpha = (int)(0xFF * glowPulse);
+				int outerGlowAlpha = (int)(0x80 * glowPulse);
+				int questGlowColor;
+				int questOuterGlowColor;
+
+				if (questHighlight.equals("crop-green")) {
+					questGlowColor = (glowAlpha << 24) | 0x0055FF55; // Green with pulsing alpha
+					questOuterGlowColor = (outerGlowAlpha << 24) | 0x0055FF55;
+					questHighlightChar = "🌾"; // Crop character
+					questCharColor = questGlowColor & 0x00FFFFFF;
+				} else { // boss-red
+					questGlowColor = (glowAlpha << 24) | 0x00FF5555; // Red with pulsing alpha
+					questOuterGlowColor = (outerGlowAlpha << 24) | 0x00FF5555;
+					questHighlightChar = "💀"; // Skull character
+					questCharColor = questGlowColor & 0x00FFFFFF;
+				}
+
+				// Draw outer glow layer (thinner, more transparent)
+				context.fill(x - 1, y - 1, x + SLOT_SIZE + 1, y, questOuterGlowColor); // top
+				context.fill(x - 1, y + SLOT_SIZE, x + SLOT_SIZE + 1, y + SLOT_SIZE + 1, questOuterGlowColor); // bottom
+				context.fill(x - 1, y, x, y + SLOT_SIZE, questOuterGlowColor); // left
+				context.fill(x + SLOT_SIZE, y, x + SLOT_SIZE + 1, y + SLOT_SIZE, questOuterGlowColor); // right
+
+				// Draw inner bright outline (1px)
+				context.fill(x - 1, y - 1, x + SLOT_SIZE + 1, y - 1, questGlowColor); // top
+				context.fill(x - 1, y + SLOT_SIZE + 1, x + SLOT_SIZE + 1, y + SLOT_SIZE + 1, questGlowColor); // bottom
+				context.fill(x - 1, y, x - 1, y + SLOT_SIZE, questGlowColor); // left
+			}
+
 			// Draw simple square slot border
 			context.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, borderColor);
 
@@ -364,6 +406,11 @@ public class FarmWarpScreen extends Screen {
 			// Draw item
 			if (!stack.isEmpty()) {
 				context.drawItem(stack, x + 1, y + 1);
+			}
+
+			// Draw quest character on top (after item is drawn)
+			if (!questHighlightChar.isEmpty()) {
+				context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.literal(questHighlightChar), x + SLOT_SIZE - 4, y - 4, questCharColor | 0xFF000000);
 			}
 
 			// Draw tokens character on top (after item is drawn)

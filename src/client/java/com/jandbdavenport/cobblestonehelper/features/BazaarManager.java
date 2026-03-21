@@ -495,14 +495,16 @@ public class BazaarManager {
 		}
 
 		// Per-render page-change detection via nav button hash
-		Inventory inventory = currentBazaarScreen.getScreenHandler().getInventory();
-		int currentHash = ContainerScreenUtils.navButtonHash(inventory);
-		if (currentHash != -1) {
-			if (lastNavButtonHash != -1 && currentHash != lastNavButtonHash) {
-				scrapedThisPage = false;
-				System.out.println("[BazaarManager] Page change detected, will scrape new page");
+		if (!previewMode && currentBazaarScreen != null) {
+			Inventory inventory = currentBazaarScreen.getScreenHandler().getInventory();
+			int currentHash = ContainerScreenUtils.navButtonHash(inventory);
+			if (currentHash != -1) {
+				if (lastNavButtonHash != -1 && currentHash != lastNavButtonHash) {
+					scrapedThisPage = false;
+					System.out.println("[BazaarManager] Page change detected, will scrape new page");
+				}
+				lastNavButtonHash = currentHash;
 			}
-			lastNavButtonHash = currentHash;
 		}
 
 		// Determine value text

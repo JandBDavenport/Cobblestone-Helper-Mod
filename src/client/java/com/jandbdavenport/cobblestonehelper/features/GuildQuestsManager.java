@@ -158,19 +158,11 @@ public class GuildQuestsManager {
 			if (!bossTarget.isEmpty() && bossTarget.equalsIgnoreCase(name)) {
 				return "boss-red";
 			}
-			// Debug: log if we're checking pitcher plant
-			if (name.equalsIgnoreCase("Pitcher Plant")) {
-				System.out.println("[GuildQuestsManager] Checking boss1: target='" + boss1Target + "', mapped='" + bossTarget + "', comparing to '" + name + "'");
-			}
 		}
 		if (!boss2Complete && !boss2Target.isEmpty()) {
 			String bossTarget = getBossCropName(boss2Target);
 			if (!bossTarget.isEmpty() && bossTarget.equalsIgnoreCase(name)) {
 				return "boss-red";
-			}
-			// Debug: log if we're checking pitcher plant
-			if (name.equalsIgnoreCase("Pitcher Plant")) {
-				System.out.println("[GuildQuestsManager] Checking boss2: target='" + boss2Target + "', mapped='" + bossTarget + "', comparing to '" + name + "'");
 			}
 		}
 
@@ -182,10 +174,10 @@ public class GuildQuestsManager {
 	 */
 	private static String getBossCropName(String bossName) {
 		return switch (bossName.toLowerCase()) {
-			case "potato monster" -> "Potato";
-			case "secret cat" -> "Carrot";
+			case "potato monster", "potato monsters" -> "Potato";
+			case "secret cat", "secret cats" -> "Carrot";
 			case "overworld cadaver", "overworld cadavers" -> "Beetroot";
-			case "sun queen" -> "Pitcher Plant";
+			case "sun queen", "sun queens" -> "Pitcher Plant";
 			default -> "";
 		};
 	}

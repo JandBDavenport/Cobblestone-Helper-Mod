@@ -364,13 +364,8 @@ public class GuildQuestsManager {
 						boss1Target = extractBossTarget(newBoss1ActionLine);
 					}
 					if (lore.size() > 3) {
-						// If quest changed, reset completion flag
-						if (!newBoss1ActionLine.equals(prevBoss1ActionLine)) {
-							boss1Complete = false;
-						} else {
-							// Check for enchanted glint (completed quest) or parse progress line
-							boss1Complete = isQuestItemEnchanted(stack) || parseProgressLine(lore.get(3).getString());
-						}
+						// Always check current item state to determine completion
+						boss1Complete = isQuestItemEnchanted(stack) || parseProgressLine(lore.get(3).getString());
 					}
 					questItemsFound++;
 				}
@@ -382,13 +377,8 @@ public class GuildQuestsManager {
 						boss2Target = extractBossTarget(newBoss2ActionLine);
 					}
 					if (lore.size() > 3) {
-						// If quest changed, reset completion flag
-						if (!newBoss2ActionLine.equals(prevBoss2ActionLine)) {
-							boss2Complete = false;
-						} else {
-							// Check for enchanted glint (completed quest) or parse progress line
-							boss2Complete = isQuestItemEnchanted(stack) || parseProgressLine(lore.get(3).getString());
-						}
+						// Always check current item state to determine completion
+						boss2Complete = isQuestItemEnchanted(stack) || parseProgressLine(lore.get(3).getString());
 					}
 					questItemsFound++;
 				}
@@ -401,14 +391,9 @@ public class GuildQuestsManager {
 						crop3kTarget = cropName;
 					}
 					if (lore.size() > 3) {
-						// If quest changed, reset completion flag
-						if (!newCrop3kActionLine.equals(prevCrop3kActionLine)) {
-							crop3kComplete = false;
-						} else {
-							// Check for enchanted glint (completed quest) or parse progress line
-							String progressLine = lore.get(3).getString();
-							crop3kComplete = isQuestItemEnchanted(stack) || parseProgressLine(progressLine);
-						}
+						// Always check current item state to determine completion
+						String progressLine = lore.get(3).getString();
+						crop3kComplete = isQuestItemEnchanted(stack) || parseProgressLine(progressLine);
 					}
 					questItemsFound++;
 				}
@@ -421,14 +406,9 @@ public class GuildQuestsManager {
 						crop7500Target = cropName;
 					}
 					if (lore.size() > 3) {
-						// If quest changed, reset completion flag
-						if (!newCrop7500ActionLine.equals(prevCrop7500ActionLine)) {
-							crop7500Complete = false;
-						} else {
-							// Check for enchanted glint (completed quest) or parse progress line
-							String progressLine = lore.get(3).getString();
-							crop7500Complete = isQuestItemEnchanted(stack) || parseProgressLine(progressLine);
-						}
+						// Always check current item state to determine completion
+						String progressLine = lore.get(3).getString();
+						crop7500Complete = isQuestItemEnchanted(stack) || parseProgressLine(progressLine);
 					}
 					questItemsFound++;
 				}

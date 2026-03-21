@@ -712,11 +712,11 @@ public class ConfigScreen extends Screen {
 		// Bottom separator (purple accent)
 		context.fill(contentLeft, TITLE_BOTTOM_Y - 1, contentRight, TITLE_BOTTOM_Y, ACCENT);
 
-		// STEP 2: Draw content box background (dark gray)
-		context.fill(contentLeft, CONTENT_START_Y, contentRight, contentBottomY, PANEL_BG);
-
-		// STEP 3: Draw content box border (1px accent)
+		// STEP 2: Draw content box border (1px accent) - draw first
 		context.fill(contentLeft - 1, CONTENT_START_Y - 1, contentRight + 1, contentBottomY + 1, ACCENT);
+
+		// STEP 3: Draw content box background (dark gray) - on top of border
+		context.fill(contentLeft, CONTENT_START_Y, contentRight, contentBottomY, PANEL_BG);
 
 		// STEP 4: Enable scissor BEFORE super.render() to clip all content
 		context.enableScissor(contentLeft, CONTENT_START_Y, contentRight, contentBottomY);

@@ -187,7 +187,9 @@ public class FarmWarpScreen extends Screen {
 		long now = Util.getMeasuringTimeMs();
 		float pulse = (float)((Math.sin(now / 2500.0 * 2 * Math.PI) + 1) / 2); // 0→1 over 2.5s cycle
 		int accentAlpha = (int)(0xCC + 0x33 * pulse); // 0xCC (80%) → 0xFF (100%)
-		int accentColor = (accentAlpha << 24) | 0x00FF8C00;
+		// Extract RGB from ModConfig.fwColorAccent and rebuild with pulsing alpha
+		int accentRGB = ModConfig.fwColorAccent & 0x00FFFFFF;
+		int accentColor = (accentAlpha << 24) | accentRGB;
 
 		for (CategoryHeader header : categoryHeaders) {
 			int headerX = this.gridStartX;
@@ -338,10 +340,14 @@ public class FarmWarpScreen extends Screen {
 			// Apply ease-out easing: t = 1-(1-t)²
 			hoverProgress = 1f - (1f - hoverProgress) * (1f - hoverProgress);
 
-			// Animate border color: lerp from dark (0x383838) to orange (0xFF8C00)
-			int bR = (int)MathHelper.lerp(hoverProgress, 0x38, 0xFF);
-			int bG = (int)MathHelper.lerp(hoverProgress, 0x38, 0x8C);
-			int bB = (int)MathHelper.lerp(hoverProgress, 0x38, 0x00);
+			// Animate border color: lerp from dark gray to accent color
+			// Extract accent RGB components
+			int accentR = (ModConfig.fwColorAccent >> 16) & 0xFF;
+			int accentG = (ModConfig.fwColorAccent >> 8) & 0xFF;
+			int accentB = ModConfig.fwColorAccent & 0xFF;
+			int bR = (int)MathHelper.lerp(hoverProgress, 0x38, accentR);
+			int bG = (int)MathHelper.lerp(hoverProgress, 0x38, accentG);
+			int bB = (int)MathHelper.lerp(hoverProgress, 0x38, accentB);
 			int borderColor = 0xFF000000 | (bR << 16) | (bG << 8) | bB;
 
 			// Animate overlay alpha: 0 → 0x40 (25% opacity of orange)

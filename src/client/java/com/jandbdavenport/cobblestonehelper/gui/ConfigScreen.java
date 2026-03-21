@@ -56,6 +56,38 @@ public class ConfigScreen extends Screen {
 	private static final int CONTENT_WIDTH = 300;
 	private static final int SCROLL_AREA_HEIGHT = 350;
 
+	/**
+	 * Compute a lighter shade of ModConfig.fwColorAccent by adding brightness.
+	 * Uses simple RGB blending: mix accent with white at a ratio.
+	 */
+	private static int getLighterAccent() {
+		int accent = ModConfig.fwColorAccent;
+		int r = (accent >> 16) & 0xFF;
+		int g = (accent >> 8) & 0xFF;
+		int b = accent & 0xFF;
+		// Blend 30% toward white
+		r = (int)(r * 0.7f + 0xFF * 0.3f);
+		g = (int)(g * 0.7f + 0xFF * 0.3f);
+		b = (int)(b * 0.7f + 0xFF * 0.3f);
+		return 0xFF000000 | (r << 16) | (g << 8) | b;
+	}
+
+	/**
+	 * Compute a darker shade of ModConfig.fwColorAccent by reducing brightness.
+	 * Uses simple RGB blending: mix accent with black at a ratio.
+	 */
+	private static int getDarkerAccent() {
+		int accent = ModConfig.fwColorAccent;
+		int r = (accent >> 16) & 0xFF;
+		int g = (accent >> 8) & 0xFF;
+		int b = accent & 0xFF;
+		// Blend 40% toward black
+		r = (int)(r * 0.6f);
+		g = (int)(g * 0.6f);
+		b = (int)(b * 0.6f);
+		return 0xFF000000 | (r << 16) | (g << 8) | b;
+	}
+
 	// Layout constants
 	private static final int TITLE_START_Y = 10;
 	private static final int TITLE_HEIGHT = 35;  // Title goes from y=10 to y=45
@@ -1186,25 +1218,25 @@ public class ConfigScreen extends Screen {
 			int thumbY = scrollbarY + (scrollOffset * (scrollbarH - thumbHeight)) / maxScroll;
 			int thumbEnd = Math.min(thumbY + thumbHeight, scrollbarEndY);
 
-			// Main color (match accent purple)
+			// Main color (match accent color from ModConfig)
 			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + scrollbarW - 1, thumbEnd - 1, ModConfig.fwColorAccent);
 			// Light accent on left
-			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + 2, thumbEnd - 1, 0xFF7A6A8C);
+			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + 2, thumbEnd - 1, getLighterAccent());
 			// Dark accent on right
-			context.fill(scrollbarX + scrollbarW - 1, thumbY + 1, scrollbarX + scrollbarW, thumbEnd - 1, 0xFF4A3B6E);
+			context.fill(scrollbarX + scrollbarW - 1, thumbY + 1, scrollbarX + scrollbarW, thumbEnd - 1, getDarkerAccent());
 			// Light bevel on top
-			context.fill(scrollbarX + 1, thumbY, scrollbarX + scrollbarW - 1, thumbY + 1, 0xFF7A6A8C);
+			context.fill(scrollbarX + 1, thumbY, scrollbarX + scrollbarW - 1, thumbY + 1, getLighterAccent());
 			// Dark bevel on bottom
-			context.fill(scrollbarX + 1, thumbEnd - 1, scrollbarX + scrollbarW - 1, thumbEnd, 0xFF4A3B6E);
+			context.fill(scrollbarX + 1, thumbEnd - 1, scrollbarX + scrollbarW - 1, thumbEnd, getDarkerAccent());
 		} else {
 			// Full scrollbar when nothing to scroll
 			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + scrollbarW - 1, scrollbarEndY - 1, ModConfig.fwColorAccent);
-			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + 2, scrollbarEndY - 1, 0xFF7A6A8C);
-			context.fill(scrollbarX + scrollbarW - 1, scrollbarY + 1, scrollbarX + scrollbarW, scrollbarEndY - 1, 0xFF4A3B6E);
+			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + 2, scrollbarEndY - 1, getLighterAccent());
+			context.fill(scrollbarX + scrollbarW - 1, scrollbarY + 1, scrollbarX + scrollbarW, scrollbarEndY - 1, getDarkerAccent());
 			// Light bevel on top
-			context.fill(scrollbarX + 1, scrollbarY, scrollbarX + scrollbarW - 1, scrollbarY + 1, 0xFF7A6A8C);
+			context.fill(scrollbarX + 1, scrollbarY, scrollbarX + scrollbarW - 1, scrollbarY + 1, getLighterAccent());
 			// Dark bevel on bottom
-			context.fill(scrollbarX + 1, scrollbarEndY - 1, scrollbarX + scrollbarW - 1, scrollbarEndY, 0xFF4A3B6E);
+			context.fill(scrollbarX + 1, scrollbarEndY - 1, scrollbarX + scrollbarW - 1, scrollbarEndY, getDarkerAccent());
 		}
 	}
 

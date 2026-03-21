@@ -352,7 +352,7 @@ public class FarmWarpScreen extends Screen {
 
 			// Animate overlay alpha: 0 → 0x40 (25% opacity of orange)
 			int overlayAlpha = (int)(hoverProgress * 0x40);
-			int overlayColor = (overlayAlpha << 24) | 0x00FF8C00;
+			int accentRGB = ModConfig.fwColorAccent & 0x00FFFFFF; int overlayColor = (overlayAlpha << 24) | accentRGB;
 
 			// If this is the best crop, render glowing yellow outline with fancy decoration
 			if (isBestCrop) {

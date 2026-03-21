@@ -332,7 +332,7 @@ public class GuildQuestsManager {
 						// If quest changed, reset completion flag
 						if (!newBoss1ActionLine.equals(prevBoss1ActionLine)) {
 							boss1Complete = false;
-						} else if (!boss1Complete) {
+						} else {
 							// Check for enchanted glint (completed quest) or parse progress line
 							boss1Complete = isQuestItemEnchanted(stack) || parseProgressLine(lore.get(3).getString());
 						}
@@ -350,7 +350,7 @@ public class GuildQuestsManager {
 						// If quest changed, reset completion flag
 						if (!newBoss2ActionLine.equals(prevBoss2ActionLine)) {
 							boss2Complete = false;
-						} else if (!boss2Complete) {
+						} else {
 							// Check for enchanted glint (completed quest) or parse progress line
 							boss2Complete = isQuestItemEnchanted(stack) || parseProgressLine(lore.get(3).getString());
 						}
@@ -369,7 +369,7 @@ public class GuildQuestsManager {
 						// If quest changed, reset completion flag
 						if (!newCrop3kActionLine.equals(prevCrop3kActionLine)) {
 							crop3kComplete = false;
-						} else if (!crop3kComplete) {
+						} else {
 							// Check for enchanted glint (completed quest) or parse progress line
 							String progressLine = lore.get(3).getString();
 							crop3kComplete = isQuestItemEnchanted(stack) || parseProgressLine(progressLine);
@@ -389,7 +389,7 @@ public class GuildQuestsManager {
 						// If quest changed, reset completion flag
 						if (!newCrop7500ActionLine.equals(prevCrop7500ActionLine)) {
 							crop7500Complete = false;
-						} else if (!crop7500Complete) {
+						} else {
 							// Check for enchanted glint (completed quest) or parse progress line
 							String progressLine = lore.get(3).getString();
 							crop7500Complete = isQuestItemEnchanted(stack) || parseProgressLine(progressLine);

@@ -326,7 +326,7 @@ public class GuildQuestsManager {
 					if (lore.size() > 2) {
 						String actionLine = lore.get(2).getString();
 						newBoss1ActionLine = actionLine.trim().replaceAll("^\\|\\s*", ""); // Strip leading pipe
-						boss1Target = extractBossTarget(actionLine);
+						boss1Target = extractBossTarget(newBoss1ActionLine);
 					}
 					if (lore.size() > 3) {
 						// If quest changed, reset completion flag
@@ -344,7 +344,7 @@ public class GuildQuestsManager {
 					if (lore.size() > 2) {
 						String actionLine = lore.get(2).getString();
 						newBoss2ActionLine = actionLine.trim().replaceAll("^\\|\\s*", ""); // Strip leading pipe
-						boss2Target = extractBossTarget(actionLine);
+						boss2Target = extractBossTarget(newBoss2ActionLine);
 					}
 					if (lore.size() > 3) {
 						// If quest changed, reset completion flag
@@ -362,7 +362,7 @@ public class GuildQuestsManager {
 					if (lore.size() > 2) {
 						String actionLine = lore.get(2).getString();
 						newCrop3kActionLine = actionLine.trim().replaceAll("^\\|\\s*", ""); // Strip leading pipe
-						String cropName = extractCropName(actionLine);
+						String cropName = extractCropName(newCrop3kActionLine);
 						crop3kTarget = cropName;
 					}
 					if (lore.size() > 3) {
@@ -382,7 +382,7 @@ public class GuildQuestsManager {
 					if (lore.size() > 2) {
 						String actionLine = lore.get(2).getString();
 						newCrop7500ActionLine = actionLine.trim().replaceAll("^\\|\\s*", ""); // Strip leading pipe
-						String cropName = extractCropName(actionLine);
+						String cropName = extractCropName(newCrop7500ActionLine);
 						crop7500Target = cropName;
 					}
 					if (lore.size() > 3) {
@@ -544,6 +544,17 @@ public class GuildQuestsManager {
 			try {
 				int m = Integer.parseInt(mFormatMatcher.group(1));
 				return (long) m * 60000;
+			} catch (NumberFormatException ignored) {
+			}
+		}
+
+		// Try "Xs" format (e.g., "30s!" or "30s") - for seconds only when less than 1 minute
+		Pattern sFormatPattern = Pattern.compile("^\\s*(\\d+)\\s*s");
+		Matcher sFormatMatcher = sFormatPattern.matcher(text);
+		if (sFormatMatcher.find()) {
+			try {
+				int s = Integer.parseInt(sFormatMatcher.group(1));
+				return (long) s * 1000;
 			} catch (NumberFormatException ignored) {
 			}
 		}

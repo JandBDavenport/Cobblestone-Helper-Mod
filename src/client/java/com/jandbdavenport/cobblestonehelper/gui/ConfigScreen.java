@@ -919,11 +919,11 @@ public class ConfigScreen extends Screen {
 		int centerX = this.width / 2;
 
 		// Draw title text
-		context.drawCenteredTextWithShadow(this.textRenderer, this.title, centerX, TITLE_START_Y + 12, TEXT_PRIMARY);
+		context.drawCenteredTextWithShadow(this.textRenderer, this.title, centerX, TITLE_START_Y + 9, TEXT_PRIMARY);
 
 		// Draw hint text
 		String hint = "Changes saved automatically.";
-		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(hint), centerX, TITLE_START_Y + 23, TEXT_SECONDARY);
+		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(hint), centerX, TITLE_START_Y + 20, TEXT_SECONDARY);
 	}
 
 	/**

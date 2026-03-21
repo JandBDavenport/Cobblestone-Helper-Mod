@@ -72,6 +72,7 @@ public class ConfigScreen extends Screen {
 		sectionExpanded.put("guildQuests", false);
 		sectionExpanded.put("farmWarps", false);
 		sectionExpanded.put("plantHitbox", false);
+		sectionExpanded.put("uiColors", false);
 		sectionExpanded.put("themes", false);
 	}
 
@@ -86,6 +87,8 @@ public class ConfigScreen extends Screen {
 	private int farmWarpsSectionEnd = 0;
 	private int plantHitboxSectionStart = 0;
 	private int plantHitboxSectionEnd = 0;
+	private int uiColorsSectionStart = 0;
+	private int uiColorsSectionEnd = 0;
 	private int themesSectionStart = 0;
 	private int themesSectionEnd = 0;
 
@@ -133,6 +136,8 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += sectionExpanded.get("farmWarps") ? 100 : 0;
 		estimatedHeight += 30; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 80 : 0;
+		estimatedHeight += 30; // UI Colors section
+		estimatedHeight += sectionExpanded.get("uiColors") ? 100 : 0;
 		estimatedHeight += 30; // Themes section
 		estimatedHeight += sectionExpanded.get("themes") ? 50 : 0;
 
@@ -168,6 +173,11 @@ public class ConfigScreen extends Screen {
 		plantHitboxSectionStart = yPos;
 		yPos = buildPlantHitboxSection(centerX, yPos);
 		plantHitboxSectionEnd = yPos;
+
+		// UI COLORS SECTION
+		uiColorsSectionStart = yPos;
+		yPos = buildUIColorsSection(centerX, yPos);
+		uiColorsSectionEnd = yPos;
 
 		// THEMES SECTION
 		themesSectionStart = yPos;
@@ -504,6 +514,43 @@ public class ConfigScreen extends Screen {
 	}
 
 	/**
+	 * Build UI Colors section with color pickers for fwColor* values
+	 */
+	private int buildUIColorsSection(int centerX, int yPos) {
+		boolean expanded = sectionExpanded.get("uiColors");
+		String headerText = (expanded ? "▼" : "▶") + " UI Colors";
+		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
+			sectionExpanded.put("uiColors", !sectionExpanded.get("uiColors"));
+			this.init();
+		});
+		yPos += 25;
+
+		if (!expanded) {
+			return yPos;
+		}
+
+		// Background Color picker
+		yPos = drawColorPicker(centerX, yPos, "Background Color:", "fwColorBackground", ModConfig.fwColorBackground, color -> {
+			ModConfig.fwColorBackground = color;
+			ModConfig.saveConfig();
+		});
+
+		// Accent Color picker
+		yPos = drawColorPicker(centerX, yPos, "Accent Color:", "fwColorAccent", ModConfig.fwColorAccent, color -> {
+			ModConfig.fwColorAccent = color;
+			ModConfig.saveConfig();
+		});
+
+		// Slot Color picker
+		yPos = drawColorPicker(centerX, yPos, "Slot Color:", "fwColorSlot", ModConfig.fwColorSlot, color -> {
+			ModConfig.fwColorSlot = color;
+			ModConfig.saveConfig();
+		});
+
+		return yPos;
+	}
+
+	/**
 	 * Build Themes section with preset buttons for all features
 	 */
 	/**
@@ -570,7 +617,7 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
 			Map.entry("gqColorUnknown", 0xFFFF4444),
 			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorAccent", 0xFF7B5EA7),
 			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
@@ -588,7 +635,7 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
 			Map.entry("gqColorUnknown", 0xFF00AA00),
 			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorAccent", 0xFF00CC00),
 			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
@@ -606,7 +653,7 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
 			Map.entry("gqColorUnknown", 0xFF00CCFF),
 			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorAccent", 0xFF0099FF),
 			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
@@ -624,7 +671,7 @@ public class ConfigScreen extends Screen {
 			Map.entry("gqColorTarget", 0xFFFFFFFF),
 			Map.entry("gqColorUnknown", 0xFFFF6600),
 			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFFFF8C00),
+			Map.entry("fwColorAccent", 0xFFFF6600),
 			Map.entry("fwColorSlot", 0xFF222222)
 		));
 
@@ -882,7 +929,7 @@ public class ConfigScreen extends Screen {
 		// STEP 1: Draw title background with gradient effect
 		context.fill(contentLeft, TITLE_START_Y, contentRight, TITLE_BOTTOM_Y, PANEL_HEADER_BG);
 		// Top edge accent (subtle lighter line)
-		context.fill(contentLeft, TITLE_START_Y, contentRight, TITLE_START_Y + 1, 0xFF1A1A1A);
+		context.fill(contentLeft, TITLE_START_Y, contentRight, TITLE_START_Y + 1, ModConfig.fwColorAccent);
 		// Bottom separator (purple accent)
 		context.fill(contentLeft, TITLE_BOTTOM_Y - 1, contentRight, TITLE_BOTTOM_Y, ModConfig.fwColorAccent);
 		// Left border

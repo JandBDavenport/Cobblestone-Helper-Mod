@@ -28,7 +28,7 @@ public class ConfigScreen extends Screen {
 
 	private static final int PANEL_BG = 0xFF1A1A1A;        // Dark background
 	private static final int PANEL_INNER = 0xFF242424;     // Slightly lighter panel interior
-	private static final int PANEL_HEADER_BG = 0xFF0D0D0D; // Very dark header strip
+	private static final int PANEL_HEADER_BG = 0xFF1A1A1A; // Very dark header strip
 	private static final int ACCENT = 0xFF7B5EA7;          // Purple accent for section dividers
 
 	private static final int TEXT_PRIMARY = 0xFFFFFFFF;    // White text
@@ -923,7 +923,7 @@ public class ConfigScreen extends Screen {
 
 		// Draw hint text
 		String hint = "Changes saved automatically.";
-		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(hint), centerX, TITLE_START_Y + 27, TEXT_SECONDARY);
+		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(hint), centerX, TITLE_START_Y + 23, TEXT_SECONDARY);
 	}
 
 	/**

@@ -711,6 +711,10 @@ public class ConfigScreen extends Screen {
 		context.fill(contentLeft, TITLE_START_Y, contentRight, TITLE_START_Y + 1, 0xFF1A1A1A);
 		// Bottom separator (purple accent)
 		context.fill(contentLeft, TITLE_BOTTOM_Y - 1, contentRight, TITLE_BOTTOM_Y, ACCENT);
+		// Left border
+		context.fill(contentLeft - 1, TITLE_START_Y, contentLeft, TITLE_BOTTOM_Y, ACCENT);
+		// Right border
+		context.fill(contentRight, TITLE_START_Y, contentRight + 1, TITLE_BOTTOM_Y, ACCENT);
 
 		// STEP 2: Draw content box border (1px accent) - draw first
 		context.fill(contentLeft - 1, CONTENT_START_Y - 1, contentRight + 1, contentBottomY + 1, ACCENT);
@@ -918,7 +922,7 @@ public class ConfigScreen extends Screen {
 		context.drawCenteredTextWithShadow(this.textRenderer, this.title, centerX, TITLE_START_Y + 12, TEXT_PRIMARY);
 
 		// Draw hint text
-		String hint = "Click buttons to toggle features. Changes saved automatically.";
+		String hint = "Changes saved automatically.";
 		context.drawCenteredTextWithShadow(this.textRenderer, Text.literal(hint), centerX, TITLE_START_Y + 27, TEXT_SECONDARY);
 	}
 

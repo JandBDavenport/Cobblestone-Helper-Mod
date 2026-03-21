@@ -30,7 +30,7 @@ public class ConfigScreen extends Screen {
 	private static final int PANEL_BG = 0xFF1A1A1A;        // Dark background
 	private static final int PANEL_INNER = 0xFF242424;     // Slightly lighter panel interior
 	private static final int PANEL_HEADER_BG = 0xFF1A1A1A; // Very dark header strip
-	private static final int ACCENT = 0xFF7B5EA7;          // Purple accent for section dividers
+	// Note: ACCENT color now comes from ModConfig.fwColorAccent to support theme changes
 
 	private static final int TEXT_PRIMARY = 0xFFFFFFFF;    // White text
 	private static final int TEXT_SECONDARY = 0xFFAAAAAA;  // Gray text for hints
@@ -665,6 +665,11 @@ public class ConfigScreen extends Screen {
 						}
 					}
 					ModConfig.saveConfig();
+					// Refresh FarmWarpScreen if it's currently open to apply theme colors
+					if (this.client != null && this.client.currentScreen instanceof FarmWarpScreen) {
+						FarmWarpScreen farmScreen = (FarmWarpScreen) this.client.currentScreen;
+						farmScreen.init();
+					}
 					this.init();
 				},
 				BUTTON_TYPE_NORMAL);
@@ -879,14 +884,14 @@ public class ConfigScreen extends Screen {
 		// Top edge accent (subtle lighter line)
 		context.fill(contentLeft, TITLE_START_Y, contentRight, TITLE_START_Y + 1, 0xFF1A1A1A);
 		// Bottom separator (purple accent)
-		context.fill(contentLeft, TITLE_BOTTOM_Y - 1, contentRight, TITLE_BOTTOM_Y, ACCENT);
+		context.fill(contentLeft, TITLE_BOTTOM_Y - 1, contentRight, TITLE_BOTTOM_Y, ModConfig.fwColorAccent);
 		// Left border
-		context.fill(contentLeft - 1, TITLE_START_Y, contentLeft, TITLE_BOTTOM_Y, ACCENT);
+		context.fill(contentLeft - 1, TITLE_START_Y, contentLeft, TITLE_BOTTOM_Y, ModConfig.fwColorAccent);
 		// Right border
-		context.fill(contentRight, TITLE_START_Y, contentRight + 1, TITLE_BOTTOM_Y, ACCENT);
+		context.fill(contentRight, TITLE_START_Y, contentRight + 1, TITLE_BOTTOM_Y, ModConfig.fwColorAccent);
 
 		// STEP 2: Draw content box border (1px accent) - draw first
-		context.fill(contentLeft - 1, CONTENT_START_Y - 1, contentRight + 1, contentBottomY + 1, ACCENT);
+		context.fill(contentLeft - 1, CONTENT_START_Y - 1, contentRight + 1, contentBottomY + 1, ModConfig.fwColorAccent);
 
 		// STEP 3: Draw content box background (dark gray) - on top of border
 		context.fill(contentLeft, CONTENT_START_Y, contentRight, contentBottomY, PANEL_BG);
@@ -1005,7 +1010,7 @@ public class ConfigScreen extends Screen {
 
 		// Draw left accent bar
 		context.fill(btn.getX(), btn.getY(), btn.getX() + 3,
-				btn.getY() + btn.getHeight(), ACCENT);
+				btn.getY() + btn.getHeight(), ModConfig.fwColorAccent);
 
 		// Draw border
 		context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(),
@@ -1135,7 +1140,7 @@ public class ConfigScreen extends Screen {
 			int thumbEnd = Math.min(thumbY + thumbHeight, scrollbarEndY);
 
 			// Main color (match accent purple)
-			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + scrollbarW - 1, thumbEnd - 1, ACCENT);
+			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + scrollbarW - 1, thumbEnd - 1, ModConfig.fwColorAccent);
 			// Light accent on left
 			context.fill(scrollbarX + 1, thumbY + 1, scrollbarX + 2, thumbEnd - 1, 0xFF7A6A8C);
 			// Dark accent on right
@@ -1146,7 +1151,7 @@ public class ConfigScreen extends Screen {
 			context.fill(scrollbarX + 1, thumbEnd - 1, scrollbarX + scrollbarW - 1, thumbEnd, 0xFF4A3B6E);
 		} else {
 			// Full scrollbar when nothing to scroll
-			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + scrollbarW - 1, scrollbarEndY - 1, ACCENT);
+			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + scrollbarW - 1, scrollbarEndY - 1, ModConfig.fwColorAccent);
 			context.fill(scrollbarX + 1, scrollbarY + 1, scrollbarX + 2, scrollbarEndY - 1, 0xFF7A6A8C);
 			context.fill(scrollbarX + scrollbarW - 1, scrollbarY + 1, scrollbarX + scrollbarW, scrollbarEndY - 1, 0xFF4A3B6E);
 			// Light bevel on top

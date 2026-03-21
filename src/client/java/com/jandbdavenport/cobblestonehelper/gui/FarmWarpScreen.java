@@ -26,11 +26,24 @@ public class FarmWarpScreen extends Screen {
 	private static final int GRID_START_Y = 30;
 
 	// Color palette (ARGB format - most colors now come from ModConfig)
-	private static final int COLOR_ACCENT_MID   = 0x80FF8C00;
-	private static final int COLOR_ACCENT_DIM   = 0x40FF8C00;
 	private static final int COLOR_BG_INNER     = 0xFF1A1A1A;
 	private static final int COLOR_SLOT_BORDER  = 0xFF383838;
 	private static final int COLOR_TEXT_WHITE   = 0xFFFFFFFF;
+
+	// Helper method to compute accent color with semi-transparency
+	private static int getAccentMidColor() {
+		int accent = ModConfig.fwColorAccent;
+		// Extract RGB and apply 50% alpha (0x80)
+		int rgb = accent & 0x00FFFFFF;
+		return 0x80000000 | rgb;
+	}
+
+	private static int getAccentDimColor() {
+		int accent = ModConfig.fwColorAccent;
+		// Extract RGB and apply 25% alpha (0x40)
+		int rgb = accent & 0x00FFFFFF;
+		return 0x40000000 | rgb;
+	}
 
 	private List<CropItemWidget> cropWidgets = new ArrayList<>();
 	private List<CategoryHeader> categoryHeaders = new ArrayList<>();
@@ -194,7 +207,7 @@ public class FarmWarpScreen extends Screen {
 
 		// 9. Draw separator lines between categories
 		for (Integer separatorY : separatorYs) {
-			context.fill(this.gridStartX, separatorY, this.gridStartX + rowWidth, separatorY + 1, COLOR_ACCENT_MID);
+			context.fill(this.gridStartX, separatorY, this.gridStartX + rowWidth, separatorY + 1, getAccentMidColor());
 		}
 	}
 

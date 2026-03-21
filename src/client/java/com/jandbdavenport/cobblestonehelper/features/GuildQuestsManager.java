@@ -676,7 +676,48 @@ public class GuildQuestsManager {
 		}
 
 		MinecraftClient client = MinecraftClient.getInstance();
-	// Apply scale transformation
+
+		// Apply scaling transformation
+		context.getMatrices().pushMatrix();
+		context.getMatrices().translate((float)hudX, (float)hudY);
+		context.getMatrices().scale(ModConfig.gqScale, ModConfig.gqScale);
+
+		int y = 0;
+		int lineHeight = 10;
+
+		// Header: "Guild Quests: MM:SS"
+		String header = "Guild Quests: " + formatTimer();
+		context.drawTextWithShadow(client.textRenderer, Text.literal(header), 0, y, ModConfig.gqColorHeader);
+		y += lineHeight;
+
+		if (dataState == DataState.NO_DATA) {
+			// Prompt user to open guild quests
+			context.drawTextWithShadow(client.textRenderer, Text.literal("Open /guild to load"), 0, y, ModConfig.gqColorUnknown);
+		} else {
+			// Show each incomplete quest
+			if (!boss1Complete && !boss1ActionLine.isEmpty()) {
+				context.drawTextWithShadow(client.textRenderer, Text.literal(boss1ActionLine), 0, y, ModConfig.gqColorLabel);
+				y += lineHeight;
+			}
+			if (!boss2Complete && !boss2ActionLine.isEmpty()) {
+				context.drawTextWithShadow(client.textRenderer, Text.literal(boss2ActionLine), 0, y, ModConfig.gqColorLabel);
+				y += lineHeight;
+			}
+			if (!crop3kComplete && !crop3kActionLine.isEmpty()) {
+				context.drawTextWithShadow(client.textRenderer, Text.literal(crop3kActionLine), 0, y, ModConfig.gqColorLabel);
+				y += lineHeight;
+			}
+			if (!crop7500Complete && !crop7500ActionLine.isEmpty()) {
+				context.drawTextWithShadow(client.textRenderer, Text.literal(crop7500ActionLine), 0, y, ModConfig.gqColorLabel);
+				y += lineHeight;
+			}
+			// If ALL quests complete, show completed message
+			if (boss1Complete && boss2Complete && crop3kComplete && crop7500Complete) {
+				context.drawTextWithShadow(client.textRenderer, Text.literal("All quests done!"), 0, y, ModConfig.gqColorTarget);
+			}
+		}
+
+		context.getMatrices().popMatrix();
 	}
 
 	/**

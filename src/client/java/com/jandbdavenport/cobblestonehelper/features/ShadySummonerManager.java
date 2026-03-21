@@ -330,12 +330,19 @@ public class ShadySummonerManager {
 	String stateText = getStateText();
 	int stateColor = getStateColor();
 
-	// Draw label
-	context.drawTextWithShadow(client.textRenderer, Text.literal("Shady Summoner: "), hudX, hudY, ModConfig.ssColorLabel);
+	// Apply scaling transformation
+	context.getMatrices().pushMatrix();
+	context.getMatrices().translate((float)hudX, (float)hudY);
+	context.getMatrices().scale(ModConfig.ssScale, ModConfig.ssScale);
 
-	// Draw state in appropriate color right after the label
-	int stateX = hudX + client.textRenderer.getWidth("Shady Summoner: ");
-	context.drawTextWithShadow(client.textRenderer, Text.literal(stateText), stateX, hudY, stateColor);
+	// Draw label
+	int labelWidth = client.textRenderer.getWidth("Shady Summoner: ");
+	context.drawTextWithShadow(client.textRenderer, Text.literal("Shady Summoner: "), 0, 0, ModConfig.ssColorLabel);
+
+	// Draw state in appropriate color right after the label (use relative offset)
+	context.drawTextWithShadow(client.textRenderer, Text.literal(stateText), labelWidth, 0, stateColor);
+
+	context.getMatrices().popMatrix();
 }
 
 	/**

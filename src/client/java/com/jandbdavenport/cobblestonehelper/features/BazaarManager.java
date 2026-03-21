@@ -540,8 +540,12 @@ public class BazaarManager {
 		return;
 	}
 
-	// Draw value text
-	context.drawTextWithShadow(client.textRenderer, Text.literal(valueText), hudX, hudY, valueColor);
+	// Draw value text with scaling transformation
+	context.getMatrices().pushMatrix();
+	context.getMatrices().translate((float)hudX, (float)hudY);
+	context.getMatrices().scale(ModConfig.bzScale, ModConfig.bzScale);
+	context.drawTextWithShadow(client.textRenderer, Text.literal(valueText), 0, 0, valueColor);
+	context.getMatrices().popMatrix();
 
 
 		// Handle in-place repositioning mode

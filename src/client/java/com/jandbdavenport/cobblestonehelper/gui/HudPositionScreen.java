@@ -61,18 +61,8 @@ public class HudPositionScreen extends Screen {
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-		// Always render standard background (don't try to render parent screen)
-		this.renderBackground(context, mouseX, mouseY, delta);
-
-		// Draw instructions at top
-		String instructions = "Drag the widget to reposition. Press Escape to save.";
-		context.drawCenteredTextWithShadow(
-			this.textRenderer,
-			Text.literal(instructions),
-			this.width / 2,
-			10,
-			0xFFFFFFFF
-		);
+		// Render background and buttons
+		super.render(context, mouseX, mouseY, delta);
 
 		// Handle mouse input for dragging
 		handleMouseInput(mouseX, mouseY);
@@ -89,8 +79,15 @@ public class HudPositionScreen extends Screen {
 		// Draw border around the preview widget
 		drawPreviewBorder(context);
 
-		// Draw buttons and other UI on top
-		super.render(context, mouseX, mouseY, delta);
+		// Draw instructions on top
+		String instructions = "Drag the widget to reposition. Press Escape to save.";
+		context.drawCenteredTextWithShadow(
+			this.textRenderer,
+			Text.literal(instructions),
+			this.width / 2,
+			10,
+			0xFFFFFFFF
+		);
 	}
 
 	/**

@@ -315,7 +315,7 @@ public class ConfigScreen extends Screen {
 	private int buildShadySummonerSection(int centerX, int yPos) {
 		// Section header (collapsible)
 		boolean expanded = sectionExpanded.get("shadySummoner");
-		String headerText = (expanded ? "▼" : "▶") + " Shady Summoner";
+		String headerText = (expanded ? "▼" : "▶") + " Shady Summoner Overlay";
 		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
 			sectionExpanded.put("shadySummoner", !sectionExpanded.get("shadySummoner"));
 			this.init();
@@ -383,7 +383,7 @@ public class ConfigScreen extends Screen {
 	 */
 	private int buildBazaarSection(int centerX, int yPos) {
 		boolean expanded = sectionExpanded.get("bazaar");
-		String headerText = (expanded ? "▼" : "▶") + " Bazaar";
+		String headerText = (expanded ? "▼" : "▶") + " Bazaar Overlay";
 		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
 			sectionExpanded.put("bazaar", !sectionExpanded.get("bazaar"));
 			this.init();
@@ -443,7 +443,7 @@ public class ConfigScreen extends Screen {
 	 */
 	private int buildGuildQuestsSection(int centerX, int yPos) {
 		boolean expanded = sectionExpanded.get("guildQuests");
-		String headerText = (expanded ? "▼" : "▶") + " Guild Quests";
+		String headerText = (expanded ? "▼" : "▶") + " Guild Quests Overlay";
 		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
 			sectionExpanded.put("guildQuests", !sectionExpanded.get("guildQuests"));
 			this.init();

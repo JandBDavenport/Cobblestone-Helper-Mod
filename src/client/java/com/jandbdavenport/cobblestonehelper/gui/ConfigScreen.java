@@ -578,6 +578,7 @@ public class ConfigScreen extends Screen {
 			ModConfig.plantHitboxBrownMushroom, button -> {
 				ModConfig.plantHitboxBrownMushroom = !ModConfig.plantHitboxBrownMushroom;
 				ModConfig.saveConfig();
+				this.init();
 			});
 		yPos += 25;
 
@@ -586,6 +587,7 @@ public class ConfigScreen extends Screen {
 			ModConfig.plantHitboxRedMushroom, button -> {
 				ModConfig.plantHitboxRedMushroom = !ModConfig.plantHitboxRedMushroom;
 				ModConfig.saveConfig();
+				this.init();
 			});
 		yPos += 25;
 
@@ -594,6 +596,7 @@ public class ConfigScreen extends Screen {
 			ModConfig.plantHitboxCrimsonFungus, button -> {
 				ModConfig.plantHitboxCrimsonFungus = !ModConfig.plantHitboxCrimsonFungus;
 				ModConfig.saveConfig();
+				this.init();
 			});
 		yPos += 25;
 
@@ -602,6 +605,7 @@ public class ConfigScreen extends Screen {
 			ModConfig.plantHitboxWarpedFungus, button -> {
 				ModConfig.plantHitboxWarpedFungus = !ModConfig.plantHitboxWarpedFungus;
 				ModConfig.saveConfig();
+				this.init();
 			});
 		yPos += 25;
 
@@ -610,6 +614,7 @@ public class ConfigScreen extends Screen {
 			ModConfig.plantHitboxCactusFlower, button -> {
 				ModConfig.plantHitboxCactusFlower = !ModConfig.plantHitboxCactusFlower;
 				ModConfig.saveConfig();
+				this.init();
 			});
 		yPos += 25;
 
@@ -618,6 +623,7 @@ public class ConfigScreen extends Screen {
 			ModConfig.plantHitboxTallDryGrass, button -> {
 				ModConfig.plantHitboxTallDryGrass = !ModConfig.plantHitboxTallDryGrass;
 				ModConfig.saveConfig();
+				this.init();
 			});
 		yPos += 25;
 
@@ -626,6 +632,7 @@ public class ConfigScreen extends Screen {
 			ModConfig.plantHitboxWildflowers, button -> {
 				ModConfig.plantHitboxWildflowers = !ModConfig.plantHitboxWildflowers;
 				ModConfig.saveConfig();
+				this.init();
 			});
 		yPos += 25;
 

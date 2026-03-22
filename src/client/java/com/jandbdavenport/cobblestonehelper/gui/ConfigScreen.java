@@ -7,9 +7,13 @@ import com.jandbdavenport.cobblestonehelper.util.ThemeLoader;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -143,6 +147,9 @@ public class ConfigScreen extends Screen {
 	private final Map<ButtonWidget, Boolean> buttonToggleStates = new HashMap<>();
 	private final Map<ButtonWidget, Boolean> buttonScaleSelected = new HashMap<>();
 
+	// Theme name text field
+	private TextFieldWidget themeNameField;
+
 	public ConfigScreen(Screen parentScreen) {
 		super(Text.literal("Cobblestone Helper Config"));
 		this.parentScreen = parentScreen;
@@ -156,6 +163,14 @@ public class ConfigScreen extends Screen {
 		buttonTypes.clear();
 		buttonToggleStates.clear();
 		buttonScaleSelected.clear();
+
+		// Initialize theme name field
+		if (this.textRenderer != null) {
+			themeNameField = new TextFieldWidget(this.textRenderer, 0, 0, 150, 20, Text.literal("Theme name"));
+			themeNameField.setMaxLength(50);
+			themeNameField.setDrawsBackground(true);
+			themeNameField.setText("");
+		}
 
 		// Estimate content height for scroll calculation
 		int estimatedHeight = 0;
@@ -221,6 +236,11 @@ public class ConfigScreen extends Screen {
 		// Add all color picker fields as drawable children
 		for (HexColorPickerWidget picker : colorPickers.values()) {
 			this.addDrawableChild(picker.getField());
+		}
+
+		// Add theme name field as drawable child
+		if (themeNameField != null) {
+			this.addDrawableChild(themeNameField);
 		}
 	}
 
@@ -643,9 +663,57 @@ public class ConfigScreen extends Screen {
 				BUTTON_TYPE_NORMAL);
 		}
 
-		// Return the height occupied by all theme buttons + padding
+		// Calculate Y position after theme buttons
 		int numRows = Math.max(1, (themes.size() + 4) / 5);
-		return yPos + numRows * 25 + 10;
+		yPos += numRows * 25 + 15;
+
+		// Add save theme UI
+		if (themeNameField != null) {
+			// Position the theme name field
+			themeNameField.setX(centerX - 70);
+			themeNameField.setY(yPos);
+			themeNameField.setWidth(150);
+
+			// Add save button
+			addStyledButton(centerX + 85, yPos, 50, 20,
+				Text.literal("Save"), button -> {
+					String themeName = themeNameField.getText().trim();
+					if (!themeName.isEmpty()) {
+						ThemeLoader.saveTheme(themeName);
+						themeNameField.setText("");
+						this.init();
+					}
+				},
+				BUTTON_TYPE_NORMAL);
+		}
+
+		yPos += 25;
+
+		// Add open themes folder button
+		addStyledButton(centerX - 140, yPos, 280, 20,
+			Text.literal("Open Themes Folder"), button -> {
+				try {
+					File themesDir = new File("config/cobblestonehelper/themes");
+					if (!themesDir.exists()) {
+						themesDir.mkdirs();
+					}
+					// Try to open with Desktop, but gracefully handle headless environments
+					if (Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().open(themesDir);
+					} else {
+						System.out.println("[ConfigScreen] Desktop operations not supported in this environment");
+					}
+				} catch (java.awt.HeadlessException e) {
+					System.out.println("[ConfigScreen] Desktop not available (headless environment)");
+				} catch (Exception e) {
+					System.err.println("[ConfigScreen] Error opening themes folder: " + e.getMessage());
+				}
+			},
+			BUTTON_TYPE_NORMAL);
+
+		yPos += 25;
+
+		return yPos;
 	}
 
 	/**
@@ -1100,6 +1168,13 @@ public class ConfigScreen extends Screen {
 
 			// Draw preview
 			picker.renderPreview(context);
+		}
+
+		// Draw theme name label if the field is visible
+		if (themeNameField != null && sectionExpanded.get("themes")) {
+			int y = themeNameField.getY();
+			context.drawTextWithShadow(this.textRenderer, "Theme name:",
+					this.width / 2 - 140, y + 1, TEXT_SECONDARY);
 		}
 	}
 

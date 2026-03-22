@@ -177,11 +177,6 @@ public class ConfigScreen extends Screen {
 		buttonToggleStates.clear();
 		buttonScaleSelected.clear();
 
-		// Ensure target scroll offset matches current during initialization
-		if (scrollOffset != targetScrollOffset) {
-			scrollOffset = targetScrollOffset;
-		}
-
 		// Initialize theme name field
 		if (this.textRenderer != null) {
 			themeNameField = new TextFieldWidget(this.textRenderer, 0, 0, 150, 20, Text.literal("Theme name"));

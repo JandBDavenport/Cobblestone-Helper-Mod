@@ -319,7 +319,7 @@ public class GuildQuestsManager {
 			if (!overlay) {
 				String text = message.getString();
 				// Check for quest reset message
-				if (text.contains("GUILDS") && text.contains("New guild quests have become available")) {
+				if (text.toLowerCase().contains("new guild quests")) {
 					resetQuestState();
 				} else {
 					// Check for quest completion message
@@ -564,7 +564,7 @@ public class GuildQuestsManager {
 		}
 
 		// Try "Xs" format (e.g., "30s!" or "30s") - for seconds only when less than 1 minute
-		Pattern sFormatPattern = Pattern.compile("^\\s*(\\d+)\\s*s");
+		Pattern sFormatPattern = Pattern.compile("(\\d+)\\s*s(?!m)");  // Match Xs but not when part of larger unit
 		Matcher sFormatMatcher = sFormatPattern.matcher(text);
 		if (sFormatMatcher.find()) {
 			try {

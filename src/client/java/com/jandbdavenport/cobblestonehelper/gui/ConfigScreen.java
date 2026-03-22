@@ -502,6 +502,7 @@ public class ConfigScreen extends Screen {
 		addStyledButton(centerX - 140, yPos, 280, 20, Text.literal("Clear Guild Quests Cache"), button -> {
 			GuildQuestsManager.clearCache();
 			ModConfig.saveConfig();
+			GuildQuestsManager.saveConfig(); // Explicitly save Guild Quests config after clearing
 		}, BUTTON_TYPE_NORMAL);
 		yPos += 25;
 

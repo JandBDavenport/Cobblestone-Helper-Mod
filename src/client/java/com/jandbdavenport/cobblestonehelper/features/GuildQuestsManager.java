@@ -694,21 +694,21 @@ public class GuildQuestsManager {
 			// Prompt user to open guild quests
 			context.drawTextWithShadow(client.textRenderer, Text.literal("Open /guild to load"), 0, y, ModConfig.gqColorUnknown);
 		} else {
-			// Show each incomplete quest
+			// Show each incomplete quest with nicely formatted text
 			if (!boss1Complete && !boss1ActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal(boss1ActionLine), 0, y, ModConfig.gqColorLabel);
+				context.drawTextWithShadow(client.textRenderer, Text.literal("Boss 1: " + boss1Target), 0, y, ModConfig.gqColorLabel);
 				y += lineHeight;
 			}
 			if (!boss2Complete && !boss2ActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal(boss2ActionLine), 0, y, ModConfig.gqColorLabel);
+				context.drawTextWithShadow(client.textRenderer, Text.literal("Boss 2: " + boss2Target), 0, y, ModConfig.gqColorLabel);
 				y += lineHeight;
 			}
 			if (!crop3kComplete && !crop3kActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal(crop3kActionLine), 0, y, ModConfig.gqColorLabel);
+				context.drawTextWithShadow(client.textRenderer, Text.literal("Crop 1: " + crop3kTarget), 0, y, ModConfig.gqColorLabel);
 				y += lineHeight;
 			}
 			if (!crop7500Complete && !crop7500ActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal(crop7500ActionLine), 0, y, ModConfig.gqColorLabel);
+				context.drawTextWithShadow(client.textRenderer, Text.literal("Crop 2: " + crop7500Target), 0, y, ModConfig.gqColorLabel);
 				y += lineHeight;
 			}
 			// If ALL quests complete, show completed message

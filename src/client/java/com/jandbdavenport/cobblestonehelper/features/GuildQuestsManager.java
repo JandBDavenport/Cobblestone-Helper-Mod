@@ -542,9 +542,22 @@ public class GuildQuestsManager {
 
 	/**
 	 * Parse a time remaining from a string.
+	 * Only parses lines that are actually timer lines (contain clock emoji or look like time).
 	 * Supports: "mm:ss", "hh:mm:ss", "X minutes", "Xm Ys", "Xm", "Xh"
 	 */
 	private static Long parseTimeRemaining(String text) {
+		// Only parse lines that look like they contain a timer
+		// Must either contain the clock emoji or have time-like patterns
+		boolean likelyTimerLine = text.contains("⌚") || text.contains("quests available in") ||
+			text.contains("minutes") || text.contains("hours");
+
+		// Also parse if it matches time patterns with reasonable bounds
+		boolean hasTimePattern = text.matches(".*\\d+\\s*[mhs].*");
+
+		if (!likelyTimerLine && !hasTimePattern) {
+			return null;  // Skip lines that don't look like timers
+		}
+
 		// Try "Xm Ys" format (e.g., "55m 30s!" or "55m 30s")
 		Pattern msFormatPattern = Pattern.compile("(\\d+)\\s*m\\s+(\\d+)\\s*s");
 		Matcher msMatcher = msFormatPattern.matcher(text);
@@ -552,8 +565,11 @@ public class GuildQuestsManager {
 			try {
 				int m = Integer.parseInt(msMatcher.group(1));
 				int s = Integer.parseInt(msMatcher.group(2));
-				System.out.println("[GuildQuestsManager] Matched 'Xm Ys' pattern: " + m + "m " + s + "s");
-				return (long) (m * 60 + s) * 1000;
+				// Sanity check: m and s should be reasonable
+				if (m >= 0 && m <= 1440 && s >= 0 && s < 60) {
+					System.out.println("[GuildQuestsManager] Matched 'Xm Ys' pattern: " + m + "m " + s + "s");
+					return (long) (m * 60 + s) * 1000;
+				}
 			} catch (NumberFormatException ignored) {
 			}
 		}
@@ -564,8 +580,11 @@ public class GuildQuestsManager {
 		if (mFormatMatcher.find()) {
 			try {
 				int m = Integer.parseInt(mFormatMatcher.group(1));
-				System.out.println("[GuildQuestsManager] Matched 'Xm' pattern: " + m + "m");
-				return (long) m * 60000;
+				// Sanity check: m should be reasonable (0-1440 minutes = 0-24 hours)
+				if (m >= 0 && m <= 1440) {
+					System.out.println("[GuildQuestsManager] Matched 'Xm' pattern: " + m + "m");
+					return (long) m * 60000;
+				}
 			} catch (NumberFormatException ignored) {
 			}
 		}
@@ -576,8 +595,11 @@ public class GuildQuestsManager {
 		if (sFormatMatcher.find()) {
 			try {
 				int s = Integer.parseInt(sFormatMatcher.group(1));
-				System.out.println("[GuildQuestsManager] Matched 'Xs' pattern: " + s + "s");
-				return (long) s * 1000;
+				// Sanity check: s should be 0-3600 (up to 1 hour in seconds) to avoid matching "1s" in "Quest #1s"
+				if (s >= 1 && s <= 3600) {
+					System.out.println("[GuildQuestsManager] Matched 'Xs' pattern: " + s + "s");
+					return (long) s * 1000;
+				}
 			} catch (NumberFormatException ignored) {
 			}
 		}
@@ -588,8 +610,11 @@ public class GuildQuestsManager {
 		if (hFormatMatcher.find()) {
 			try {
 				int h = Integer.parseInt(hFormatMatcher.group(1));
-				System.out.println("[GuildQuestsManager] Matched 'Xh' pattern: " + h + "h");
-				return (long) h * 3600000;
+				// Sanity check: h should be reasonable (0-24 hours)
+				if (h >= 0 && h <= 24) {
+					System.out.println("[GuildQuestsManager] Matched 'Xh' pattern: " + h + "h");
+					return (long) h * 3600000;
+				}
 			} catch (NumberFormatException ignored) {
 			}
 		}

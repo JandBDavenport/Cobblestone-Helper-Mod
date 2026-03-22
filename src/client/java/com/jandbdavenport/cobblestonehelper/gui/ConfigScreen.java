@@ -198,7 +198,7 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // Farm Warps section
 		estimatedHeight += sectionExpanded.get("farmWarps") ? 100 : 0;
 		estimatedHeight += 30; // Plant Hitbox section
-		estimatedHeight += sectionExpanded.get("plantHitbox") ? 80 : 0;
+		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
 		estimatedHeight += 30; // UI Colors section
 		estimatedHeight += sectionExpanded.get("uiColors") ? 100 : 0;
 		estimatedHeight += 30; // Themes section

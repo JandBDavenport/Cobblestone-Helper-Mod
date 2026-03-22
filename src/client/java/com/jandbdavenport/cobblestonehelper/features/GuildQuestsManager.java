@@ -500,6 +500,7 @@ public class GuildQuestsManager {
 
 	/**
 	 * Sync the timer from the quest screen's clock item.
+	 * Only updates if the new timer is later than the current timer (prevents jumping backward).
 	 */
 	private static void syncTimerFromScreen() {
 		if (currentScreen == null) {
@@ -520,8 +521,18 @@ public class GuildQuestsManager {
 					Long remainingMs = parseTimeRemaining(lineStr);
 					if (remainingMs != null) {
 						System.out.println("[GuildQuestsManager] Parsed timer: " + remainingMs + "ms");
-						questResetMs = System.currentTimeMillis() + remainingMs;
-						saveConfig(); // Save the updated timer
+						long newQuestResetMs = System.currentTimeMillis() + remainingMs;
+
+						// Only update if this is the first sync OR if the new timer is later than current
+						// This prevents the timer from jumping backward due to lag or stale item data
+						if (questResetMs == 0 || newQuestResetMs > questResetMs) {
+							questResetMs = newQuestResetMs;
+							saveConfig(); // Save the updated timer
+							System.out.println("[GuildQuestsManager] Timer updated to: " + newQuestResetMs);
+						} else {
+							long diffMs = questResetMs - newQuestResetMs;
+							System.out.println("[GuildQuestsManager] Ignoring timer update that would jump back " + diffMs + "ms");
+						}
 						return;
 					}
 				}

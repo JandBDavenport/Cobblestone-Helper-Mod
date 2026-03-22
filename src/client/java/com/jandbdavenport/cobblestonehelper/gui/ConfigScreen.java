@@ -202,7 +202,7 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // Guild Quests section
 		estimatedHeight += sectionExpanded.get("guildQuests") ? 150 : 0;
 		estimatedHeight += 30; // Farm Warps section
-		estimatedHeight += sectionExpanded.get("farmWarps") ? 100 : 0;
+		estimatedHeight += sectionExpanded.get("farmWarps") ? 160 : 0; // 2 toggles + 3 color pickers + padding
 		estimatedHeight += 30; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
 		estimatedHeight += 30; // UI Colors section
@@ -514,7 +514,7 @@ public class ConfigScreen extends Screen {
 	 */
 	private int buildFarmWarpsSection(int centerX, int yPos) {
 		boolean expanded = sectionExpanded.get("farmWarps");
-		String headerText = (expanded ? "▼" : "▶") + " Farm Warps Overlay";
+		String headerText = (expanded ? "▼" : "▶") + " Farm Warps Menu";
 		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
 			sectionExpanded.put("farmWarps", !sectionExpanded.get("farmWarps"));
 			this.init();
@@ -543,6 +543,22 @@ public class ConfigScreen extends Screen {
 				this.init();
 			});
 		yPos += 25;
+
+		// Color pickers
+		yPos = drawColorPicker(centerX, yPos, "Background:", "fwColorBackground", ModConfig.fwColorBackground, color -> {
+			ModConfig.fwColorBackground = color;
+			ModConfig.saveConfig();
+		});
+
+		yPos = drawColorPicker(centerX, yPos, "Accent Color:", "fwColorAccent", ModConfig.fwColorAccent, color -> {
+			ModConfig.fwColorAccent = color;
+			ModConfig.saveConfig();
+		});
+
+		yPos = drawColorPicker(centerX, yPos, "Slot Color:", "fwColorSlot", ModConfig.fwColorSlot, color -> {
+			ModConfig.fwColorSlot = color;
+			ModConfig.saveConfig();
+		});
 
 		return yPos;
 	}
@@ -652,24 +668,6 @@ public class ConfigScreen extends Screen {
 		if (!expanded) {
 			return yPos;
 		}
-
-		// Background Color picker
-		yPos = drawColorPicker(centerX, yPos, "Background Color:", "fwColorBackground", ModConfig.fwColorBackground, color -> {
-			ModConfig.fwColorBackground = color;
-			ModConfig.saveConfig();
-		});
-
-		// Accent Color picker
-		yPos = drawColorPicker(centerX, yPos, "Accent Color:", "fwColorAccent", ModConfig.fwColorAccent, color -> {
-			ModConfig.fwColorAccent = color;
-			ModConfig.saveConfig();
-		});
-
-		// Slot Color picker
-		yPos = drawColorPicker(centerX, yPos, "Slot Color:", "fwColorSlot", ModConfig.fwColorSlot, color -> {
-			ModConfig.fwColorSlot = color;
-			ModConfig.saveConfig();
-		});
 
 		return yPos;
 	}

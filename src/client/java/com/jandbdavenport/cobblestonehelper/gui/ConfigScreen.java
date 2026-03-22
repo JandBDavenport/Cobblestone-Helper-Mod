@@ -1221,7 +1221,7 @@ public class ConfigScreen extends Screen {
 
 		// Draw theme presets header if themes are visible
 		if (sectionExpanded.get("themes") && themePresetsHeaderY > 0) {
-			context.drawTextWithShadow(this.textRenderer, "Preset Themes:",
+			context.drawTextWithShadow(this.textRenderer, "Available Themes:",
 					centerX - 140, themePresetsHeaderY, TEXT_SECONDARY);
 		}
 	}

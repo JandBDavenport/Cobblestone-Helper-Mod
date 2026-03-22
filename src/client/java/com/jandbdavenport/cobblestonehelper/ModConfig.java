@@ -19,7 +19,15 @@ public class ModConfig {
 	public static boolean shadySummonerEnabled = true;
 	public static boolean bazaarEnabled = true;
 	public static boolean guildQuestsEnabled = true;
-	public static boolean plantHitboxEnabled = true;
+
+	// Plant Hitbox toggles (individual plants)
+	public static boolean plantHitboxBrownMushroom = false;
+	public static boolean plantHitboxRedMushroom = false;
+	public static boolean plantHitboxCrimsonFungus = false;
+	public static boolean plantHitboxWarpedFungus = false;
+	public static boolean plantHitboxCactusFlower = false;
+	public static boolean plantHitboxTallDryGrass = false;
+	public static boolean plantHitboxWildflowers = false;
 
 	// Farm Warps display toggles
 	public static boolean farmWarpsGuildQuestHighlight = true;
@@ -79,7 +87,15 @@ public class ModConfig {
 				shadySummonerEnabled = getBoolean(json, "shadySummonerEnabled", true);
 				bazaarEnabled = getBoolean(json, "bazaarEnabled", true);
 				guildQuestsEnabled = getBoolean(json, "guildQuestsEnabled", true);
-				plantHitboxEnabled = getBoolean(json, "plantHitboxEnabled", true);
+
+				// Load Plant Hitbox toggles (default to false/disabled)
+				plantHitboxBrownMushroom = getBoolean(json, "plantHitboxBrownMushroom", false);
+				plantHitboxRedMushroom = getBoolean(json, "plantHitboxRedMushroom", false);
+				plantHitboxCrimsonFungus = getBoolean(json, "plantHitboxCrimsonFungus", false);
+				plantHitboxWarpedFungus = getBoolean(json, "plantHitboxWarpedFungus", false);
+				plantHitboxCactusFlower = getBoolean(json, "plantHitboxCactusFlower", false);
+				plantHitboxTallDryGrass = getBoolean(json, "plantHitboxTallDryGrass", false);
+				plantHitboxWildflowers = getBoolean(json, "plantHitboxWildflowers", false);
 
 				// Load Farm Warps toggles
 				farmWarpsGuildQuestHighlight = getBoolean(json, "farmWarpsGuildQuestHighlight", true);
@@ -140,7 +156,15 @@ public class ModConfig {
 			json.addProperty("shadySummonerEnabled", shadySummonerEnabled);
 			json.addProperty("bazaarEnabled", bazaarEnabled);
 			json.addProperty("guildQuestsEnabled", guildQuestsEnabled);
-			json.addProperty("plantHitboxEnabled", plantHitboxEnabled);
+
+			// Plant Hitbox toggles
+			json.addProperty("plantHitboxBrownMushroom", plantHitboxBrownMushroom);
+			json.addProperty("plantHitboxRedMushroom", plantHitboxRedMushroom);
+			json.addProperty("plantHitboxCrimsonFungus", plantHitboxCrimsonFungus);
+			json.addProperty("plantHitboxWarpedFungus", plantHitboxWarpedFungus);
+			json.addProperty("plantHitboxCactusFlower", plantHitboxCactusFlower);
+			json.addProperty("plantHitboxTallDryGrass", plantHitboxTallDryGrass);
+			json.addProperty("plantHitboxWildflowers", plantHitboxWildflowers);
 
 			json.addProperty("farmWarpsGuildQuestHighlight", farmWarpsGuildQuestHighlight);
 			json.addProperty("farmWarpsShowBazaarHighlight", farmWarpsShowBazaarHighlight);

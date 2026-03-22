@@ -35,11 +35,22 @@ public class PlantHitboxMixin {
         return Block.createCuboidShape(0, 0, 0, 16, 8, 16);
     }
 
+    private boolean isPlantHitboxEnabled(Block block) {
+        if (block == Blocks.BROWN_MUSHROOM) return ModConfig.plantHitboxBrownMushroom;
+        if (block == Blocks.RED_MUSHROOM) return ModConfig.plantHitboxRedMushroom;
+        if (block == Blocks.CRIMSON_FUNGUS) return ModConfig.plantHitboxCrimsonFungus;
+        if (block == Blocks.WARPED_FUNGUS) return ModConfig.plantHitboxWarpedFungus;
+        if (block == Blocks.CACTUS_FLOWER) return ModConfig.plantHitboxCactusFlower;
+        if (block == Blocks.TALL_DRY_GRASS) return ModConfig.plantHitboxTallDryGrass;
+        if (block == Blocks.WILDFLOWERS) return ModConfig.plantHitboxWildflowers;
+        return false;
+    }
+
     // Inject into all getRaycastShape overloads
     @Inject(method = "getRaycastShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void enlargeRaycastShape1(BlockView world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!ModConfig.plantHitboxEnabled) return;
         BlockState state = (BlockState) (Object) this;
+        if (!isPlantHitboxEnabled(state.getBlock())) return;
         if (isTargetPlant(state.getBlock())) {
             cir.setReturnValue(getFullCube());
         } else if (isWildflower(state.getBlock())) {
@@ -50,8 +61,8 @@ public class PlantHitboxMixin {
     // Inject into all getOutlineShape overloads
     @Inject(method = "getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void enlargeOutlineShape1(BlockView world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!ModConfig.plantHitboxEnabled) return;
         BlockState state = (BlockState) (Object) this;
+        if (!isPlantHitboxEnabled(state.getBlock())) return;
         if (isTargetPlant(state.getBlock())) {
             cir.setReturnValue(getFullCube());
         } else if (isWildflower(state.getBlock())) {
@@ -61,8 +72,8 @@ public class PlantHitboxMixin {
 
     @Inject(method = "getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void enlargeOutlineShape2(BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!ModConfig.plantHitboxEnabled) return;
         BlockState state = (BlockState) (Object) this;
+        if (!isPlantHitboxEnabled(state.getBlock())) return;
         if (isTargetPlant(state.getBlock())) {
             cir.setReturnValue(getFullCube());
         } else if (isWildflower(state.getBlock())) {

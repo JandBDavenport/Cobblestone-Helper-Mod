@@ -572,13 +572,60 @@ public class ConfigScreen extends Screen {
 			return yPos;
 		}
 
-		// Enable toggle
+		// Individual plant toggles
 		addToggleButton(centerX - 140, yPos, 280, 20,
-			Text.literal(ModConfig.plantHitboxEnabled ? "✓ Enabled" : "✗ Disabled"),
-			ModConfig.plantHitboxEnabled, button -> {
-				ModConfig.plantHitboxEnabled = !ModConfig.plantHitboxEnabled;
+			Text.literal(ModConfig.plantHitboxBrownMushroom ? "✓ Brown Mushroom" : "✗ Brown Mushroom"),
+			ModConfig.plantHitboxBrownMushroom, button -> {
+				ModConfig.plantHitboxBrownMushroom = !ModConfig.plantHitboxBrownMushroom;
 				ModConfig.saveConfig();
-				this.init();
+			});
+		yPos += 25;
+
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.plantHitboxRedMushroom ? "✓ Red Mushroom" : "✗ Red Mushroom"),
+			ModConfig.plantHitboxRedMushroom, button -> {
+				ModConfig.plantHitboxRedMushroom = !ModConfig.plantHitboxRedMushroom;
+				ModConfig.saveConfig();
+			});
+		yPos += 25;
+
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.plantHitboxCrimsonFungus ? "✓ Crimson Fungus" : "✗ Crimson Fungus"),
+			ModConfig.plantHitboxCrimsonFungus, button -> {
+				ModConfig.plantHitboxCrimsonFungus = !ModConfig.plantHitboxCrimsonFungus;
+				ModConfig.saveConfig();
+			});
+		yPos += 25;
+
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.plantHitboxWarpedFungus ? "✓ Warped Fungus" : "✗ Warped Fungus"),
+			ModConfig.plantHitboxWarpedFungus, button -> {
+				ModConfig.plantHitboxWarpedFungus = !ModConfig.plantHitboxWarpedFungus;
+				ModConfig.saveConfig();
+			});
+		yPos += 25;
+
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.plantHitboxCactusFlower ? "✓ Cactus Flower" : "✗ Cactus Flower"),
+			ModConfig.plantHitboxCactusFlower, button -> {
+				ModConfig.plantHitboxCactusFlower = !ModConfig.plantHitboxCactusFlower;
+				ModConfig.saveConfig();
+			});
+		yPos += 25;
+
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.plantHitboxTallDryGrass ? "✓ Tall Dry Grass" : "✗ Tall Dry Grass"),
+			ModConfig.plantHitboxTallDryGrass, button -> {
+				ModConfig.plantHitboxTallDryGrass = !ModConfig.plantHitboxTallDryGrass;
+				ModConfig.saveConfig();
+			});
+		yPos += 25;
+
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.plantHitboxWildflowers ? "✓ Wildflowers" : "✗ Wildflowers"),
+			ModConfig.plantHitboxWildflowers, button -> {
+				ModConfig.plantHitboxWildflowers = !ModConfig.plantHitboxWildflowers;
+				ModConfig.saveConfig();
 			});
 		yPos += 25;
 

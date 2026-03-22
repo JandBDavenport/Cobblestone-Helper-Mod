@@ -279,8 +279,8 @@ public class GuildQuestsManager {
 					lastTimerSyncMs = 0; // Force timer sync on next tick
 					addGuildQuestsButtons(screen); // Add buttons to the screen
 
-					// Sync timer immediately
-					syncTimerFromScreen();
+					// Sync timer immediately (force sync, don't skip even if timer goes backward)
+					syncTimerFromScreen(true);
 				}
 			}
 		});
@@ -300,7 +300,7 @@ public class GuildQuestsManager {
 				// Sync timer from screen only every 5 seconds to avoid constant resetting
 				long now = System.currentTimeMillis();
 				if (now - lastTimerSyncMs >= 5000) {
-					syncTimerFromScreen();
+					syncTimerFromScreen(false);
 					lastTimerSyncMs = now;
 				}
 
@@ -500,9 +500,9 @@ public class GuildQuestsManager {
 
 	/**
 	 * Sync the timer from the quest screen's clock item.
-	 * Only updates if the new timer is later than the current timer (prevents jumping backward).
+	 * @param forceSync If true, always update the timer. If false, only update if timer is moving forward.
 	 */
-	private static void syncTimerFromScreen() {
+	private static void syncTimerFromScreen(boolean forceSync) {
 		if (currentScreen == null) {
 			return;
 		}
@@ -523,9 +523,9 @@ public class GuildQuestsManager {
 						System.out.println("[GuildQuestsManager] Parsed timer: " + remainingMs + "ms");
 						long newQuestResetMs = System.currentTimeMillis() + remainingMs;
 
-						// Only update if this is the first sync OR if the new timer is later than current
-						// This prevents the timer from jumping backward due to lag or stale item data
-						if (questResetMs == 0 || newQuestResetMs > questResetMs) {
+						// Update if: forced sync OR first sync OR timer is moving forward
+						// This prevents the timer from jumping backward due to lag or stale item data (unless forced)
+						if (forceSync || questResetMs == 0 || newQuestResetMs > questResetMs) {
 							questResetMs = newQuestResetMs;
 							saveConfig(); // Save the updated timer
 							System.out.println("[GuildQuestsManager] Timer updated to: " + newQuestResetMs);

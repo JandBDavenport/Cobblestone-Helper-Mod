@@ -106,30 +106,6 @@ public class CobblestoneHelper implements ClientModInitializer {
 		System.out.println("[CobblestoneHelper] ✓ Registered command: /wf");
 
 
-		// Register /clearguildquestscache command
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-			dispatcher.register(literal("clearguildquestscache").executes(ctx -> {
-				MinecraftClient.getInstance().send(() -> {
-					GuildQuestsManager.clearCache();
-					MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§6Guild quests cache cleared! Open the Quests menu to rescan."));
-				});
-				return Command.SINGLE_SUCCESS;
-			}))
-		);
-		System.out.println("[CobblestoneHelper] ✓ Registered command: /clearguildquestscache");
-
-		// Register /clearbazaarcache command
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-			dispatcher.register(literal("clearbazaarcache").executes(ctx -> {
-				MinecraftClient.getInstance().send(() -> {
-					BazaarManager.clearCache();
-					MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§6Bazaar cache cleared! The best crop will be recalculated next time you open the bazaar."));
-				});
-				return Command.SINGLE_SUCCESS;
-			}))
-		);
-		System.out.println("[CobblestoneHelper] ✓ Registered command: /clearbazaarcache");
-
 		// Register /chconfig command
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 			dispatcher.register(literal("chconfig").executes(ctx -> {

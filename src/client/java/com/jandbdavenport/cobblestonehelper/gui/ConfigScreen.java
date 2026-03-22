@@ -3,6 +3,7 @@ package com.jandbdavenport.cobblestonehelper.gui;
 import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
+import com.jandbdavenport.cobblestonehelper.util.ThemeLoader;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -171,7 +172,8 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // UI Colors section
 		estimatedHeight += sectionExpanded.get("uiColors") ? 100 : 0;
 		estimatedHeight += 30; // Themes section
-		estimatedHeight += sectionExpanded.get("themes") ? 50 : 0;
+		int themeRows = Math.max(1, (ThemeLoader.loadThemes().size() + 4) / 5);
+		estimatedHeight += sectionExpanded.get("themes") ? (themeRows * 25 + 80) : 0;
 
 		// Content box height is fixed; content scrolls inside it
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
@@ -614,135 +616,22 @@ public class ConfigScreen extends Screen {
 	private int drawGlobalThemePresets(int centerX, int yPos) {
 		yPos += 10;
 
-		// Define global themes - each applies coordinated colors to all features
-		Map<String, Map<String, Integer>> globalThemes = new LinkedHashMap<>();
+		// Load themes from JSON files
+		List<ThemeLoader.LoadedTheme> themes = ThemeLoader.loadThemes();
 
-		// Default theme (original colors)
-		globalThemes.put("Default", Map.ofEntries(
-			Map.entry("ssColorLabel", 0xFFBB77FF),
-			Map.entry("ssColorActive", 0xFF00CC00),
-			Map.entry("ssColorWarning", 0xFFFF4444),
-			Map.entry("ssColorNormal", 0xFFFFCC00),
-			Map.entry("ssColorUnknown", 0xFF888888),
-			Map.entry("bzColorLoading", 0xFFFFCC00),
-			Map.entry("bzColorComplete", 0xFF00CC00),
-			Map.entry("gqColorHeader", 0xFF55FF55),
-			Map.entry("gqColorLabel", 0xFF55FF55),
-			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFFFFFF00),
-			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFFFF8C00),
-			Map.entry("fwColorSlot", 0xFF222222)
-		));
-
-		// Purple theme (default)
-		globalThemes.put("Purple", Map.ofEntries(
-			Map.entry("ssColorLabel", 0xFFBB77FF),
-			Map.entry("ssColorActive", 0xFF00CC00),
-			Map.entry("ssColorWarning", 0xFFFF4444),
-			Map.entry("ssColorNormal", 0xFFFFCC00),
-			Map.entry("ssColorUnknown", 0xFF888888),
-			Map.entry("bzColorLoading", 0xFFBB77FF),
-			Map.entry("bzColorComplete", 0xFF00CC00),
-			Map.entry("gqColorHeader", 0xFFBB77FF),
-			Map.entry("gqColorLabel", 0xFFBB77FF),
-			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFFFF4444),
-			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFF7B5EA7),
-			Map.entry("fwColorSlot", 0xFF222222)
-		));
-
-		// Green theme
-		globalThemes.put("Green", Map.ofEntries(
-			Map.entry("ssColorLabel", 0xFF55FF55),
-			Map.entry("ssColorActive", 0xFF00FF00),
-			Map.entry("ssColorWarning", 0xFFFF0000),
-			Map.entry("ssColorNormal", 0xFFFFFF00),
-			Map.entry("ssColorUnknown", 0xFF777777),
-			Map.entry("bzColorLoading", 0xFF00FF00),
-			Map.entry("bzColorComplete", 0xFF00AA00),
-			Map.entry("gqColorHeader", 0xFF55FF55),
-			Map.entry("gqColorLabel", 0xFF55FF55),
-			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFF00AA00),
-			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFF00CC00),
-			Map.entry("fwColorSlot", 0xFF222222)
-		));
-
-		// Blue theme
-		globalThemes.put("Blue", Map.ofEntries(
-			Map.entry("ssColorLabel", 0xFF5599FF),
-			Map.entry("ssColorActive", 0xFF0099FF),
-			Map.entry("ssColorWarning", 0xFFFF6600),
-			Map.entry("ssColorNormal", 0xFFFFFF99),
-			Map.entry("ssColorUnknown", 0xFF666666),
-			Map.entry("bzColorLoading", 0xFF0099FF),
-			Map.entry("bzColorComplete", 0xFF00CCFF),
-			Map.entry("gqColorHeader", 0xFF5599FF),
-			Map.entry("gqColorLabel", 0xFF5599FF),
-			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFF00CCFF),
-			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFF0099FF),
-			Map.entry("fwColorSlot", 0xFF222222)
-		));
-
-		// Warm theme (orange/red)
-		globalThemes.put("Warm", Map.ofEntries(
-			Map.entry("ssColorLabel", 0xFFFF8844),
-			Map.entry("ssColorActive", 0xFFFFCC00),
-			Map.entry("ssColorWarning", 0xFFFF0000),
-			Map.entry("ssColorNormal", 0xFFFFDD00),
-			Map.entry("ssColorUnknown", 0xFFCC6600),
-			Map.entry("bzColorLoading", 0xFFFF6600),
-			Map.entry("bzColorComplete", 0xFFFF3300),
-			Map.entry("gqColorHeader", 0xFFFFDD00),
-			Map.entry("gqColorLabel", 0xFFFFDD00),
-			Map.entry("gqColorTarget", 0xFFFFFFFF),
-			Map.entry("gqColorUnknown", 0xFFFF6600),
-			Map.entry("fwColorBackground", 0xF2111111),
-			Map.entry("fwColorAccent", 0xFFFF6600),
-			Map.entry("fwColorSlot", 0xFF222222)
-		));
-
-		// Draw theme buttons (2 per row)
+		// Draw theme buttons in rows of 5
 		int buttonWidth = 52;
 		int buttonSpacing = 56;
-		int themeIndex = 0;
-		for (String themeName : globalThemes.keySet()) {
-			int xOffset = themeIndex * buttonSpacing;
-			int yOffset = 0;
+		for (int i = 0; i < themes.size(); i++) {
+			int col = i % 5;
+			int row = i / 5;
+			int bx = centerX - 140 + col * buttonSpacing;
+			int by = yPos + row * 25;
 
-			final Map<String, Integer> themeColors = globalThemes.get(themeName);
-			addStyledButton(centerX - 140 + xOffset, yPos + yOffset, buttonWidth, 20,
-				Text.literal(themeName), button -> {
-					// Apply theme colors to all features
-					for (Map.Entry<String, Integer> entry : themeColors.entrySet()) {
-						String colorKey = entry.getKey();
-						int color = entry.getValue();
-
-						if (colorKey.startsWith("ss")) {
-							if ("ssColorLabel".equals(colorKey)) ModConfig.ssColorLabel = color;
-							else if ("ssColorActive".equals(colorKey)) ModConfig.ssColorActive = color;
-							else if ("ssColorWarning".equals(colorKey)) ModConfig.ssColorWarning = color;
-							else if ("ssColorNormal".equals(colorKey)) ModConfig.ssColorNormal = color;
-							else if ("ssColorUnknown".equals(colorKey)) ModConfig.ssColorUnknown = color;
-						} else if (colorKey.startsWith("bz")) {
-							if ("bzColorLoading".equals(colorKey)) ModConfig.bzColorLoading = color;
-							else if ("bzColorComplete".equals(colorKey)) ModConfig.bzColorComplete = color;
-						} else if (colorKey.startsWith("gq")) {
-							if ("gqColorHeader".equals(colorKey)) ModConfig.gqColorHeader = color;
-							else if ("gqColorLabel".equals(colorKey)) ModConfig.gqColorLabel = color;
-							else if ("gqColorTarget".equals(colorKey)) ModConfig.gqColorTarget = color;
-							else if ("gqColorUnknown".equals(colorKey)) ModConfig.gqColorUnknown = color;
-						} else if (colorKey.startsWith("fw")) {
-							if ("fwColorBackground".equals(colorKey)) ModConfig.fwColorBackground = color;
-							else if ("fwColorAccent".equals(colorKey)) ModConfig.fwColorAccent = color;
-							else if ("fwColorSlot".equals(colorKey)) ModConfig.fwColorSlot = color;
-						}
-					}
+			ThemeLoader.LoadedTheme theme = themes.get(i);
+			addStyledButton(bx, by, buttonWidth, 20,
+				Text.literal(theme.name()), button -> {
+					applyThemeColors(theme.colors());
 					ModConfig.saveConfig();
 					// Refresh FarmWarpScreen if it's currently open to apply theme colors
 					if (this.client != null && this.client.currentScreen instanceof FarmWarpScreen) {
@@ -752,12 +641,28 @@ public class ConfigScreen extends Screen {
 					this.init();
 				},
 				BUTTON_TYPE_NORMAL);
-
-			themeIndex++;
 		}
 
-		return yPos + 25;
+		// Return the height occupied by all theme buttons + padding
+		int numRows = Math.max(1, (themes.size() + 4) / 5);
+		return yPos + numRows * 25 + 10;
 	}
+
+	/**
+	 * Apply theme colors using the registry-driven system.
+	 */
+	private void applyThemeColors(Map<String, Integer> colors) {
+		for (Map.Entry<String, Integer> entry : colors.entrySet()) {
+			String key = entry.getKey();
+			int color = entry.getValue();
+
+			java.util.function.Consumer<Integer> applier = ThemeLoader.APPLIERS.get(key);
+			if (applier != null) {
+				applier.accept(color);
+			}
+		}
+	}
+
 	private int drawScaleButtons(int centerX, int yPos, String label, float currentScale, Consumer<Float> onChanged) {
 		yPos += 5;
 

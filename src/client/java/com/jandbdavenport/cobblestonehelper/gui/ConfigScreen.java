@@ -1334,11 +1334,17 @@ public class ConfigScreen extends Screen {
 		int thumbY = scrollbarY + (scrollOffset * (scrollbarH - thumbHeight)) / maxScroll;
 		int thumbEnd = Math.min(thumbY + thumbHeight, contentBottomY);
 
+		boolean scrollChanged = false;
+
 		if (isDraggingScrollbar) {
 			// Continue dragging
 			int dragDelta = (int) (mouseY - dragStartY);
 			int newScrollOffset = dragStartScrollOffset + (dragDelta * maxScroll) / (scrollbarH - thumbHeight);
-			scrollOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
+			int clampedOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
+			if (clampedOffset != scrollOffset) {
+				scrollOffset = clampedOffset;
+				scrollChanged = true;
+			}
 		} else if (mouseY >= thumbY && mouseY <= thumbEnd) {
 			// Start dragging the thumb
 			isDraggingScrollbar = true;
@@ -1348,8 +1354,17 @@ public class ConfigScreen extends Screen {
 			// Click on track - jump scroll
 			int newThumbY = (int) mouseY - thumbHeight / 2;
 			newThumbY = Math.max(scrollbarY, Math.min(newThumbY, contentBottomY - thumbHeight));
-			scrollOffset = (newThumbY - scrollbarY) * maxScroll / (scrollbarH - thumbHeight);
-			scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScroll);
+			int newScrollOffset = (newThumbY - scrollbarY) * maxScroll / (scrollbarH - thumbHeight);
+			int clampedOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
+			if (clampedOffset != scrollOffset) {
+				scrollOffset = clampedOffset;
+				scrollChanged = true;
+			}
+		}
+
+		// Refresh layout if scroll offset changed
+		if (scrollChanged) {
+			this.init();
 		}
 	}
 

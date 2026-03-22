@@ -187,8 +187,11 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // UI Colors section
 		estimatedHeight += sectionExpanded.get("uiColors") ? 100 : 0;
 		estimatedHeight += 30; // Themes section
-		int themeRows = Math.max(1, (ThemeLoader.loadThemes().size() + 4) / 5);
-		estimatedHeight += sectionExpanded.get("themes") ? (themeRows * 25 + 80) : 0;
+		// Calculate height for themes section: save (25) + restore (25) + custom themes + open folder (25)
+		List<ThemeLoader.LoadedTheme> allThemes = ThemeLoader.loadThemes();
+		int customThemeCount = (int) allThemes.stream().filter(t -> !t.name().equals("Default")).count();
+		int themeRows = Math.max(0, (customThemeCount + 4) / 5);
+		estimatedHeight += sectionExpanded.get("themes") ? (50 + themeRows * 25 + 35) : 0;
 
 		// Content box height is fixed; content scrolls inside it
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
@@ -638,36 +641,12 @@ public class ConfigScreen extends Screen {
 
 		// Load themes from JSON files
 		List<ThemeLoader.LoadedTheme> themes = ThemeLoader.loadThemes();
+		// Filter out the "Default" theme - we'll handle it separately as a restore button
+		List<ThemeLoader.LoadedTheme> customThemes = themes.stream()
+			.filter(t -> !t.name().equals("Default"))
+			.toList();
 
-		// Draw theme buttons in rows of 5
-		int buttonWidth = 52;
-		int buttonSpacing = 56;
-		for (int i = 0; i < themes.size(); i++) {
-			int col = i % 5;
-			int row = i / 5;
-			int bx = centerX - 140 + col * buttonSpacing;
-			int by = yPos + row * 25;
-
-			ThemeLoader.LoadedTheme theme = themes.get(i);
-			addStyledButton(bx, by, buttonWidth, 20,
-				Text.literal(theme.name()), button -> {
-					applyThemeColors(theme.colors());
-					ModConfig.saveConfig();
-					// Refresh FarmWarpScreen if it's currently open to apply theme colors
-					if (this.client != null && this.client.currentScreen instanceof FarmWarpScreen) {
-						FarmWarpScreen farmScreen = (FarmWarpScreen) this.client.currentScreen;
-						farmScreen.init();
-					}
-					this.init();
-				},
-				BUTTON_TYPE_NORMAL);
-		}
-
-		// Calculate Y position after theme buttons
-		int numRows = Math.max(1, (themes.size() + 4) / 5);
-		yPos += numRows * 25 + 15;
-
-		// Add save theme UI
+		// SECTION 1: Save Theme UI at the top
 		if (themeNameField != null) {
 			// Position the theme name field
 			themeNameField.setX(centerX - 70);
@@ -686,10 +665,65 @@ public class ConfigScreen extends Screen {
 				},
 				BUTTON_TYPE_NORMAL);
 		}
-
 		yPos += 25;
 
-		// Add open themes folder button
+		// SECTION 2: Restore to Default button
+		addStyledButton(centerX - 140, yPos, 280, 20,
+			Text.literal("Restore to Default"), button -> {
+				// Find the Default theme and apply it
+				for (ThemeLoader.LoadedTheme theme : themes) {
+					if (theme.name().equals("Default")) {
+						applyThemeColors(theme.colors());
+						ModConfig.saveConfig();
+						// Refresh FarmWarpScreen if it's currently open to apply theme colors
+						if (this.client != null && this.client.currentScreen instanceof FarmWarpScreen) {
+							FarmWarpScreen farmScreen = (FarmWarpScreen) this.client.currentScreen;
+							farmScreen.init();
+						}
+						this.init();
+						break;
+					}
+				}
+			},
+			BUTTON_TYPE_NORMAL);
+		yPos += 25;
+
+		// SECTION 3: Theme Presets Header
+		yPos += 5; // Add some space before the header
+
+		// SECTION 4: Theme buttons in rows of 5
+		if (!customThemes.isEmpty()) {
+			int buttonWidth = 52;
+			int buttonSpacing = 56;
+			for (int i = 0; i < customThemes.size(); i++) {
+				int col = i % 5;
+				int row = i / 5;
+				int bx = centerX - 140 + col * buttonSpacing;
+				int by = yPos + row * 25;
+
+				ThemeLoader.LoadedTheme theme = customThemes.get(i);
+				addStyledButton(bx, by, buttonWidth, 20,
+					Text.literal(theme.name()), button -> {
+						applyThemeColors(theme.colors());
+						ModConfig.saveConfig();
+						// Refresh FarmWarpScreen if it's currently open to apply theme colors
+						if (this.client != null && this.client.currentScreen instanceof FarmWarpScreen) {
+							FarmWarpScreen farmScreen = (FarmWarpScreen) this.client.currentScreen;
+							farmScreen.init();
+						}
+						this.init();
+					},
+					BUTTON_TYPE_NORMAL);
+			}
+
+			// Calculate Y position after theme buttons
+			int numRows = Math.max(1, (customThemes.size() + 4) / 5);
+			yPos += numRows * 25 + 10;
+		} else {
+			yPos += 10;
+		}
+
+		// SECTION 5: Open Themes Folder button
 		addStyledButton(centerX - 140, yPos, 280, 20,
 			Text.literal("Open Themes Folder"), button -> {
 				try {
@@ -697,16 +731,19 @@ public class ConfigScreen extends Screen {
 					if (!themesDir.exists()) {
 						themesDir.mkdirs();
 					}
-					// Try to open with Desktop, but gracefully handle headless environments
-					if (Desktop.isDesktopSupported()) {
+					// Use Runtime.getRuntime().exec() as a fallback for better cross-platform support
+					String os = System.getProperty("os.name").toLowerCase();
+					if (os.contains("win")) {
+						Runtime.getRuntime().exec(new String[]{"explorer.exe", themesDir.getAbsolutePath()});
+					} else if (os.contains("mac")) {
+						Runtime.getRuntime().exec(new String[]{"open", themesDir.getAbsolutePath()});
+					} else if (os.contains("nux")) {
+						Runtime.getRuntime().exec(new String[]{"xdg-open", themesDir.getAbsolutePath()});
+					} else if (Desktop.isDesktopSupported()) {
 						Desktop.getDesktop().open(themesDir);
-					} else {
-						System.out.println("[ConfigScreen] Desktop operations not supported in this environment");
 					}
-				} catch (java.awt.HeadlessException e) {
-					System.out.println("[ConfigScreen] Desktop not available (headless environment)");
 				} catch (Exception e) {
-					System.err.println("[ConfigScreen] Error opening themes folder: " + e.getMessage());
+					System.out.println("[ConfigScreen] Note: Could not open themes folder automatically. Navigate to config/cobblestonehelper/themes manually.");
 				}
 			},
 			BUTTON_TYPE_NORMAL);
@@ -1173,7 +1210,7 @@ public class ConfigScreen extends Screen {
 		// Draw theme name label if the field is visible
 		if (themeNameField != null && sectionExpanded.get("themes")) {
 			int y = themeNameField.getY();
-			context.drawTextWithShadow(this.textRenderer, "Theme name:",
+			context.drawTextWithShadow(this.textRenderer, "New theme:",
 					this.width / 2 - 140, y + 1, TEXT_SECONDARY);
 		}
 	}

@@ -47,6 +47,7 @@ replay_*.log
 
 test_latest.log
 test_run.log
+test-run.log
 
 # documentation (except README)
 

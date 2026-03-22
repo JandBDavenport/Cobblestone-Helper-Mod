@@ -59,6 +59,7 @@ public class ConfigScreen extends Screen {
 	private final Screen parentScreen;
 	private int scrollOffset = 0;
 	private int targetScrollOffset = 0; // Target for smooth scrolling animation
+	private int lastTargetScrollOffset = 0; // Track when target changes to force init
 	private int maxScroll = 0;
 	private static final int CONTENT_WIDTH = 300;
 	private static final int SCROLL_AREA_HEIGHT = 350;
@@ -984,6 +985,13 @@ public class ConfigScreen extends Screen {
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		// STEP 0: Apply smooth scroll animation
+
+		// If scroll target just changed, force an init to update layout immediately
+		if (targetScrollOffset != lastTargetScrollOffset) {
+			lastTargetScrollOffset = targetScrollOffset;
+			this.init();
+		}
+
 		if (scrollOffset != targetScrollOffset) {
 			int scrollDelta = targetScrollOffset - scrollOffset;
 			// Use 40% per frame for snappier, more responsive scrolling

@@ -986,8 +986,8 @@ public class ConfigScreen extends Screen {
 		// STEP 0: Apply smooth scroll animation
 		if (scrollOffset != targetScrollOffset) {
 			int scrollDelta = targetScrollOffset - scrollOffset;
-			// Use larger animation steps for faster, more visible animation
-			int animationAmount = (int)(scrollDelta * 0.25); // 25% per frame instead of 15%
+			// Use 40% per frame for snappier, more responsive scrolling
+			int animationAmount = (int)(scrollDelta * 0.40);
 			if (animationAmount == 0 && scrollDelta != 0) {
 				animationAmount = scrollDelta > 0 ? 1 : -1; // Ensure we always move at least 1 pixel
 			}
@@ -1365,7 +1365,7 @@ public class ConfigScreen extends Screen {
 			if (clampedOffset != scrollOffset) {
 				scrollOffset = clampedOffset;
 				targetScrollOffset = clampedOffset;
-				scrollChanged = true;
+				this.init();
 			}
 		} else if (mouseY >= thumbY && mouseY <= thumbEnd) {
 			// Start dragging the thumb
@@ -1373,18 +1373,13 @@ public class ConfigScreen extends Screen {
 			dragStartY = (int) mouseY;
 			dragStartScrollOffset = scrollOffset;
 		} else {
-			// Click on track - smooth scroll to position
+			// Click on track - smooth scroll to position (don't call init yet, let animation handle it)
 			int newThumbY = (int) mouseY - thumbHeight / 2;
 			newThumbY = Math.max(scrollbarY, Math.min(newThumbY, contentBottomY - thumbHeight));
 			int newScrollOffset = (newThumbY - scrollbarY) * maxScroll / (scrollbarH - thumbHeight);
 			int clampedOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
 			targetScrollOffset = clampedOffset;
-			scrollChanged = true;
-		}
-
-		// Refresh layout if scroll offset changed
-		if (scrollChanged) {
-			this.init();
+			// Don't call init() here - let the render loop handle the animation and init() calls
 		}
 	}
 

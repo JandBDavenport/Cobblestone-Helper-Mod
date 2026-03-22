@@ -1055,7 +1055,7 @@ public class ConfigScreen extends Screen {
 			// Aim for: 100px in ~200ms, 500px in ~400ms, etc.
 			// Formula: duration = 150ms + (distance * 0.5ms per pixel)
 			int absoluteDistance = Math.abs(targetScrollOffset - scrollOffset);
-			float targetDurationMs = 150f + (absoluteDistance * 0.5f);
+			float targetDurationMs = 80f + (absoluteDistance * 0.5f);
 			float framesNeeded = targetDurationMs / 16.67f; // ~60 FPS
 
 			// Increment progress based on frames elapsed

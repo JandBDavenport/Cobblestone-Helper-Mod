@@ -17,6 +17,13 @@ Displays current Bazaar crop prices directly in the container GUI. Automatically
 ###  Farm Warps
 Quick-access grid of farm warp commands organized by category. Click any farm to teleport instantly. Highlights the best Bazaar crop for easy reference.
 
+###  Guild Quests HUD
+Displays incomplete guild quests and a timer until next quest refresh.
+
+###  Plant Hitbox
+Enlarges raycast and outline shapes for select plant blocks, making them easier to target and break.
+THIS FEATURE IS DISABLED BY DEFAULT, USE AT YOUR OWN RISK.
+
 ## Installation
 
 1. Download the latest JAR from [Releases](https://github.com/JandBDavenport/Cobblestone-Helper-Mod/releases)
@@ -28,12 +35,11 @@ Quick-access grid of farm warp commands organized by category. Click any farm to
 | Command | Description |
 |---|---|
 | `/wf` | Open Farm Warps screen |
-| `/hideplayers` | Toggle player hiding |
-| `/shadypos` | Reposition Shady Summoner HUD |
-| `/clearbazaarcache` | Clear Bazaar price cache |
+| `/chconfig` | Open config menu |
 
 ## Keybindings
 
+*All keybindings are rebindable in the options menu*
 | Key | Action |
 |---|---|
 | <kbd>H</kbd> | Toggle hide players |

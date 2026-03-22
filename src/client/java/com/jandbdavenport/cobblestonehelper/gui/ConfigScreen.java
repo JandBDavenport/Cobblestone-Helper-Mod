@@ -202,7 +202,7 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // Guild Quests section
 		estimatedHeight += sectionExpanded.get("guildQuests") ? 150 : 0;
 		estimatedHeight += 30; // Farm Warps section
-		estimatedHeight += sectionExpanded.get("farmWarps") ? 50 : 0; // 2 toggles + padding
+		estimatedHeight += sectionExpanded.get("farmWarps") ? 160 : 0; // 2 toggles + 3 color pickers + padding
 		estimatedHeight += 30; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
 		estimatedHeight += 30; // UI Colors section
@@ -257,9 +257,9 @@ public class ConfigScreen extends Screen {
 		yPos = buildThemesSection(centerX, yPos);
 		themesSectionEnd = yPos;
 
-		// Add all color picker fields as drawable children
-		for (HexColorPickerWidget picker : colorPickers.values()) {
-			this.addDrawableChild(picker.getField());
+		// Add all color picker fields as drawable children (including duplicates from different sections)
+		for (ColorPickerEntry entry : colorPickerEntries) {
+			this.addDrawableChild(entry.picker().getField());
 		}
 
 		// Add theme name field as drawable child
@@ -543,6 +543,22 @@ public class ConfigScreen extends Screen {
 				this.init();
 			});
 		yPos += 25;
+
+		// Color pickers
+		yPos = drawColorPicker(centerX, yPos, "Background:", "fwColorBackground", ModConfig.fwColorBackground, color -> {
+			ModConfig.fwColorBackground = color;
+			ModConfig.saveConfig();
+		});
+
+		yPos = drawColorPicker(centerX, yPos, "Accent Color:", "fwColorAccent", ModConfig.fwColorAccent, color -> {
+			ModConfig.fwColorAccent = color;
+			ModConfig.saveConfig();
+		});
+
+		yPos = drawColorPicker(centerX, yPos, "Slot Color:", "fwColorSlot", ModConfig.fwColorSlot, color -> {
+			ModConfig.fwColorSlot = color;
+			ModConfig.saveConfig();
+		});
 
 		return yPos;
 	}

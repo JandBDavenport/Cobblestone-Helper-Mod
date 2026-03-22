@@ -514,7 +514,7 @@ public class ConfigScreen extends Screen {
 	 */
 	private int buildFarmWarpsSection(int centerX, int yPos) {
 		boolean expanded = sectionExpanded.get("farmWarps");
-		String headerText = (expanded ? "▼" : "▶") + " Farm Warps";
+		String headerText = (expanded ? "▼" : "▶") + " Farm Warps Overlay";
 		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
 			sectionExpanded.put("farmWarps", !sectionExpanded.get("farmWarps"));
 			this.init();
@@ -543,22 +543,6 @@ public class ConfigScreen extends Screen {
 				this.init();
 			});
 		yPos += 25;
-
-		// Color pickers
-		yPos = drawColorPicker(centerX, yPos, "Background:", "fwColorBackground", ModConfig.fwColorBackground, color -> {
-			ModConfig.fwColorBackground = color;
-			ModConfig.saveConfig();
-		});
-
-		yPos = drawColorPicker(centerX, yPos, "Accent Color:", "fwColorAccent", ModConfig.fwColorAccent, color -> {
-			ModConfig.fwColorAccent = color;
-			ModConfig.saveConfig();
-		});
-
-		yPos = drawColorPicker(centerX, yPos, "Slot Color:", "fwColorSlot", ModConfig.fwColorSlot, color -> {
-			ModConfig.fwColorSlot = color;
-			ModConfig.saveConfig();
-		});
 
 		return yPos;
 	}

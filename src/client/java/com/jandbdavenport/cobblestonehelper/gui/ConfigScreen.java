@@ -129,6 +129,9 @@ public class ConfigScreen extends Screen {
 	private int themesSectionStart = 0;
 	private int themesSectionEnd = 0;
 
+	// Theme presets header position for rendering
+	private int themePresetsHeaderY = 0;
+
 	// Color picker widgets (indexed by feature)
 	private final Map<String, HexColorPickerWidget> colorPickers = new HashMap<>();
 
@@ -690,6 +693,8 @@ public class ConfigScreen extends Screen {
 
 		// SECTION 3: Theme Presets Header
 		yPos += 5; // Add some space before the header
+		themePresetsHeaderY = yPos; // Track position for rendering the header label
+		yPos += 12; // Space for the header text
 
 		// SECTION 4: Theme buttons in rows of 5
 		if (!customThemes.isEmpty()) {
@@ -1212,6 +1217,12 @@ public class ConfigScreen extends Screen {
 			int y = themeNameField.getY();
 			context.drawTextWithShadow(this.textRenderer, "New theme:",
 					this.width / 2 - 140, y + 1, TEXT_SECONDARY);
+		}
+
+		// Draw theme presets header if themes are visible
+		if (sectionExpanded.get("themes") && themePresetsHeaderY > 0) {
+			context.drawTextWithShadow(this.textRenderer, "Preset Themes:",
+					centerX - 140, themePresetsHeaderY, TEXT_SECONDARY);
 		}
 	}
 

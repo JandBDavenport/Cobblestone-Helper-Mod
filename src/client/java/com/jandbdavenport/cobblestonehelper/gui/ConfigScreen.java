@@ -60,6 +60,7 @@ public class ConfigScreen extends Screen {
 	private int scrollOffset = 0;
 	private int targetScrollOffset = 0; // Target for smooth scrolling animation
 	private int lastTargetScrollOffset = 0; // Track when target changes to force init
+	private float animationProgress = 1.0f; // 0.0 to 1.0, how far through animation we are
 	private int maxScroll = 0;
 	private static final int CONTENT_WIDTH = 300;
 	private static final int SCROLL_AREA_HEIGHT = 350;
@@ -986,29 +987,43 @@ public class ConfigScreen extends Screen {
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		// STEP 0: Apply smooth scroll animation
 
-		// If scroll target just changed, force an init to update layout immediately
+		// If scroll target just changed, reset animation progress
 		if (targetScrollOffset != lastTargetScrollOffset) {
 			lastTargetScrollOffset = targetScrollOffset;
+			animationProgress = 0.0f;
 			this.init();
 		}
 
-		if (scrollOffset != targetScrollOffset) {
-			int scrollDelta = targetScrollOffset - scrollOffset;
-			// Use 40% per frame for snappier, more responsive scrolling
-			int animationAmount = (int)(scrollDelta * 0.40);
-			if (animationAmount == 0 && scrollDelta != 0) {
-				animationAmount = scrollDelta > 0 ? 1 : -1; // Ensure we always move at least 1 pixel
-			}
-			scrollOffset += animationAmount;
+		if (scrollOffset != targetScrollOffset && animationProgress < 1.0f) {
+			int totalDistance = targetScrollOffset - scrollOffset;
 
-			// Snap to target if very close
-			if (Math.abs(scrollOffset - targetScrollOffset) <= 1) {
-				scrollOffset = targetScrollOffset;
+			// Calculate animation duration based on scroll distance
+			// Aim for: 100px in ~200ms, 500px in ~400ms, etc.
+			// Formula: duration = 150ms + (distance * 0.5ms per pixel)
+			int absoluteDistance = Math.abs(targetScrollOffset - scrollOffset);
+			float targetDurationMs = 150f + (absoluteDistance * 0.5f);
+			float framesNeeded = targetDurationMs / 16.67f; // ~60 FPS
+
+			// Increment progress based on frames elapsed
+			animationProgress += (1.0f / framesNeeded);
+
+			// Clamp progress to 0-1 range
+			if (animationProgress > 1.0f) {
+				animationProgress = 1.0f;
 			}
 
-			// Only call init if we actually changed the scroll offset
-			if (animationAmount != 0) {
+			// Calculate new scroll offset based on animation progress using easing
+			int startOffset = scrollOffset;
+			int newOffset = (int)(startOffset + (targetScrollOffset - startOffset) * animationProgress);
+
+			if (newOffset != scrollOffset) {
+				scrollOffset = newOffset;
 				this.init();
+			}
+
+			// Snap to target when animation completes
+			if (animationProgress >= 1.0f) {
+				scrollOffset = targetScrollOffset;
 			}
 		}
 

@@ -144,6 +144,9 @@ public class ConfigScreen extends Screen {
 	// Save theme instruction position for rendering
 	private int saveThemeInstructionY = 0;
 
+	// Plant hitbox warning position for rendering
+	private int plantHitboxWarningY = 0;
+
 	// Color picker widgets (indexed by feature)
 	private final Map<String, HexColorPickerWidget> colorPickers = new HashMap<>();
 
@@ -571,6 +574,10 @@ public class ConfigScreen extends Screen {
 		if (!expanded) {
 			return yPos;
 		}
+
+	// Store warning position for rendering
+	plantHitboxWarningY = yPos;
+	yPos += 20; // Account for warning text height
 
 		// Individual plant toggles
 		addToggleButton(centerX - 140, yPos, 280, 20,
@@ -1348,6 +1355,12 @@ public class ConfigScreen extends Screen {
 		if (sectionExpanded.get("themes") && themePresetsHeaderY > 0) {
 			context.drawTextWithShadow(this.textRenderer, "Available Themes:",
 					centerX - 140, themePresetsHeaderY, TEXT_SECONDARY);
+		}
+
+		// Draw plant hitbox warning if section is expanded
+		if (sectionExpanded.get("plantHitbox") && plantHitboxWarningY > 0) {
+			context.drawTextWithShadow(this.textRenderer, "⚠ May not be allowed. Use if you know what you're doing.",
+					centerX - 140, plantHitboxWarningY, 0xFFFF5555);
 		}
 	}
 

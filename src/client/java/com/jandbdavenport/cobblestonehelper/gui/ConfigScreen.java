@@ -58,9 +58,11 @@ public class ConfigScreen extends Screen {
 
 	private final Screen parentScreen;
 	private int scrollOffset = 0;
+	private int targetScrollOffset = 0; // Target for smooth scrolling animation
 	private int maxScroll = 0;
 	private static final int CONTENT_WIDTH = 300;
 	private static final int SCROLL_AREA_HEIGHT = 350;
+	private static final float SCROLL_ANIMATION_SPEED = 0.15f; // Fraction of distance to move per frame (0.0-1.0)
 
 	// Scrollbar drag state
 	private boolean isDraggingScrollbar = false;
@@ -175,6 +177,11 @@ public class ConfigScreen extends Screen {
 		buttonTypes.clear();
 		buttonToggleStates.clear();
 		buttonScaleSelected.clear();
+
+		// Ensure target scroll offset matches current during initialization
+		if (scrollOffset != targetScrollOffset) {
+			scrollOffset = targetScrollOffset;
+		}
 
 		// Initialize theme name field
 		if (this.textRenderer != null) {
@@ -982,6 +989,17 @@ public class ConfigScreen extends Screen {
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+		// STEP 0: Apply smooth scroll animation
+		if (scrollOffset != targetScrollOffset) {
+			int scrollDelta = targetScrollOffset - scrollOffset;
+			int animationAmount = Math.max(1, (int)(scrollDelta * SCROLL_ANIMATION_SPEED));
+			scrollOffset += animationAmount;
+			if (Math.abs(scrollOffset - targetScrollOffset) < 1) {
+				scrollOffset = targetScrollOffset;
+			}
+			this.init();
+		}
+
 		int contentLeft = this.width / 2 - CONTENT_WIDTH / 2;
 		int contentRight = this.width / 2 + CONTENT_WIDTH / 2;
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
@@ -1297,8 +1315,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double scrollAmount) {
 		int scrollDelta = (int) (-scrollAmount * 10);
-		scrollOffset = MathHelper.clamp(scrollOffset + scrollDelta, 0, maxScroll);
-		this.init();
+		targetScrollOffset = MathHelper.clamp(scrollOffset + scrollDelta, 0, maxScroll);
 		return true;
 	}
 
@@ -1337,12 +1354,13 @@ public class ConfigScreen extends Screen {
 		boolean scrollChanged = false;
 
 		if (isDraggingScrollbar) {
-			// Continue dragging
+			// Continue dragging - snap directly to position (no animation while dragging)
 			int dragDelta = (int) (mouseY - dragStartY);
 			int newScrollOffset = dragStartScrollOffset + (dragDelta * maxScroll) / (scrollbarH - thumbHeight);
 			int clampedOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
 			if (clampedOffset != scrollOffset) {
 				scrollOffset = clampedOffset;
+				targetScrollOffset = clampedOffset;
 				scrollChanged = true;
 			}
 		} else if (mouseY >= thumbY && mouseY <= thumbEnd) {
@@ -1351,15 +1369,13 @@ public class ConfigScreen extends Screen {
 			dragStartY = (int) mouseY;
 			dragStartScrollOffset = scrollOffset;
 		} else {
-			// Click on track - jump scroll
+			// Click on track - smooth scroll to position
 			int newThumbY = (int) mouseY - thumbHeight / 2;
 			newThumbY = Math.max(scrollbarY, Math.min(newThumbY, contentBottomY - thumbHeight));
 			int newScrollOffset = (newThumbY - scrollbarY) * maxScroll / (scrollbarH - thumbHeight);
 			int clampedOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
-			if (clampedOffset != scrollOffset) {
-				scrollOffset = clampedOffset;
-				scrollChanged = true;
-			}
+			targetScrollOffset = clampedOffset;
+			scrollChanged = true;
 		}
 
 		// Refresh layout if scroll offset changed

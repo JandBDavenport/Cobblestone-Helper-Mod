@@ -694,21 +694,33 @@ public class GuildQuestsManager {
 			// Prompt user to open guild quests
 			context.drawTextWithShadow(client.textRenderer, Text.literal("Open /guild to load"), 0, y, ModConfig.gqColorUnknown);
 		} else {
-			// Show each incomplete quest with nicely formatted text
+			// Show each incomplete quest with nicely formatted text (label in label color, target in target color)
 			if (!boss1Complete && !boss1ActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Boss 1: " + boss1Target), 0, y, ModConfig.gqColorLabel);
+				String label = "Boss 1: ";
+				context.drawTextWithShadow(client.textRenderer, Text.literal(label), 0, y, ModConfig.gqColorLabel);
+				int labelWidth = client.textRenderer.getWidth(label);
+				context.drawTextWithShadow(client.textRenderer, Text.literal(boss1Target), labelWidth, y, ModConfig.gqColorTarget);
 				y += lineHeight;
 			}
 			if (!boss2Complete && !boss2ActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Boss 2: " + boss2Target), 0, y, ModConfig.gqColorLabel);
+				String label = "Boss 2: ";
+				context.drawTextWithShadow(client.textRenderer, Text.literal(label), 0, y, ModConfig.gqColorLabel);
+				int labelWidth = client.textRenderer.getWidth(label);
+				context.drawTextWithShadow(client.textRenderer, Text.literal(boss2Target), labelWidth, y, ModConfig.gqColorTarget);
 				y += lineHeight;
 			}
 			if (!crop3kComplete && !crop3kActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Crop 1: " + crop3kTarget), 0, y, ModConfig.gqColorLabel);
+				String label = "Crop 1: ";
+				context.drawTextWithShadow(client.textRenderer, Text.literal(label), 0, y, ModConfig.gqColorLabel);
+				int labelWidth = client.textRenderer.getWidth(label);
+				context.drawTextWithShadow(client.textRenderer, Text.literal(crop3kTarget), labelWidth, y, ModConfig.gqColorTarget);
 				y += lineHeight;
 			}
 			if (!crop7500Complete && !crop7500ActionLine.isEmpty()) {
-				context.drawTextWithShadow(client.textRenderer, Text.literal("Crop 2: " + crop7500Target), 0, y, ModConfig.gqColorLabel);
+				String label = "Crop 2: ";
+				context.drawTextWithShadow(client.textRenderer, Text.literal(label), 0, y, ModConfig.gqColorLabel);
+				int labelWidth = client.textRenderer.getWidth(label);
+				context.drawTextWithShadow(client.textRenderer, Text.literal(crop7500Target), labelWidth, y, ModConfig.gqColorTarget);
 				y += lineHeight;
 			}
 			// If ALL quests complete, show completed message

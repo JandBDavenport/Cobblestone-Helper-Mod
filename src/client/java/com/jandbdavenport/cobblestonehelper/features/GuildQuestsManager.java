@@ -542,20 +542,13 @@ public class GuildQuestsManager {
 
 	/**
 	 * Parse a time remaining from a string.
-	 * Only parses lines that are actually timer lines (contain clock emoji or look like time).
+	 * Only parses lines that contain the clock emoji "⌚" or are known timer formats.
 	 * Supports: "mm:ss", "hh:mm:ss", "X minutes", "Xm Ys", "Xm", "Xh"
 	 */
 	private static Long parseTimeRemaining(String text) {
-		// Only parse lines that look like they contain a timer
-		// Must either contain the clock emoji or have time-like patterns
-		boolean likelyTimerLine = text.contains("⌚") || text.contains("quests available in") ||
-			text.contains("minutes") || text.contains("hours");
-
-		// Also parse if it matches time patterns with reasonable bounds
-		boolean hasTimePattern = text.matches(".*\\d+\\s*[mhs].*");
-
-		if (!likelyTimerLine && !hasTimePattern) {
-			return null;  // Skip lines that don't look like timers
+		// MUST contain the clock emoji to avoid matching quest names like "Boss Quest #1s"
+		if (!text.contains("⌚")) {
+			return null;  // Only parse lines with the clock emoji
 		}
 
 		// Try "Xm Ys" format (e.g., "55m 30s!" or "55m 30s")

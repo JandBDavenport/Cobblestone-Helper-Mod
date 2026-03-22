@@ -147,6 +147,9 @@ public class ConfigScreen extends Screen {
 	// Plant hitbox warning position for rendering
 	private int plantHitboxWarningY = 0;
 
+	// Plant hitbox explanation position for rendering
+	private int plantHitboxExplanationY = 0;
+
 	// Color picker widgets (indexed by feature)
 	private final Map<String, HexColorPickerWidget> colorPickers = new HashMap<>();
 
@@ -579,6 +582,9 @@ public class ConfigScreen extends Screen {
 	plantHitboxWarningY = yPos;
 	yPos += 40; // Account for two-line warning text height
 
+	// Store explanation position for rendering
+	plantHitboxExplanationY = yPos;
+	yPos += 15; // Account for explanation text height
 		// Individual plant toggles
 		addToggleButton(centerX - 140, yPos, 280, 20,
 			Text.literal(ModConfig.plantHitboxBrownMushroom ? "✓ Brown Mushroom" : "✗ Brown Mushroom"),
@@ -1363,6 +1369,12 @@ public class ConfigScreen extends Screen {
 					centerX - 140, plantHitboxWarningY, 0xFFFF5555);
 			context.drawTextWithShadow(this.textRenderer, "Only use if you know what you're doing.",
 					centerX - 140, plantHitboxWarningY + 10, 0xFFFF5555);
+		}
+
+		// Draw plant hitbox explanation if section is expanded
+		if (sectionExpanded.get("plantHitbox") && plantHitboxExplanationY > 0) {
+			context.drawTextWithShadow(this.textRenderer, "Enlarges hitbox of crops, making them easier to break.",
+					centerX - 140, plantHitboxExplanationY, TEXT_SECONDARY);
 		}
 	}
 

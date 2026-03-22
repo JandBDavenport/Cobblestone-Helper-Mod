@@ -577,7 +577,7 @@ public class ConfigScreen extends Screen {
 
 	// Store warning position for rendering
 	plantHitboxWarningY = yPos;
-	yPos += 20; // Account for warning text height
+	yPos += 40; // Account for two-line warning text height
 
 		// Individual plant toggles
 		addToggleButton(centerX - 140, yPos, 280, 20,
@@ -1359,8 +1359,10 @@ public class ConfigScreen extends Screen {
 
 		// Draw plant hitbox warning if section is expanded
 		if (sectionExpanded.get("plantHitbox") && plantHitboxWarningY > 0) {
-			context.drawTextWithShadow(this.textRenderer, "⚠ May not be allowed. Use if you know what you're doing.",
+			context.drawTextWithShadow(this.textRenderer, "⚠ May not be allowed.",
 					centerX - 140, plantHitboxWarningY, 0xFFFF5555);
+			context.drawTextWithShadow(this.textRenderer, "Only use if you know what you're doing.",
+					centerX - 140, plantHitboxWarningY + 10, 0xFFFF5555);
 		}
 	}
 

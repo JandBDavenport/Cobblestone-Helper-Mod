@@ -59,10 +59,15 @@ public class ThemeLoader {
 		reg("gqColorTarget",     c -> ModConfig.gqColorTarget = c,     () -> ModConfig.gqColorTarget);
 		reg("gqColorUnknown",    c -> ModConfig.gqColorUnknown = c,    () -> ModConfig.gqColorUnknown);
 
-		// Farm Warps colors
+		// Farm Warps colors (config menu)
 		reg("fwColorBackground", c -> ModConfig.fwColorBackground = c, () -> ModConfig.fwColorBackground);
 		reg("fwColorAccent",     c -> ModConfig.fwColorAccent = c,     () -> ModConfig.fwColorAccent);
 		reg("fwColorSlot",       c -> ModConfig.fwColorSlot = c,       () -> ModConfig.fwColorSlot);
+
+		// Farm Warps Menu colors
+		reg("fwMenuColorBackground", c -> ModConfig.fwMenuColorBackground = c, () -> ModConfig.fwMenuColorBackground);
+		reg("fwMenuColorAccent",     c -> ModConfig.fwMenuColorAccent = c,     () -> ModConfig.fwMenuColorAccent);
+		reg("fwMenuColorSlot",       c -> ModConfig.fwMenuColorSlot = c,       () -> ModConfig.fwMenuColorSlot);
 	}
 
 	/**
@@ -197,7 +202,10 @@ public class ThemeLoader {
 			Map.entry("gqColorUnknown", "FFFFFF00"),
 			Map.entry("fwColorBackground", "F2111111"),
 			Map.entry("fwColorAccent", "FFFF8C00"),
-			Map.entry("fwColorSlot", "FF222222")
+			Map.entry("fwColorSlot", "FF222222"),
+			Map.entry("fwMenuColorBackground", "F2111111"),
+			Map.entry("fwMenuColorAccent", "FFFF8C00"),
+			Map.entry("fwMenuColorSlot", "FF222222")
 		));
 
 		defaults.put("Purple", Map.ofEntries(
@@ -214,7 +222,10 @@ public class ThemeLoader {
 			Map.entry("gqColorUnknown", "FFFF4444"),
 			Map.entry("fwColorBackground", "F2111111"),
 			Map.entry("fwColorAccent", "FF7B5EA7"),
-			Map.entry("fwColorSlot", "FF222222")
+			Map.entry("fwColorSlot", "FF222222"),
+			Map.entry("fwMenuColorBackground", "F2111111"),
+			Map.entry("fwMenuColorAccent", "FF7B5EA7"),
+			Map.entry("fwMenuColorSlot", "FF222222")
 		));
 
 		defaults.put("Green", Map.ofEntries(
@@ -231,7 +242,10 @@ public class ThemeLoader {
 			Map.entry("gqColorUnknown", "FF00AA00"),
 			Map.entry("fwColorBackground", "F2111111"),
 			Map.entry("fwColorAccent", "FF00CC00"),
-			Map.entry("fwColorSlot", "FF222222")
+			Map.entry("fwColorSlot", "FF222222"),
+			Map.entry("fwMenuColorBackground", "F2111111"),
+			Map.entry("fwMenuColorAccent", "FF00CC00"),
+			Map.entry("fwMenuColorSlot", "FF222222")
 		));
 
 		defaults.put("Blue", Map.ofEntries(
@@ -248,7 +262,10 @@ public class ThemeLoader {
 			Map.entry("gqColorUnknown", "FF00CCFF"),
 			Map.entry("fwColorBackground", "F2111111"),
 			Map.entry("fwColorAccent", "FF0099FF"),
-			Map.entry("fwColorSlot", "FF222222")
+			Map.entry("fwColorSlot", "FF222222"),
+			Map.entry("fwMenuColorBackground", "F2111111"),
+			Map.entry("fwMenuColorAccent", "FF0099FF"),
+			Map.entry("fwMenuColorSlot", "FF222222")
 		));
 
 		defaults.put("Warm", Map.ofEntries(
@@ -265,7 +282,10 @@ public class ThemeLoader {
 			Map.entry("gqColorUnknown", "FFFF6600"),
 			Map.entry("fwColorBackground", "F2111111"),
 			Map.entry("fwColorAccent", "FFFF6600"),
-			Map.entry("fwColorSlot", "FF222222")
+			Map.entry("fwColorSlot", "FF222222"),
+			Map.entry("fwMenuColorBackground", "F2111111"),
+			Map.entry("fwMenuColorAccent", "FFFF6600"),
+			Map.entry("fwMenuColorSlot", "FF222222")
 		));
 
 		for (Map.Entry<String, Map<String, String>> entry : defaults.entrySet()) {

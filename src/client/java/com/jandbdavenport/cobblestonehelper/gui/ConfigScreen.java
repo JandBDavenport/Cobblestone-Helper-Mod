@@ -544,19 +544,19 @@ public class ConfigScreen extends Screen {
 			});
 		yPos += 25;
 
-		// Color pickers
-		yPos = drawColorPicker(centerX, yPos, "Background:", "fwColorBackground", ModConfig.fwColorBackground, color -> {
-			ModConfig.fwColorBackground = color;
+		// Color pickers for farm warp menu
+		yPos = drawColorPicker(centerX, yPos, "Background:", "fwMenuColorBackground", ModConfig.fwMenuColorBackground, color -> {
+			ModConfig.fwMenuColorBackground = color;
 			ModConfig.saveConfig();
 		});
 
-		yPos = drawColorPicker(centerX, yPos, "Accent Color:", "fwColorAccent", ModConfig.fwColorAccent, color -> {
-			ModConfig.fwColorAccent = color;
+		yPos = drawColorPicker(centerX, yPos, "Accent Color:", "fwMenuColorAccent", ModConfig.fwMenuColorAccent, color -> {
+			ModConfig.fwMenuColorAccent = color;
 			ModConfig.saveConfig();
 		});
 
-		yPos = drawColorPicker(centerX, yPos, "Slot Color:", "fwColorSlot", ModConfig.fwColorSlot, color -> {
-			ModConfig.fwColorSlot = color;
+		yPos = drawColorPicker(centerX, yPos, "Slot Color:", "fwMenuColorSlot", ModConfig.fwMenuColorSlot, color -> {
+			ModConfig.fwMenuColorSlot = color;
 			ModConfig.saveConfig();
 		});
 

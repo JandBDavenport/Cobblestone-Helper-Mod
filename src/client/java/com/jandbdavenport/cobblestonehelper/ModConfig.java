@@ -53,10 +53,15 @@ public class ModConfig {
 	public static int gqColorUnknown = 0xFFFFFF00;
 	public static float gqScale = 1.0f;
 
-	// Farm Warps colors
+	// Config Menu UI colors (used for config screen styling)
 	public static int fwColorBackground = 0xF2111111;
 	public static int fwColorAccent     = 0xFFFF8C00;
 	public static int fwColorSlot       = 0xFF222222;
+
+	// Farm Warps Menu colors (separate from config menu)
+	public static int fwMenuColorBackground = 0xF2111111;
+	public static int fwMenuColorAccent     = 0xFFFF8C00;
+	public static int fwMenuColorSlot       = 0xFF222222;
 
 	private static final String CONFIG_DIR = "config";
 	private static final String CONFIG_FILE = "cobblestonehelper.json";
@@ -121,10 +126,15 @@ public class ModConfig {
 				gqColorUnknown = getArgbColor(json, "gqColorUnknown", 0xFFFFFF00);
 				gqScale = getFloat(json, "gqScale", 1.0f);
 
-				// Load Farm Warps colors
+				// Load Farm Warps colors (config menu)
 				fwColorBackground = getArgbColor(json, "fwColorBackground", 0xF2111111);
 				fwColorAccent     = getArgbColor(json, "fwColorAccent", 0xFFFF8C00);
 				fwColorSlot       = getArgbColor(json, "fwColorSlot", 0xFF222222);
+
+				// Load Farm Warps Menu colors (farm warp screen)
+				fwMenuColorBackground = getArgbColor(json, "fwMenuColorBackground", 0xF2111111);
+				fwMenuColorAccent     = getArgbColor(json, "fwMenuColorAccent", 0xFFFF8C00);
+				fwMenuColorSlot       = getArgbColor(json, "fwMenuColorSlot", 0xFF222222);
 
 				System.out.println("[ModConfig] ✓ Config loaded successfully");
 			}
@@ -189,10 +199,15 @@ public class ModConfig {
 			json.addProperty("gqColorUnknown", String.format("%08X", gqColorUnknown));
 			json.addProperty("gqScale", gqScale);
 
-			// Farm Warps
+			// Farm Warps (config menu colors)
 			json.addProperty("fwColorBackground", String.format("%08X", fwColorBackground));
 			json.addProperty("fwColorAccent", String.format("%08X", fwColorAccent));
 			json.addProperty("fwColorSlot", String.format("%08X", fwColorSlot));
+
+			// Farm Warps Menu colors
+			json.addProperty("fwMenuColorBackground", String.format("%08X", fwMenuColorBackground));
+			json.addProperty("fwMenuColorAccent", String.format("%08X", fwMenuColorAccent));
+			json.addProperty("fwMenuColorSlot", String.format("%08X", fwMenuColorSlot));
 
 			// Write back to file
 			Files.writeString(configPath, GSON.toJson(json), StandardCharsets.UTF_8);

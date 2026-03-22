@@ -32,14 +32,14 @@ public class FarmWarpScreen extends Screen {
 
 	// Helper method to compute accent color with semi-transparency
 	private static int getAccentMidColor() {
-		int accent = ModConfig.fwColorAccent;
+		int accent = ModConfig.fwMenuColorAccent;
 		// Extract RGB and apply 50% alpha (0x80)
 		int rgb = accent & 0x00FFFFFF;
 		return 0x80000000 | rgb;
 	}
 
 	private static int getAccentDimColor() {
-		int accent = ModConfig.fwColorAccent;
+		int accent = ModConfig.fwMenuColorAccent;
 		// Extract RGB and apply 25% alpha (0x40)
 		int rgb = accent & 0x00FFFFFF;
 		return 0x40000000 | rgb;
@@ -161,21 +161,21 @@ public class FarmWarpScreen extends Screen {
 		int panelBottom = this.contentHeight;
 
 		// 1. Draw orange border (1px thick as 4 fill strips for rounded corners)
-		context.fill(panelLeft, this.panelTop, panelRight, this.panelTop + 1, ModConfig.fwColorAccent); // top
-		context.fill(panelLeft, panelBottom - 1, panelRight, panelBottom, ModConfig.fwColorAccent); // bottom
-		context.fill(panelLeft, this.panelTop + 1, panelLeft + 1, panelBottom - 1, ModConfig.fwColorAccent); // left
-		context.fill(panelRight - 1, this.panelTop + 1, panelRight, panelBottom - 1, ModConfig.fwColorAccent); // right
+		context.fill(panelLeft, this.panelTop, panelRight, this.panelTop + 1, ModConfig.fwMenuColorAccent); // top
+		context.fill(panelLeft, panelBottom - 1, panelRight, panelBottom, ModConfig.fwMenuColorAccent); // bottom
+		context.fill(panelLeft, this.panelTop + 1, panelLeft + 1, panelBottom - 1, ModConfig.fwMenuColorAccent); // left
+		context.fill(panelRight - 1, this.panelTop + 1, panelRight, panelBottom - 1, ModConfig.fwMenuColorAccent); // right
 
 		// 2. Draw rounded panel interior using staircase pattern for smooth corners
 		int panelW = panelRight - panelLeft;
 		int panelH = panelBottom - this.panelTop;
-		fillRounded(context, panelLeft + 1, this.panelTop + 1, panelW - 2, panelH - 2, ModConfig.fwColorBackground);
+		fillRounded(context, panelLeft + 1, this.panelTop + 1, panelW - 2, panelH - 2, ModConfig.fwMenuColorBackground);
 
 		// 3. Draw title bar strip (slightly lighter bg, 30px tall)
 		context.fill(panelLeft + 1, this.panelTop + 1, panelRight - 1, this.panelTop + 31, COLOR_BG_INNER);
 
 		// 4. Draw orange divider line under title bar
-		context.fill(panelLeft + 1, this.panelTop + 31, panelRight - 1, this.panelTop + 32, ModConfig.fwColorAccent);
+		context.fill(panelLeft + 1, this.panelTop + 31, panelRight - 1, this.panelTop + 32, ModConfig.fwMenuColorAccent);
 
 		// 5. Draw gradient in content area (much more visible: light gray to very dark)
 		context.fillGradient(panelLeft + 1, this.panelTop + 32, panelRight - 1, panelBottom - 1, 0xFF2A2A2A, 0xFF0A0A0A);
@@ -187,8 +187,8 @@ public class FarmWarpScreen extends Screen {
 		long now = Util.getMeasuringTimeMs();
 		float pulse = (float)((Math.sin(now / 2500.0 * 2 * Math.PI) + 1) / 2); // 0→1 over 2.5s cycle
 		int accentAlpha = (int)(0xCC + 0x33 * pulse); // 0xCC (80%) → 0xFF (100%)
-		// Extract RGB from ModConfig.fwColorAccent and rebuild with pulsing alpha
-		int accentRGB = ModConfig.fwColorAccent & 0x00FFFFFF;
+		// Extract RGB from ModConfig.fwMenuColorAccent and rebuild with pulsing alpha
+		int accentRGB = ModConfig.fwMenuColorAccent & 0x00FFFFFF;
 		int accentColor = (accentAlpha << 24) | accentRGB;
 
 		for (CategoryHeader header : categoryHeaders) {
@@ -199,7 +199,7 @@ public class FarmWarpScreen extends Screen {
 			context.fill(headerX - 7, headerY - 2, headerX - 4, headerY + 7, accentColor);
 
 			// Category name in orange
-			context.drawTextWithShadow(this.textRenderer, Text.literal(header.name()), headerX, headerY, ModConfig.fwColorAccent);
+			context.drawTextWithShadow(this.textRenderer, Text.literal(header.name()), headerX, headerY, ModConfig.fwMenuColorAccent);
 		}
 
 		// 8. Render crop item widgets (they handle their own hover states)
@@ -342,9 +342,9 @@ public class FarmWarpScreen extends Screen {
 
 			// Animate border color: lerp from dark gray to accent color
 			// Extract accent RGB components
-			int accentR = (ModConfig.fwColorAccent >> 16) & 0xFF;
-			int accentG = (ModConfig.fwColorAccent >> 8) & 0xFF;
-			int accentB = ModConfig.fwColorAccent & 0xFF;
+			int accentR = (ModConfig.fwMenuColorAccent >> 16) & 0xFF;
+			int accentG = (ModConfig.fwMenuColorAccent >> 8) & 0xFF;
+			int accentB = ModConfig.fwMenuColorAccent & 0xFF;
 			int bR = (int)MathHelper.lerp(hoverProgress, 0x38, accentR);
 			int bG = (int)MathHelper.lerp(hoverProgress, 0x38, accentG);
 			int bB = (int)MathHelper.lerp(hoverProgress, 0x38, accentB);
@@ -352,7 +352,7 @@ public class FarmWarpScreen extends Screen {
 
 			// Animate overlay alpha: 0 → 0x40 (25% opacity of orange)
 			int overlayAlpha = (int)(hoverProgress * 0x40);
-			int accentRGB = ModConfig.fwColorAccent & 0x00FFFFFF; int overlayColor = (overlayAlpha << 24) | accentRGB;
+			int accentRGB = ModConfig.fwMenuColorAccent & 0x00FFFFFF; int overlayColor = (overlayAlpha << 24) | accentRGB;
 
 			// If this is the best crop, render glowing yellow outline with fancy decoration
 			if (isBestCrop) {
@@ -413,7 +413,7 @@ public class FarmWarpScreen extends Screen {
 			context.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, borderColor);
 
 			// Draw square slot background
-			context.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, ModConfig.fwColorSlot);
+			context.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, ModConfig.fwMenuColorSlot);
 
 			// Draw animated overlay (only if visible)
 			if (overlayAlpha > 0) {

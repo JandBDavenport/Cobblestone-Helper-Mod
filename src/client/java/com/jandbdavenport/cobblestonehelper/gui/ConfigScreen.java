@@ -132,6 +132,9 @@ public class ConfigScreen extends Screen {
 	// Theme presets header position for rendering
 	private int themePresetsHeaderY = 0;
 
+	// Save theme instruction position for rendering
+	private int saveThemeInstructionY = 0;
+
 	// Color picker widgets (indexed by feature)
 	private final Map<String, HexColorPickerWidget> colorPickers = new HashMap<>();
 
@@ -190,11 +193,11 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // UI Colors section
 		estimatedHeight += sectionExpanded.get("uiColors") ? 100 : 0;
 		estimatedHeight += 30; // Themes section
-		// Calculate height for themes section: save (25) + restore (25) + custom themes + open folder (25)
+		// Calculate height for themes section: instructions (12) + save (25) + restore (25) + custom themes + open folder (25)
 		List<ThemeLoader.LoadedTheme> allThemes = ThemeLoader.loadThemes();
 		int customThemeCount = (int) allThemes.stream().filter(t -> !t.name().equals("Default")).count();
 		int themeRows = Math.max(0, (customThemeCount + 4) / 5);
-		estimatedHeight += sectionExpanded.get("themes") ? (50 + themeRows * 25 + 35) : 0;
+		estimatedHeight += sectionExpanded.get("themes") ? (62 + themeRows * 25 + 35) : 0;
 
 		// Content box height is fixed; content scrolls inside it
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
@@ -651,6 +654,10 @@ public class ConfigScreen extends Screen {
 
 		// SECTION 1: Save Theme UI at the top
 		if (themeNameField != null) {
+			// Track position for rendering instruction text
+			saveThemeInstructionY = yPos;
+			yPos += 12; // Space for instruction text
+
 			// Position the theme name field
 			themeNameField.setX(centerX - 70);
 			themeNameField.setY(yPos);
@@ -1212,11 +1219,18 @@ public class ConfigScreen extends Screen {
 			picker.renderPreview(context);
 		}
 
-		// Draw theme name label if the field is visible
+		// Draw save theme instructions and label if the field is visible
 		if (themeNameField != null && sectionExpanded.get("themes")) {
+			// Draw instruction text
+			if (saveThemeInstructionY > 0) {
+				context.drawTextWithShadow(this.textRenderer, "Save current colors as a theme:",
+						centerX - 140, saveThemeInstructionY, TEXT_SECONDARY);
+			}
+
+			// Draw label for the text field
 			int y = themeNameField.getY();
-			context.drawTextWithShadow(this.textRenderer, "New theme:",
-					this.width / 2 - 140, y + 1, TEXT_SECONDARY);
+			context.drawTextWithShadow(this.textRenderer, "Theme name:",
+					centerX - 140, y + 1, TEXT_SECONDARY);
 		}
 
 		// Draw theme presets header if themes are visible

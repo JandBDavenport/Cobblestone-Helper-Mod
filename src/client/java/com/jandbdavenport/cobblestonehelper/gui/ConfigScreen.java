@@ -1388,6 +1388,7 @@ public class ConfigScreen extends Screen {
 			if (clampedOffset != scrollOffset) {
 				scrollOffset = clampedOffset;
 				targetScrollOffset = clampedOffset;
+				animationProgress = 1.0f; // No animation for dragging
 				this.init();
 			}
 		} else if (mouseY >= thumbY && mouseY <= thumbEnd) {
@@ -1396,13 +1397,15 @@ public class ConfigScreen extends Screen {
 			dragStartY = (int) mouseY;
 			dragStartScrollOffset = scrollOffset;
 		} else {
-			// Click on track - smooth scroll to position (don't call init yet, let animation handle it)
+			// Click on track - instant jump (no animation for large jumps)
 			int newThumbY = (int) mouseY - thumbHeight / 2;
 			newThumbY = Math.max(scrollbarY, Math.min(newThumbY, contentBottomY - thumbHeight));
 			int newScrollOffset = (newThumbY - scrollbarY) * maxScroll / (scrollbarH - thumbHeight);
 			int clampedOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
+			scrollOffset = clampedOffset;
 			targetScrollOffset = clampedOffset;
-			// Don't call init() here - let the render loop handle the animation and init() calls
+			animationProgress = 1.0f; // Instant, no animation
+			this.init();
 		}
 	}
 

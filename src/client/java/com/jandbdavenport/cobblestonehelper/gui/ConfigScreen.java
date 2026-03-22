@@ -11,6 +11,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -60,6 +61,11 @@ public class ConfigScreen extends Screen {
 	private int maxScroll = 0;
 	private static final int CONTENT_WIDTH = 300;
 	private static final int SCROLL_AREA_HEIGHT = 350;
+
+	// Scrollbar drag state
+	private boolean isDraggingScrollbar = false;
+	private int dragStartY = 0;
+	private int dragStartScrollOffset = 0;
 
 	/**
 	 * Compute a lighter shade of ModConfig.fwColorAccent by adding brightness.
@@ -1017,6 +1023,12 @@ public class ConfigScreen extends Screen {
 
 		// STEP 10: Draw scrollbar inside the panel (as right edge)
 		drawScrollbar(context, contentLeft, contentRight);
+
+		// STEP 11: Handle scrollbar interaction (drag and click)
+		if (this.client != null && this.client.getWindow() != null) {
+			boolean mouseDown = GLFW.glfwGetMouseButton(this.client.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
+			handleScrollbarInteraction(mouseX, mouseY, mouseDown);
+		}
 	}
 
 	/**
@@ -1288,6 +1300,57 @@ public class ConfigScreen extends Screen {
 		scrollOffset = MathHelper.clamp(scrollOffset + scrollDelta, 0, maxScroll);
 		this.init();
 		return true;
+	}
+
+	/**
+	 * Handle scrollbar interaction (drag and click)
+	 */
+	public void handleScrollbarInteraction(double mouseX, double mouseY, boolean mouseDown) {
+		int contentLeft = this.width / 2 - CONTENT_WIDTH / 2;
+		int contentRight = this.width / 2 + CONTENT_WIDTH / 2;
+		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
+		int scrollbarX = contentRight - 8;
+		int scrollbarY = CONTENT_START_Y;
+		int scrollbarH = contentBottomY - scrollbarY;
+
+		// Check if mouse is over scrollbar
+		boolean mouseOverScrollbar = mouseX >= scrollbarX && mouseX <= scrollbarX + 8 && mouseY >= scrollbarY && mouseY <= contentBottomY;
+
+		if (!mouseDown) {
+			// Mouse released - stop dragging
+			isDraggingScrollbar = false;
+			return;
+		}
+
+		if (!mouseOverScrollbar && !isDraggingScrollbar) {
+			return; // Not over scrollbar and not dragging
+		}
+
+		if (maxScroll <= 0) {
+			return; // Nothing to scroll
+		}
+
+		int thumbHeight = Math.max(15, (scrollbarH * scrollbarH) / (scrollbarH + maxScroll));
+		int thumbY = scrollbarY + (scrollOffset * (scrollbarH - thumbHeight)) / maxScroll;
+		int thumbEnd = Math.min(thumbY + thumbHeight, contentBottomY);
+
+		if (isDraggingScrollbar) {
+			// Continue dragging
+			int dragDelta = (int) (mouseY - dragStartY);
+			int newScrollOffset = dragStartScrollOffset + (dragDelta * maxScroll) / (scrollbarH - thumbHeight);
+			scrollOffset = MathHelper.clamp(newScrollOffset, 0, maxScroll);
+		} else if (mouseY >= thumbY && mouseY <= thumbEnd) {
+			// Start dragging the thumb
+			isDraggingScrollbar = true;
+			dragStartY = (int) mouseY;
+			dragStartScrollOffset = scrollOffset;
+		} else {
+			// Click on track - jump scroll
+			int newThumbY = (int) mouseY - thumbHeight / 2;
+			newThumbY = Math.max(scrollbarY, Math.min(newThumbY, contentBottomY - thumbHeight));
+			scrollOffset = (newThumbY - scrollbarY) * maxScroll / (scrollbarH - thumbHeight);
+			scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScroll);
+		}
 	}
 
 	@Override

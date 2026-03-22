@@ -62,7 +62,6 @@ public class ConfigScreen extends Screen {
 	private int maxScroll = 0;
 	private static final int CONTENT_WIDTH = 300;
 	private static final int SCROLL_AREA_HEIGHT = 350;
-	private static final float SCROLL_ANIMATION_SPEED = 0.15f; // Fraction of distance to move per frame (0.0-1.0)
 
 	// Scrollbar drag state
 	private boolean isDraggingScrollbar = false;
@@ -992,12 +991,22 @@ public class ConfigScreen extends Screen {
 		// STEP 0: Apply smooth scroll animation
 		if (scrollOffset != targetScrollOffset) {
 			int scrollDelta = targetScrollOffset - scrollOffset;
-			int animationAmount = Math.max(1, (int)(scrollDelta * SCROLL_ANIMATION_SPEED));
+			// Use larger animation steps for faster, more visible animation
+			int animationAmount = (int)(scrollDelta * 0.25); // 25% per frame instead of 15%
+			if (animationAmount == 0 && scrollDelta != 0) {
+				animationAmount = scrollDelta > 0 ? 1 : -1; // Ensure we always move at least 1 pixel
+			}
 			scrollOffset += animationAmount;
-			if (Math.abs(scrollOffset - targetScrollOffset) < 1) {
+
+			// Snap to target if very close
+			if (Math.abs(scrollOffset - targetScrollOffset) <= 1) {
 				scrollOffset = targetScrollOffset;
 			}
-			this.init();
+
+			// Only call init if we actually changed the scroll offset
+			if (animationAmount != 0) {
+				this.init();
+			}
 		}
 
 		int contentLeft = this.width / 2 - CONTENT_WIDTH / 2;

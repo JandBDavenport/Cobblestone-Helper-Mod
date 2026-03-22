@@ -248,7 +248,7 @@ public class GuildQuestsManager {
 				MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("§6Guild quests cache cleared!"));
 			});
 		})
-		.dimensions(screen.width - 105, 5, 20, 20)
+		.dimensions(screen.width - 60, 10, 20, 20)
 		.build();
 
 		// Create "Reposition" button (right button, top right area)
@@ -256,7 +256,7 @@ public class GuildQuestsManager {
 			MinecraftClient.getInstance().send(() ->
 				MinecraftClient.getInstance().setScreen(new HudPositionScreen(WIDGET)));
 		})
-		.dimensions(screen.width - 80, 5, 20, 20)
+		.dimensions(screen.width - 30, 10, 20, 20)
 		.build();
 
 		Screens.getButtons(screen).add(clearButton);

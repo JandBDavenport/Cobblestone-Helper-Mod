@@ -60,5 +60,16 @@ public class FarmData {
 		elysium.add(new FarmEntry("Godflowers", "minecraft:wildflowers", "godflowers"));
 		elysium.add(new FarmEntry("Hallowed Heart", "minecraft:creaking_heart", "hallowedheart"));
 		LIST.add(new FarmCategory("Elysium", elysium));
+
+		// The Abyss
+		List<FarmEntry> abyss = new ArrayList<>();
+		abyss.add(new FarmEntry("Tuff", "minecraft:tuff", "tuff"));
+		abyss.add(new FarmEntry("Obsidian", "minecraft:obsidian", "obsidian"));
+		abyss.add(new FarmEntry("Cherry", "minecraft:cherry_sapling", "cherry"));
+		abyss.add(new FarmEntry("Copper", "minecraft:copper_ingot", "copper"));
+		abyss.add(new FarmEntry("Abyss", "minecraft:black_concrete_powder", "abyss"));
+		abyss.add(new FarmEntry("Ceruleum", "minecraft:warped_nylium", "ceruleum"));
+		abyss.add(new FarmEntry("Blood", "minecraft:crimson_nylium", "blood"));
+		LIST.add(new FarmCategory("The Abyss", abyss));
 	}
 }

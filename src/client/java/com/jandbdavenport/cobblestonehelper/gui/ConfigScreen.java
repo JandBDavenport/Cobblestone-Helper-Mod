@@ -207,7 +207,7 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // Farm Warps section
 		estimatedHeight += sectionExpanded.get("farmWarps") ? 160 : 0; // 2 toggles + 3 color pickers + padding
 		estimatedHeight += 30; // Auto Respawn section
-		estimatedHeight += sectionExpanded.get("autoRespawn") ? 100 : 0; // 1 toggle + 1 slider + extra spacing
+		estimatedHeight += sectionExpanded.get("autoRespawn") ? 110 : 0; // 1 toggle + 1 slider + extra spacing
 		estimatedHeight += 30; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
 		estimatedHeight += 30; // UI Colors section
@@ -597,7 +597,7 @@ public class ConfigScreen extends Screen {
 				ModConfig.saveConfig();
 				this.init();
 			});
-		yPos += 30; // Extra space for slider label above it
+		yPos += 40; // Extra space for slider label above it
 
 		// Slider for delay (2-10 seconds, map to 0.0-1.0)
 		double normalizedValue = (ModConfig.autoRespawnDelaySeconds - 2.0) / 8.0;

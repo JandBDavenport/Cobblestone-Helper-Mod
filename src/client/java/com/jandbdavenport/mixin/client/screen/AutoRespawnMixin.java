@@ -15,8 +15,8 @@ public class AutoRespawnMixin {
 	private void renderCountdown(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (!ModConfig.autoRespawnEnabled || !AutoRespawnManager.isWaiting()) return;
 
-		int seconds = AutoRespawnManager.getRemainingSeconds();
-		String text = "Respawning in " + seconds + "...";
+		float seconds = AutoRespawnManager.getRemainingSeconds();
+		String text = String.format("Respawning in %.1f...", seconds);
 
 		var client = net.minecraft.client.MinecraftClient.getInstance();
 		int x = client.getWindow().getScaledWidth() / 2;

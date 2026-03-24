@@ -207,7 +207,7 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += 30; // Farm Warps section
 		estimatedHeight += sectionExpanded.get("farmWarps") ? 160 : 0; // 2 toggles + 3 color pickers + padding
 		estimatedHeight += 30; // Auto Respawn section
-		estimatedHeight += sectionExpanded.get("autoRespawn") ? 90 : 0; // 1 toggle + 1 slider + padding
+		estimatedHeight += sectionExpanded.get("autoRespawn") ? 100 : 0; // 1 toggle + 1 slider + extra spacing
 		estimatedHeight += 30; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
 		estimatedHeight += 30; // UI Colors section
@@ -597,7 +597,7 @@ public class ConfigScreen extends Screen {
 				ModConfig.saveConfig();
 				this.init();
 			});
-		yPos += 25;
+		yPos += 30; // Extra space for slider label above it
 
 		// Slider for delay (2-10 seconds, map to 0.0-1.0)
 		double normalizedValue = (ModConfig.autoRespawnDelaySeconds - 2.0) / 8.0;
@@ -1606,10 +1606,10 @@ public class ConfigScreen extends Screen {
 			int thumbY = this.getY() + this.getHeight() / 2 - 6;
 			context.fill(thumbX, thumbY, thumbX + 4, thumbY + 12, ModConfig.fwColorAccent);
 
-			// Draw label text (left-aligned with padding)
+			// Draw label text above the slider (don't obscure the thumb)
 			if (configScreen != null && configScreen.textRenderer != null) {
 				context.drawTextWithShadow(configScreen.textRenderer, this.getMessage(),
-						this.getX() + 6, this.getY() + (this.getHeight() - 8) / 2, TEXT_PRIMARY);
+						this.getX() + 6, this.getY() - 12, TEXT_PRIMARY);
 			}
 		}
 	}

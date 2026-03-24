@@ -43,9 +43,9 @@ public class AutoRespawnManager {
 		return waitingToRespawn;
 	}
 
-	public static int getRemainingSeconds() {
+	public static float getRemainingSeconds() {
 		if (!waitingToRespawn) return 0;
 		long remaining = respawnTriggerMs - System.currentTimeMillis();
-		return Math.max(0, (int) Math.ceil(remaining / 1000.0));
+		return Math.max(0, remaining / 1000.0f);
 	}
 }

@@ -56,17 +56,22 @@ public class ItemGlowManager {
 	}
 
 	/**
-	 * Check if an item is visible by raycasting from player eye to 8 corners of the item's bounding box.
-	 * The raycast targets are nudged 0.1 blocks toward the camera.
-	 * An item is considered visible if ANY raycast returns MISS (not all blocked).
-	 * This catches cases where the item center is blocked but edges are visible.
+	 * Check if an item is visible by raycasting to 8 corners and 6 face centers of the item's bounding box.
+	 * Uses early exit: returns immediately on first visible raycast (MISS).
+	 * An item is visible if ANY test point is visible (not occluded by terrain).
 	 */
 	private static void checkItemVisibilityMultiRaycast(MinecraftClient client, ItemEntity entity) {
 		Vec3d cameraPos = client.player.getEyePos();
 		Box boundingBox = entity.getBoundingBox();
 
+		// Calculate center of bounding box
+		double centerX = (boundingBox.minX + boundingBox.maxX) / 2.0;
+		double centerY = (boundingBox.minY + boundingBox.maxY) / 2.0;
+		double centerZ = (boundingBox.minZ + boundingBox.maxZ) / 2.0;
+
 		// 8 corners of the bounding box
-		Vec3d[] corners = new Vec3d[]{
+		Vec3d[] testPoints = new Vec3d[]{
+			// Corners
 			new Vec3d(boundingBox.minX, boundingBox.minY, boundingBox.minZ),
 			new Vec3d(boundingBox.maxX, boundingBox.minY, boundingBox.minZ),
 			new Vec3d(boundingBox.minX, boundingBox.maxY, boundingBox.minZ),
@@ -74,16 +79,23 @@ public class ItemGlowManager {
 			new Vec3d(boundingBox.minX, boundingBox.minY, boundingBox.maxZ),
 			new Vec3d(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ),
 			new Vec3d(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ),
-			new Vec3d(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
+			new Vec3d(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ),
+			// 6 face centers
+			new Vec3d(centerX, centerY, boundingBox.minZ),  // Front
+			new Vec3d(centerX, centerY, boundingBox.maxZ),  // Back
+			new Vec3d(boundingBox.minX, centerY, centerZ),  // Left
+			new Vec3d(boundingBox.maxX, centerY, centerZ),  // Right
+			new Vec3d(centerX, boundingBox.maxY, centerZ),  // Top
+			new Vec3d(centerX, boundingBox.minY, centerZ)   // Bottom
 		};
 
-		// If ANY corner is visible (raycast returns MISS), entity is visible
-		for (Vec3d corner : corners) {
-			Vec3d direction = cameraPos.subtract(corner);
+		// Test each point; exit immediately on first visible (MISS)
+		for (Vec3d testPoint : testPoints) {
+			Vec3d direction = cameraPos.subtract(testPoint);
 			if (direction.length() > 0.0001) {
 				direction = direction.normalize();
 			}
-			Vec3d nudgedTarget = corner.add(direction.multiply(NUDGE_DISTANCE));
+			Vec3d nudgedTarget = testPoint.add(direction.multiply(NUDGE_DISTANCE));
 
 			BlockHitResult hit = client.world.raycast(new RaycastContext(
 				cameraPos,
@@ -94,13 +106,13 @@ public class ItemGlowManager {
 			));
 
 			if (hit.getType() == HitResult.Type.MISS) {
-				// Found at least one visible corner
+				// Found at least one visible point - early exit
 				visibilityCache.put(entity.getUuid(), true);
 				return;
 			}
 		}
 
-		// All corners are blocked
+		// All test points are blocked
 		visibilityCache.put(entity.getUuid(), false);
 	}
 

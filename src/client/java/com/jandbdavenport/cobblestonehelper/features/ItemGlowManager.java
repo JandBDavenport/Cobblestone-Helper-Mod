@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ItemGlowManager {
-	private static final int CHECKS_PER_TICK = 25;
+	private static final int CHECKS_PER_TICK = 100;
 	private static final double NUDGE_DISTANCE = 0.1; // blocks toward camera
 	private static final int RENDER_DISTANCE = 64; // blocks
 
@@ -48,7 +48,7 @@ public class ItemGlowManager {
 				ItemEntity entity = items.get(checkIndex);
 				checkIndex++;
 
-				checkItemVisibility(client, entity);
+				checkItemVisibilityMultiRaycast(client, entity);
 			}
 
 			lastItems = items;
@@ -56,35 +56,52 @@ public class ItemGlowManager {
 	}
 
 	/**
-	 * Check if an item is visible by raycasting from player eye to item center.
-	 * The raycast target is nudged 0.1 blocks toward the camera to handle edge cases
-	 * where items are flush against block edges but still visually exposed.
+	 * Check if an item is visible by raycasting from player eye to 8 corners of the item's bounding box.
+	 * The raycast targets are nudged 0.1 blocks toward the camera.
+	 * An item is considered visible if ANY raycast returns MISS (not all blocked).
+	 * This catches cases where the item center is blocked but edges are visible.
 	 */
-	private static void checkItemVisibility(MinecraftClient client, ItemEntity entity) {
+	private static void checkItemVisibilityMultiRaycast(MinecraftClient client, ItemEntity entity) {
 		Vec3d cameraPos = client.player.getEyePos();
-		Vec3d itemCenter = new Vec3d(
-			entity.getX(),
-			entity.getY() + entity.getHeight() / 2.0,
-			entity.getZ()
-		);
+		Box boundingBox = entity.getBoundingBox();
 
-		// Nudge the target toward the camera to avoid hitting block edges
-		Vec3d direction = cameraPos.subtract(itemCenter);
-		if (direction.length() > 0.0001) {
-			direction = direction.normalize();
+		// 8 corners of the bounding box
+		Vec3d[] corners = new Vec3d[]{
+			new Vec3d(boundingBox.minX, boundingBox.minY, boundingBox.minZ),
+			new Vec3d(boundingBox.maxX, boundingBox.minY, boundingBox.minZ),
+			new Vec3d(boundingBox.minX, boundingBox.maxY, boundingBox.minZ),
+			new Vec3d(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ),
+			new Vec3d(boundingBox.minX, boundingBox.minY, boundingBox.maxZ),
+			new Vec3d(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ),
+			new Vec3d(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ),
+			new Vec3d(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
+		};
+
+		// If ANY corner is visible (raycast returns MISS), entity is visible
+		for (Vec3d corner : corners) {
+			Vec3d direction = cameraPos.subtract(corner);
+			if (direction.length() > 0.0001) {
+				direction = direction.normalize();
+			}
+			Vec3d nudgedTarget = corner.add(direction.multiply(NUDGE_DISTANCE));
+
+			BlockHitResult hit = client.world.raycast(new RaycastContext(
+				cameraPos,
+				nudgedTarget,
+				RaycastContext.ShapeType.COLLIDER,
+				RaycastContext.FluidHandling.NONE,
+				entity
+			));
+
+			if (hit.getType() == HitResult.Type.MISS) {
+				// Found at least one visible corner
+				visibilityCache.put(entity.getUuid(), true);
+				return;
+			}
 		}
-		Vec3d nudgedTarget = itemCenter.add(direction.multiply(NUDGE_DISTANCE));
 
-		BlockHitResult hit = client.world.raycast(new RaycastContext(
-			cameraPos,
-			nudgedTarget,
-			RaycastContext.ShapeType.COLLIDER,
-			RaycastContext.FluidHandling.NONE,
-			entity
-		));
-
-		boolean isVisible = hit.getType() == HitResult.Type.MISS;
-		visibilityCache.put(entity.getUuid(), isVisible);
+		// All corners are blocked
+		visibilityCache.put(entity.getUuid(), false);
 	}
 
 	/**

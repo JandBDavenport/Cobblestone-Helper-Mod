@@ -601,7 +601,7 @@ public class ConfigScreen extends Screen {
 
 		// Slider for delay (2-10 seconds, map to 0.0-1.0)
 		double normalizedValue = (ModConfig.autoRespawnDelaySeconds - 2.0) / 8.0;
-		net.minecraft.client.gui.widget.SliderWidget delaySlider = new net.minecraft.client.gui.widget.SliderWidget(
+		StyledSliderWidget delaySlider = new StyledSliderWidget(this,
 			centerX - 140, yPos, 280, 20,
 			Text.literal(String.format("Delay: %.1fs", ModConfig.autoRespawnDelaySeconds)),
 			normalizedValue) {
@@ -1549,6 +1549,68 @@ public class ConfigScreen extends Screen {
 			targetScrollOffset = clampedOffset;
 			animationProgress = 1.0f; // Instant, no animation
 			this.init();
+		}
+	}
+
+	/**
+	 * Custom slider widget matching ConfigScreen's design aesthetic
+	 */
+	public static class StyledSliderWidget extends net.minecraft.client.gui.widget.SliderWidget {
+		private final ConfigScreen configScreen;
+
+		public StyledSliderWidget(ConfigScreen configScreen, int x, int y, int width, int height,
+				Text text, double value) {
+			super(x, y, width, height, text, value);
+			this.configScreen = configScreen;
+		}
+
+		@Override
+		protected void applyValue() {
+			// Default no-op; subclasses can override
+		}
+
+		@Override
+		protected void updateMessage() {
+			// Default no-op; subclasses can override
+		}
+
+		@Override
+		public void renderWidget(net.minecraft.client.gui.DrawContext context, int mouseX, int mouseY, float delta) {
+			if (!this.visible) return;
+
+			int bgColor = this.isMouseOver(mouseX, mouseY) ? BTN_HOVER_BG : BTN_BG;
+
+			// Draw background
+			context.fill(this.getX(), this.getY(), this.getX() + this.getWidth(),
+					this.getY() + this.getHeight(), bgColor);
+
+			// Draw border
+			context.fill(this.getX(), this.getY(), this.getX() + this.getWidth(),
+					this.getY() + 1, BTN_BORDER); // Top
+			context.fill(this.getX(), this.getY() + this.getHeight() - 1,
+					this.getX() + this.getWidth(), this.getY() + this.getHeight(), BTN_BORDER); // Bottom
+			context.fill(this.getX(), this.getY(), this.getX() + 1,
+					this.getY() + this.getHeight(), BTN_BORDER); // Left
+			context.fill(this.getX() + this.getWidth() - 1, this.getY(),
+					this.getX() + this.getWidth(), this.getY() + this.getHeight(), BTN_BORDER); // Right
+
+			// Draw slider track (inside, slightly inset)
+			int trackLeft = this.getX() + 4;
+			int trackRight = this.getX() + this.getWidth() - 4;
+			int trackY = this.getY() + this.getHeight() / 2 - 2;
+			int trackHeight = 4;
+			context.fill(trackLeft, trackY, trackRight, trackY + trackHeight, 0xFF1A1A1A);
+
+			// Draw slider thumb (accent colored)
+			int thumbX = (int) (trackLeft + (trackRight - trackLeft - 4) * this.value);
+			int thumbY = this.getY() + this.getHeight() / 2 - 6;
+			context.fill(thumbX, thumbY, thumbX + 4, thumbY + 12, ModConfig.fwColorAccent);
+
+			// Draw label text (left-aligned with padding)
+			if (configScreen != null && configScreen.textRenderer != null) {
+				context.drawTextWithShadow(configScreen.textRenderer, this.getMessage(),
+						this.getX() + 6, this.getY() + (this.getHeight() - 8) / 2, TEXT_PRIMARY);
+			}
 		}
 	}
 

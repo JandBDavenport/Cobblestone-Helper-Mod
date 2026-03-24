@@ -156,6 +156,9 @@ public class ConfigScreen extends Screen {
 	// Plant hitbox explanation position for rendering
 	private int plantHitboxExplanationY = 0;
 
+	// Item glow notice position for rendering
+	private int itemGlowNoticeY = 0;
+
 	// Color picker widgets (indexed by feature)
 	private final Map<String, HexColorPickerWidget> colorPickers = new HashMap<>();
 
@@ -665,6 +668,11 @@ public class ConfigScreen extends Screen {
 			ModConfig.itemGlowColor = color;
 			ModConfig.saveConfig();
 		});
+		yPos += 20;
+
+		// Store notice position for rendering
+		itemGlowNoticeY = yPos;
+		yPos += 20;
 
 		return yPos;
 	}
@@ -1482,6 +1490,12 @@ public class ConfigScreen extends Screen {
 		if (sectionExpanded.get("plantHitbox") && plantHitboxExplanationY > 0) {
 			context.drawTextWithShadow(this.textRenderer, "Enlarges hitbox of crops, making them easier to break.",
 					centerX - 140, plantHitboxExplanationY, TEXT_SECONDARY);
+		}
+
+		// Draw item glow notice if section is expanded
+		if (sectionExpanded.get("itemGlow") && itemGlowNoticeY > 0) {
+			context.drawTextWithShadow(this.textRenderer, "Items only glow when visible (not through walls).",
+					centerX - 140, itemGlowNoticeY, TEXT_SECONDARY);
 		}
 	}
 

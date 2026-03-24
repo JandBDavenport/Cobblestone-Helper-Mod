@@ -33,6 +33,10 @@ public class ModConfig {
 	public static boolean farmWarpsGuildQuestHighlight = true;
 	public static boolean farmWarpsShowBazaarHighlight = true;
 
+	// Auto Respawn
+	public static boolean autoRespawnEnabled = false;
+	public static float autoRespawnDelaySeconds = 3.0f;
+
 	// Shady Summoner colors (ARGB ints) + scale
 	public static int ssColorLabel   = 0xFFBB77FF;
 	public static int ssColorActive  = 0xFF00CC00;
@@ -106,6 +110,10 @@ public class ModConfig {
 				farmWarpsGuildQuestHighlight = getBoolean(json, "farmWarpsGuildQuestHighlight", true);
 				farmWarpsShowBazaarHighlight = getBoolean(json, "farmWarpsShowBazaarHighlight", true);
 
+				// Load Auto Respawn
+				autoRespawnEnabled = getBoolean(json, "autoRespawnEnabled", false);
+				autoRespawnDelaySeconds = getFloat(json, "autoRespawnDelaySeconds", 3.0f);
+
 				// Load Shady Summoner colors + scale
 				ssColorLabel   = getArgbColor(json, "ssColorLabel", 0xFFBB77FF);
 				ssColorActive  = getArgbColor(json, "ssColorActive", 0xFF00CC00);
@@ -178,6 +186,10 @@ public class ModConfig {
 
 			json.addProperty("farmWarpsGuildQuestHighlight", farmWarpsGuildQuestHighlight);
 			json.addProperty("farmWarpsShowBazaarHighlight", farmWarpsShowBazaarHighlight);
+
+			// Auto Respawn
+			json.addProperty("autoRespawnEnabled", autoRespawnEnabled);
+			json.addProperty("autoRespawnDelaySeconds", autoRespawnDelaySeconds);
 
 			// Shady Summoner
 			json.addProperty("ssColorLabel", String.format("%08X", ssColorLabel));

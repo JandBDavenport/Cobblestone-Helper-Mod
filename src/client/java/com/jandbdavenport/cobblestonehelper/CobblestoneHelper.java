@@ -1,6 +1,7 @@
 package com.jandbdavenport.cobblestonehelper;
 
 import com.jandbdavenport.cobblestonehelper.ModConfig;
+import com.jandbdavenport.cobblestonehelper.features.AutoRespawnManager;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
@@ -76,6 +77,11 @@ public class CobblestoneHelper implements ClientModInitializer {
 			System.out.println("[CobblestoneHelper] Initializing GuildQuestsManager...");
 			GuildQuestsManager.init();
 			System.out.println("[CobblestoneHelper] ✓ GuildQuestsManager initialized");
+
+			// Initialize Auto Respawn manager
+			System.out.println("[CobblestoneHelper] Initializing AutoRespawnManager...");
+			AutoRespawnManager.init();
+			System.out.println("[CobblestoneHelper] ✓ AutoRespawnManager initialized");
 		} catch (Exception e) {
 			System.out.println("[CobblestoneHelper] ✗ Error during feature initialization!");
 			e.printStackTrace();

@@ -117,6 +117,7 @@ public class ConfigScreen extends Screen {
 		sectionExpanded.put("bazaar", false);
 		sectionExpanded.put("guildQuests", false);
 		sectionExpanded.put("farmWarps", false);
+		sectionExpanded.put("autoRespawn", false);
 		sectionExpanded.put("plantHitbox", false);
 		sectionExpanded.put("uiColors", false);
 		sectionExpanded.put("themes", false);
@@ -131,6 +132,8 @@ public class ConfigScreen extends Screen {
 	private int guildQuestsSectionEnd = 0;
 	private int farmWarpsSectionStart = 0;
 	private int farmWarpsSectionEnd = 0;
+	private int autoRespawnSectionStart = 0;
+	private int autoRespawnSectionEnd = 0;
 	private int plantHitboxSectionStart = 0;
 	private int plantHitboxSectionEnd = 0;
 	private int uiColorsSectionStart = 0;
@@ -203,6 +206,8 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += sectionExpanded.get("guildQuests") ? 150 : 0;
 		estimatedHeight += 30; // Farm Warps section
 		estimatedHeight += sectionExpanded.get("farmWarps") ? 160 : 0; // 2 toggles + 3 color pickers + padding
+		estimatedHeight += 30; // Auto Respawn section
+		estimatedHeight += sectionExpanded.get("autoRespawn") ? 90 : 0; // 1 toggle + 1 slider + padding
 		estimatedHeight += 30; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
 		estimatedHeight += 30; // UI Colors section
@@ -241,6 +246,11 @@ public class ConfigScreen extends Screen {
 		farmWarpsSectionStart = yPos;
 		yPos = buildFarmWarpsSection(centerX, yPos);
 		farmWarpsSectionEnd = yPos;
+
+		// AUTO RESPAWN SECTION
+		autoRespawnSectionStart = yPos;
+		yPos = buildAutoRespawnSection(centerX, yPos);
+		autoRespawnSectionEnd = yPos;
 
 		// PLANT HITBOX SECTION
 		plantHitboxSectionStart = yPos;
@@ -559,6 +569,57 @@ public class ConfigScreen extends Screen {
 			ModConfig.fwMenuColorSlot = color;
 			ModConfig.saveConfig();
 		});
+
+		return yPos;
+	}
+
+	/**
+	 * Build Auto Respawn section with slider
+	 */
+	private int buildAutoRespawnSection(int centerX, int yPos) {
+		boolean expanded = sectionExpanded.get("autoRespawn");
+		String headerText = (expanded ? "▼" : "▶") + " Auto Respawn";
+		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
+			sectionExpanded.put("autoRespawn", !sectionExpanded.get("autoRespawn"));
+			this.init();
+		});
+		yPos += 25;
+
+		if (!expanded) {
+			return yPos;
+		}
+
+		// Enable/disable toggle
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.autoRespawnEnabled ? "✓ Enabled" : "✗ Disabled"),
+			ModConfig.autoRespawnEnabled, button -> {
+				ModConfig.autoRespawnEnabled = !ModConfig.autoRespawnEnabled;
+				ModConfig.saveConfig();
+				this.init();
+			});
+		yPos += 25;
+
+		// Slider for delay (2-10 seconds, map to 0.0-1.0)
+		double normalizedValue = (ModConfig.autoRespawnDelaySeconds - 2.0) / 8.0;
+		net.minecraft.client.gui.widget.SliderWidget delaySlider = new net.minecraft.client.gui.widget.SliderWidget(
+			centerX - 140, yPos, 280, 20,
+			Text.literal(String.format("Delay: %.1fs", ModConfig.autoRespawnDelaySeconds)),
+			normalizedValue) {
+			@Override
+			protected void updateMessage() {
+				double seconds = 2.0 + this.value * 8.0;
+				this.setMessage(Text.literal(String.format("Delay: %.1fs", seconds)));
+			}
+
+			@Override
+			protected void applyValue() {
+				double seconds = 2.0 + this.value * 8.0;
+				ModConfig.autoRespawnDelaySeconds = (float) seconds;
+				ModConfig.saveConfig();
+			}
+		};
+		this.addDrawableChild(delaySlider);
+		yPos += 25;
 
 		return yPos;
 	}

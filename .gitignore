@@ -54,3 +54,7 @@ test-run.log
 *.md
 !README.md
 SHAPE_METHODS_QUICK_REFERENCE.txt
+
+# dev-tools (local development only, not part of mod)
+
+dev-tools/

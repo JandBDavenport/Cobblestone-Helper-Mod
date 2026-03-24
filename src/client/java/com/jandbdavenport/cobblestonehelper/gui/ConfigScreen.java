@@ -118,6 +118,7 @@ public class ConfigScreen extends Screen {
 		sectionExpanded.put("guildQuests", false);
 		sectionExpanded.put("farmWarps", false);
 		sectionExpanded.put("autoRespawn", false);
+		sectionExpanded.put("itemGlow", false);
 		sectionExpanded.put("plantHitbox", false);
 		sectionExpanded.put("uiColors", false);
 		sectionExpanded.put("themes", false);
@@ -134,6 +135,8 @@ public class ConfigScreen extends Screen {
 	private int farmWarpsSectionEnd = 0;
 	private int autoRespawnSectionStart = 0;
 	private int autoRespawnSectionEnd = 0;
+	private int itemGlowSectionStart = 0;
+	private int itemGlowSectionEnd = 0;
 	private int plantHitboxSectionStart = 0;
 	private int plantHitboxSectionEnd = 0;
 	private int uiColorsSectionStart = 0;
@@ -208,6 +211,8 @@ public class ConfigScreen extends Screen {
 		estimatedHeight += sectionExpanded.get("farmWarps") ? 160 : 0; // 2 toggles + 3 color pickers + padding
 		estimatedHeight += 30; // Auto Respawn section
 		estimatedHeight += sectionExpanded.get("autoRespawn") ? 110 : 0; // 1 toggle + 1 slider + extra spacing
+		estimatedHeight += 30; // Item Glow section
+		estimatedHeight += sectionExpanded.get("itemGlow") ? 110 : 0; // 1 toggle + 1 color picker + spacing
 		estimatedHeight += 30; // Plant Hitbox section
 		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
 		estimatedHeight += 30; // UI Colors section
@@ -251,6 +256,11 @@ public class ConfigScreen extends Screen {
 		autoRespawnSectionStart = yPos;
 		yPos = buildAutoRespawnSection(centerX, yPos);
 		autoRespawnSectionEnd = yPos;
+
+		// ITEM GLOW SECTION
+		itemGlowSectionStart = yPos;
+		yPos = buildItemGlowSection(centerX, yPos);
+		itemGlowSectionEnd = yPos;
 
 		// PLANT HITBOX SECTION
 		plantHitboxSectionStart = yPos;
@@ -620,6 +630,41 @@ public class ConfigScreen extends Screen {
 		};
 		this.addDrawableChild(delaySlider);
 		yPos += 25;
+
+		return yPos;
+	}
+
+	/**
+	 * Build Item Glow section with toggle and color picker
+	 */
+	private int buildItemGlowSection(int centerX, int yPos) {
+		boolean expanded = sectionExpanded.get("itemGlow");
+		String headerText = (expanded ? "▼" : "▶") + " Item Glow";
+		addHeaderButton(centerX - 140, yPos, 280, 20, Text.literal(headerText), button -> {
+			sectionExpanded.put("itemGlow", !sectionExpanded.get("itemGlow"));
+			this.init();
+		});
+		yPos += 25;
+
+		if (!expanded) {
+			return yPos;
+		}
+
+		// Enable/disable toggle
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.itemGlowEnabled ? "✓ Enabled" : "✗ Disabled"),
+			ModConfig.itemGlowEnabled, button -> {
+				ModConfig.itemGlowEnabled = !ModConfig.itemGlowEnabled;
+				ModConfig.saveConfig();
+				this.init();
+			});
+		yPos += 25;
+
+		// Color picker for glow color
+		yPos = drawColorPicker(centerX, yPos, "Glow Color:", "itemGlowColor", ModConfig.itemGlowColor, color -> {
+			ModConfig.itemGlowColor = color;
+			ModConfig.saveConfig();
+		});
 
 		return yPos;
 	}

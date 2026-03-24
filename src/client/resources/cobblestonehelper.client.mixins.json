@@ -12,6 +12,7 @@
     "rendering.ShadySummonerHudMixin",
     "rendering.GuildQuestsHudMixin",
     "rendering.BazaarOverlayMixin",
+    "rendering.ItemGlowMixin",
     "screen.AutoRespawnMixin",
     "particles.SuppressHiddenEntityParticlesMixin",
     "network.ScoreboardTeamSyncMixin"

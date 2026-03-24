@@ -37,6 +37,10 @@ public class ModConfig {
 	public static boolean autoRespawnEnabled = false;
 	public static float autoRespawnDelaySeconds = 3.0f;
 
+	// Item Glow
+	public static boolean itemGlowEnabled = true;
+	public static int itemGlowColor = 0xFFFFFFFF;
+
 	// Shady Summoner colors (ARGB ints) + scale
 	public static int ssColorLabel   = 0xFFBB77FF;
 	public static int ssColorActive  = 0xFF00CC00;
@@ -114,6 +118,10 @@ public class ModConfig {
 				autoRespawnEnabled = getBoolean(json, "autoRespawnEnabled", false);
 				autoRespawnDelaySeconds = getFloat(json, "autoRespawnDelaySeconds", 3.0f);
 
+				// Load Item Glow
+				itemGlowEnabled = getBoolean(json, "itemGlowEnabled", true);
+				itemGlowColor = getArgbColor(json, "itemGlowColor", 0xFFFFFFFF);
+
 				// Load Shady Summoner colors + scale
 				ssColorLabel   = getArgbColor(json, "ssColorLabel", 0xFFBB77FF);
 				ssColorActive  = getArgbColor(json, "ssColorActive", 0xFF00CC00);
@@ -190,6 +198,10 @@ public class ModConfig {
 			// Auto Respawn
 			json.addProperty("autoRespawnEnabled", autoRespawnEnabled);
 			json.addProperty("autoRespawnDelaySeconds", autoRespawnDelaySeconds);
+
+			// Item Glow
+			json.addProperty("itemGlowEnabled", itemGlowEnabled);
+			json.addProperty("itemGlowColor", String.format("%08X", itemGlowColor));
 
 			// Shady Summoner
 			json.addProperty("ssColorLabel", String.format("%08X", ssColorLabel));

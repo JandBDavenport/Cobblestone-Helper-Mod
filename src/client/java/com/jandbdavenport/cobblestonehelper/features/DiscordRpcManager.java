@@ -45,8 +45,10 @@ public class DiscordRpcManager {
 	private static int tickCount = 0;
 
 	// Regex patterns for scoreboard parsing
-	private static final Pattern WORLD_PATTERN = Pattern.compile("(?:World|Area|Zone):\\s*(.+)", Pattern.CASE_INSENSITIVE);
-	private static final Pattern CROP_PATTERN = Pattern.compile("(?:Crop|Farming|Farm):\\s*(.+)", Pattern.CASE_INSENSITIVE);
+	// Matches "FARMING (Location)" format, e.g. "FARMING (Icy Outpost)"
+	private static final Pattern WORLD_PATTERN = Pattern.compile("FARMING\\s*\\(([^)]+)\\)", Pattern.CASE_INSENSITIVE);
+	// Matches "crop CropName" or "ᴄʀᴏᴘ CropName" (handles small-caps unicode variant)
+	private static final Pattern CROP_PATTERN = Pattern.compile("[cC][rR][oO][pP]\\s+([^§|]+)", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Initialize Discord RPC system.
@@ -210,6 +212,8 @@ public class DiscordRpcManager {
 				if (line == null) continue;
 
 				String cleanedLine = line.replaceAll("§[0-9a-fA-Fk-oK-Or-tR-T]", "");
+			System.out.println("[DiscordRpcManager] Raw sidebar line: " + line);
+			System.out.println("[DiscordRpcManager] Cleaned line: " + cleanedLine);
 
 				if (world.isEmpty()) {
 					Matcher worldMatcher = WORLD_PATTERN.matcher(cleanedLine);

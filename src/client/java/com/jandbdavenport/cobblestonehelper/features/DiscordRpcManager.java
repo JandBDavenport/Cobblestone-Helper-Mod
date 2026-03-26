@@ -102,9 +102,6 @@ public class DiscordRpcManager {
 
 		if (state == State.DISCONNECTED) {
 			ticksSinceLastRetry++;
-			if (ticksSinceLastRetry % 100 == 0) {
-				System.out.println("[DiscordRpcManager] Waiting to retry... " + ticksSinceLastRetry + "/" + RETRY_INTERVAL_TICKS);
-			}
 			if (ticksSinceLastRetry >= RETRY_INTERVAL_TICKS) {
 				System.out.println("[DiscordRpcManager] Attempting to connect to Discord...");
 				attemptConnect();
@@ -127,11 +124,9 @@ public class DiscordRpcManager {
 	 */
 	private static void attemptConnect() {
 		try {
-			System.out.println("[DiscordRpcManager] Creating new IPC connection (ipcConnection was " + (ipcConnection == null ? "null" : "not null") + ")");
 			ipcConnection = new DiscordIPCConnection(CLIENT_ID);
 			System.out.println("[DiscordRpcManager] Attempting to connect...");
 			if (ipcConnection.connect()) {
-				state = State.CONNECTED;
 				sessionStartMs = System.currentTimeMillis();
 				System.out.println("[DiscordRpcManager] ✓ Connected to Discord successfully");
 			lastDetails = "";
@@ -140,7 +135,6 @@ public class DiscordRpcManager {
 			}
 		} catch (Exception e) {
 			System.out.println("[DiscordRpcManager] Failed to connect: " + e.getMessage());
-			e.printStackTrace();
 		}
 
 		state = State.DISCONNECTED;

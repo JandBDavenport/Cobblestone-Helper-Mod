@@ -127,6 +127,7 @@ public class DiscordRpcManager {
 			ipcConnection = new DiscordIPCConnection(CLIENT_ID);
 			System.out.println("[DiscordRpcManager] Attempting to connect...");
 			if (ipcConnection.connect()) {
+			state = State.CONNECTED;
 				sessionStartMs = System.currentTimeMillis();
 				System.out.println("[DiscordRpcManager] ✓ Connected to Discord successfully");
 			lastDetails = "";

@@ -164,8 +164,8 @@ public class DiscordRpcManager {
 			String world = scoreboardInfo[0];
 			String crop = scoreboardInfo[1];
 
-			String details = crop.isEmpty() ? "On play.cobblestone.gg" : crop;
-			String presenceState = world.isEmpty() ? "Exploring" : world;
+			String details = world.isEmpty() ? "Exploring" : world;
+			String presenceState = crop.isEmpty() ? "On play.cobblestone.gg" : "Farming " + crop;
 
 			if (details.equals(lastDetails) && presenceState.equals(lastState)) {
 				return;
@@ -218,14 +218,14 @@ public class DiscordRpcManager {
 				if (world.isEmpty()) {
 					Matcher worldMatcher = WORLD_PATTERN.matcher(cleanedLine);
 					if (worldMatcher.find()) {
-						world = "World: " + worldMatcher.group(1).trim();
+						world = worldMatcher.group(1).trim();
 					}
 				}
 
 				if (crop.isEmpty()) {
 					Matcher cropMatcher = CROP_PATTERN.matcher(cleanedLine);
 					if (cropMatcher.find()) {
-						crop = "Farming: " + cropMatcher.group(1).trim();
+						crop = cropMatcher.group(1).trim();
 					}
 				}
 

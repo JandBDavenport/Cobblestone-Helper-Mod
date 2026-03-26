@@ -206,39 +206,10 @@ public class ConfigScreen extends Screen {
 			themeNameField.setText("");
 		}
 
-		// Estimate content height for scroll calculation
-		int estimatedHeight = 0;
-		estimatedHeight += 30; // Shady Summoner section
-		estimatedHeight += sectionExpanded.get("shadySummoner") ? 150 : 0;
-		estimatedHeight += 30; // Bazaar section
-		estimatedHeight += sectionExpanded.get("bazaar") ? 150 : 0;
-		estimatedHeight += 30; // Guild Quests section
-		estimatedHeight += sectionExpanded.get("guildQuests") ? 150 : 0;
-		estimatedHeight += 30; // Farm Warps section
-		estimatedHeight += sectionExpanded.get("farmWarps") ? 160 : 0; // 2 toggles + 3 color pickers + padding
-		estimatedHeight += 30; // Auto Respawn section
-		estimatedHeight += sectionExpanded.get("autoRespawn") ? 110 : 0; // 1 toggle + 1 slider + extra spacing
-		estimatedHeight += 30; // Item Glow section
-		estimatedHeight += sectionExpanded.get("itemGlow") ? 110 : 0; // 1 toggle + 1 color picker + spacing
-		estimatedHeight += 30; // Plant Hitbox section
-		estimatedHeight += sectionExpanded.get("plantHitbox") ? 195 : 0; // 7 plants * 25px + padding
-		estimatedHeight += 30; // UI Colors section
-		estimatedHeight += sectionExpanded.get("uiColors") ? 100 : 0; // 3 color pickers + padding
-		estimatedHeight += 30; // Themes section
-		// Calculate height for themes section: instructions (12) + save (25) + restore (25) + custom themes + open folder (25)
-		List<ThemeLoader.LoadedTheme> allThemes = ThemeLoader.loadThemes();
-		int customThemeCount = (int) allThemes.stream().filter(t -> !t.name().equals("Default")).count();
-		int themeRows = Math.max(0, (customThemeCount + 4) / 5);
-		estimatedHeight += sectionExpanded.get("themes") ? (62 + themeRows * 25 + 35) : 0;
-		estimatedHeight += 30; // Discord RPC section header
-		estimatedHeight += sectionExpanded.get("discordRpc") ? 30 : 0; // 1 toggle
-
 		// Content box height is fixed; content scrolls inside it
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
 		int contentBoxHeight = contentBottomY - CONTENT_START_Y;
-		maxScroll = Math.max(0, estimatedHeight - contentBoxHeight);
-
-	int centerX = this.width / 2 - 4;  // Shift left 4px to account for scrollbar visual offset
+		int centerX = this.width / 2 - 4;  // Shift left 4px to account for scrollbar visual offset
 
 		// SHADY SUMMONER SECTION
 		int yPos = CONTENT_START_Y + 5 - scrollOffset;  // 5px padding inside box
@@ -290,6 +261,20 @@ public class ConfigScreen extends Screen {
 		discordRpcSectionStart = yPos;
 		yPos = buildDiscordRpcSection(centerX, yPos);
 		discordRpcSectionEnd = yPos;
+
+		// Compute maxScroll from actual content height (exact, not estimated)
+		// yPos was initialized as CONTENT_START_Y + 5 - scrollOffset, so add scrollOffset back
+		// to get the logical content height independent of scroll position.
+		int actualContentHeight = yPos + scrollOffset - CONTENT_START_Y - 5;
+		maxScroll = Math.max(0, actualContentHeight - contentBoxHeight);
+
+		// Clamp scroll position in case content shrank (e.g. sections were collapsed)
+		if (scrollOffset > maxScroll) {
+			scrollOffset = maxScroll;
+			targetScrollOffset = maxScroll;
+			init(); // Rebuild widgets at corrected scroll position
+			return;
+		}
 
 		// Add all color picker fields as drawable children (including duplicates from different sections)
 		for (ColorPickerEntry entry : colorPickerEntries) {

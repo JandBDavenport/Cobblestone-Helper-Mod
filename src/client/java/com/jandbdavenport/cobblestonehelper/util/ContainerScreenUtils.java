@@ -87,6 +87,37 @@ public final class ContainerScreenUtils {
 	}
 
 	/**
+	 * Check if there's an active (non-gray) previous-page button in the inventory.
+	 * Returns true if a non-gray curved_arrow_left is found at slot >= minSlot.
+	 */
+	public static boolean hasActivePreviousPageButton(Inventory inventory, int minSlot) {
+		try {
+			for (int i = minSlot; i < inventory.size(); i++) {
+				ItemStack stack = inventory.getStack(i);
+				if (stack.isEmpty()) {
+					continue;
+				}
+
+				if (isNavButton(stack)) {
+					NbtComponent nbtComp = stack.get(DataComponentTypes.CUSTOM_DATA);
+					if (nbtComp != null) {
+						try {
+							var nbt = nbtComp.copyNbt();
+							String itemsadderStr = nbt.get("itemsadder").toString();
+							// Only match non-gray curved_arrow_left
+							if (itemsadderStr.contains("curved_arrow_left") && !itemsadderStr.contains("gray")) {
+								return true;
+							}
+						} catch (Exception ignored) {}
+					}
+				}
+			}
+		} catch (Exception ignored) {}
+
+		return false;
+	}
+
+	/**
 	 * Extract the first decimal number after a line prefix from any lore line.
 	 * For example, extracting "12.5" from "Sell: ⛁12.5 per unit"
 	 * Returns null if the prefix is not found or the number cannot be parsed.

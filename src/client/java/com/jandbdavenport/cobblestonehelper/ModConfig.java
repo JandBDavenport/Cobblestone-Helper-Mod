@@ -19,6 +19,7 @@ public class ModConfig {
 	public static boolean shadySummonerEnabled = true;
 	public static boolean bazaarEnabled = true;
 	public static boolean guildQuestsEnabled = true;
+	public static boolean discordRpcEnabled = true;
 
 	// Plant Hitbox toggles (individual plants)
 	public static boolean plantHitboxBrownMushroom = false;
@@ -52,6 +53,7 @@ public class ModConfig {
 	// Bazaar colors + scale
 	public static int bzColorLoading  = 0xFFFFCC00;
 	public static int bzColorComplete = 0xFF00CC00;
+	public static int bzColorWarning  = 0xFFFF5555;  // Red warning for cache clear errors
 	public static float bzScale = 1.0f;
 
 	// Guild Quests colors + scale
@@ -100,6 +102,7 @@ public class ModConfig {
 				shadySummonerEnabled = getBoolean(json, "shadySummonerEnabled", true);
 				bazaarEnabled = getBoolean(json, "bazaarEnabled", true);
 				guildQuestsEnabled = getBoolean(json, "guildQuestsEnabled", true);
+			discordRpcEnabled = getBoolean(json, "discordRpcEnabled", true);
 
 				// Load Plant Hitbox toggles (default to false/disabled)
 				plantHitboxBrownMushroom = getBoolean(json, "plantHitboxBrownMushroom", false);
@@ -133,6 +136,7 @@ public class ModConfig {
 				// Load Bazaar colors + scale
 				bzColorLoading  = getArgbColor(json, "bzColorLoading", 0xFFFFCC00);
 				bzColorComplete = getArgbColor(json, "bzColorComplete", 0xFF00CC00);
+			bzColorWarning  = getArgbColor(json, "bzColorWarning", 0xFFFF5555);
 				bzScale = getFloat(json, "bzScale", 1.0f);
 
 				// Load Guild Quests colors + scale
@@ -182,6 +186,7 @@ public class ModConfig {
 			json.addProperty("shadySummonerEnabled", shadySummonerEnabled);
 			json.addProperty("bazaarEnabled", bazaarEnabled);
 			json.addProperty("guildQuestsEnabled", guildQuestsEnabled);
+			json.addProperty("discordRpcEnabled", discordRpcEnabled);
 
 			// Plant Hitbox toggles
 			json.addProperty("plantHitboxBrownMushroom", plantHitboxBrownMushroom);

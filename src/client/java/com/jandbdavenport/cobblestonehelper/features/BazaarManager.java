@@ -100,6 +100,10 @@ public class BazaarManager {
 	private static final int INITIAL_WAIT_TICKS = 20;      // ~1 second at 20 ticks/sec
 	private static final int NO_NEXT_PAGE_THRESHOLD = 3;   // ~150 ms debounce
 
+	// Warning display timing
+	private static long lastWarningTime = 0;        // Timestamp when cache clear warning was triggered
+	private static final long WARNING_DISPLAY_MS = 2000;  // Show warning for 2 seconds
+
 	// HUD position (saved to config)
 	private static int hudX = 5;
 	private static int hudY = 5;
@@ -131,102 +135,98 @@ public class BazaarManager {
 	private static final long CACHE_DURATION_MS = 2 * 60 * 1000; // 2 minutes
 
 	public static void init() {
-		System.out.println("[BazaarManager] Loading config...");
-		loadConfig();
-		System.out.println("[BazaarManager] ✓ Config loaded");
+		System.out.println("[BazaarManager] Initializing BazaarManager...");
 
-		// Register screen event to detect bazaar container
-		System.out.println("[BazaarManager] Registering AFTER_INIT screen event...");
+		// Listen for screen open events
 		ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 			if (!(screen instanceof GenericContainerScreen)) {
-				isBazaarScreenOpen = false;
 				return;
 			}
 
 			GenericContainerScreen containerScreen = (GenericContainerScreen) screen;
-			Text title = containerScreen.getTitle();
-			String titleStr = title.getString();
+			String titleStr = containerScreen.getTitle().getString();
 
-			// Check if this is the Bazaar: Crops Market container
 			if (!titleStr.contains("Bazaar: Crops Market")) {
-				isBazaarScreenOpen = false;
-				return;
+				return; // Not the bazaar
 			}
 
 			isBazaarScreenOpen = true;
 			currentBazaarScreen = containerScreen;
 
-
-			// Check if we should start fresh collection
-			// Only clear if: NO_DATA state (never collected) OR cache is stale AND we've completed a collection
+			// Check if we should use cached prices or start fresh collection
 			long now = System.currentTimeMillis();
 			boolean isCacheStale = (now - lastCompleteMs) > CACHE_DURATION_MS;
 
-			if (collectionState == CollectionState.NO_DATA) {
-				// Starting fresh collection
-				System.out.println("[BazaarManager] Starting fresh collection");
-				collectionState = CollectionState.COLLECTING;
-				cropSellPrices.clear();
-				bestCrop = "";
-				bestSellPrice = 0.0;
-				finishedThisCollection = false;
-			isFreshBazaarOpen = true;
-			} else if (collectionState == CollectionState.COMPLETE && isCacheStale) {
-				// Cache expired - clear and start over
-				System.out.println("[BazaarManager] Cache expired, starting fresh collection");
-				collectionState = CollectionState.COLLECTING;
-				cropSellPrices.clear();
-				bestCrop = "";
-				bestSellPrice = 0.0;
-				finishedThisCollection = false;
-			isFreshBazaarOpen = true;
-		} else if (collectionState == CollectionState.COMPLETE && !isCacheStale && finishedThisCollection) {
-			// Cache is fresh AND fully collected - keep showing result, don't scrape again
-			System.out.println("[BazaarManager] Using cached best crop: " + bestCrop + " at ⛁" + bestSellPrice);
-			addPositionButton(screen);
-			return; // Don't scrape, just use cached data
-		} else if (collectionState == CollectionState.COMPLETE && (!isCacheStale || !finishedThisCollection)) {
-			// Cache expired OR previous collection was incomplete - clear and start over
-			if (!finishedThisCollection) {
-				System.out.println("[BazaarManager] Previous collection incomplete, restarting from scratch");
-			} else {
-				System.out.println("[BazaarManager] Cache expired, starting fresh collection");
+			if (collectionState == CollectionState.COMPLETE && !isCacheStale && finishedThisCollection) {
+				// Cache is fresh AND fully collected - display only
+				System.out.println("[BazaarManager] Using cached best crop: " + bestCrop + " at ⛁" + bestSellPrice);
+				addPositionButton(screen);
+				return;
 			}
+
+			// All other cases: start/restart collection
+			System.out.println("[BazaarManager] Starting fresh collection");
 			collectionState = CollectionState.COLLECTING;
 			cropSellPrices.clear();
 			bestCrop = "";
 			bestSellPrice = 0.0;
 			finishedThisCollection = false;
-			isFreshBazaarOpen = true;
-		} else if (collectionState == CollectionState.COLLECTING && !finishedThisCollection && bazaarOpenedTimeMs == 0) {
-			// Incomplete collection session AND fresh bazaar open - bazaar was closed before finishing, restart fresh
-			System.out.println("[BazaarManager] Incomplete previous session, restarting from scratch");
-			cropSellPrices.clear();
-			bestCrop = "";
-			bestSellPrice = 0.0;
-			finishedThisCollection = false;
-			isFreshBazaarOpen = true;
-		} else if (collectionState == CollectionState.COLLECTING && !finishedThisCollection && bazaarOpenedTimeMs != 0) {
-			// Page change during ongoing collection - continue collecting without resetting
-			System.out.println("[BazaarManager] Page change detected, continuing collection...");
-			isFreshBazaarOpen = false;
-		} else if (collectionState == CollectionState.COLLECTING && finishedThisCollection) {
-			// Already collecting and was completed - continue accumulating (don't clear!)
-			System.out.println("[BazaarManager] Continuing collection...");
-			isFreshBazaarOpen = false;
-		}
-
-			// Reset page scrape flag so we scrape this page (whether new collection or continuation)
 			scrapedThisPage = false;
-			initialWaitScrapeScheduled = false;
-			// Record when bazaar was opened for initial wait period
-			if (bazaarOpenedTimeMs == 0) {
-				bazaarOpenedTimeMs = System.currentTimeMillis();
-				System.out.println("[BazaarManager] Bazaar opened, waiting 1 second for prices to load...");
-			}
+			noNextPageTicks = 0;
+			lastCropContentHash = -1;
+			ticksUntilScrape = INITIAL_WAIT_TICKS;
 
 			// Add gear button for positioning
 			addPositionButton(screen);
+		});
+
+		// Tick handler for page detection and scraping
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			if (!isBazaarScreenOpen || currentBazaarScreen == null) {
+				return;
+			}
+			if (collectionState != CollectionState.COLLECTING) {
+				return;
+			}
+
+			try {
+				Inventory inventory = currentBazaarScreen.getScreenHandler().getInventory();
+
+				// Detect page change via crop content hash
+				int currentHash = ContainerScreenUtils.getCropContentHash(inventory);
+				if (lastCropContentHash != -1 && currentHash != lastCropContentHash) {
+					scrapedThisPage = false;
+					noNextPageTicks = 0;
+					ticksUntilScrape = 0;
+					System.out.println("[BazaarManager] Page change detected");
+				}
+				lastCropContentHash = currentHash;
+
+				// Count down initial wait
+				if (ticksUntilScrape > 0) {
+					ticksUntilScrape--;
+					return;
+				}
+
+				// Scrape this page if not done
+				if (!scrapedThisPage) {
+					scrapeItemsFromScreen(currentBazaarScreen);
+					return;
+				}
+
+				// Debounce last-page check
+				boolean hasNext = ContainerScreenUtils.hasActiveNextPageButton(inventory, 53);
+				if (hasNext) {
+					noNextPageTicks = 0;
+				} else {
+					noNextPageTicks++;
+					if (noNextPageTicks >= NO_NEXT_PAGE_THRESHOLD) {
+						finishCollection();
+					}
+				}
+			} catch (Exception e) {
+				System.err.println("[BazaarManager] Tick handler error: " + e.getMessage());
+			}
 		});
 
 		// Track when bazaar screen closes
@@ -242,8 +242,9 @@ public class BazaarManager {
 					removeRestoreButton(currentBazaarScreen);
 					isBazaarScreenOpen = false;
 					currentBazaarScreen = null;
-					bazaarOpenedTimeMs = 0;
-					initialWaitScrapeScheduled = false;
+					lastCropContentHash = -1;
+					ticksUntilScrape = 0;
+					noNextPageTicks = 0;
 					repositionHelper.exit(null); // Exit repositioning mode
 				}
 			} else {
@@ -251,10 +252,11 @@ public class BazaarManager {
 				removeRestoreButton(currentBazaarScreen);
 				isBazaarScreenOpen = false;
 				currentBazaarScreen = null;
-			bazaarOpenedTimeMs = 0;
-			initialWaitScrapeScheduled = false;
-			repositionHelper.exit(null); // Exit repositioning mode
-		}
+				lastCropContentHash = -1;
+				ticksUntilScrape = 0;
+				noNextPageTicks = 0;
+				repositionHelper.exit(null); // Exit repositioning mode
+			}
 		});
 		System.out.println("[BazaarManager] ✓ BazaarManager initialization complete");
 	}
@@ -318,14 +320,6 @@ public class BazaarManager {
 			// Log results
 			System.out.println("[BazaarManager] Scraped page: " + itemsProcessed + " items, " + pricesFound + " prices found, total crops: " + cropSellPrices.size());
 
-			// Check for next-page button
-			boolean hasNextPage = checkForNextPageButton(screen);
-
-			if (!hasNextPage) {
-				// No next page - collection complete
-				scrapedThisPage = true; // Mark as done even if we found nothing
-				finishCollection();
-			}
 		} catch (Exception e) {
 			System.out.println("[BazaarManager] Error scraping: " + e.getMessage());
 			e.printStackTrace();
@@ -348,10 +342,6 @@ public class BazaarManager {
 	/**
 	 * Check if a next-page button exists and is not grayed out.
 	 */
-	private static boolean checkForNextPageButton(GenericContainerScreen screen) {
-		Inventory inventory = screen.getScreenHandler().getInventory();
-		return ContainerScreenUtils.hasActiveNextPageButton(inventory, 45);
-	}
 
 	/**
 	 * Mark collection as complete and compute best crop.
@@ -493,49 +483,49 @@ public class BazaarManager {
 			return;
 		}
 
-		// Per-render page-change detection via nav button hash
-		if (!previewMode && currentBazaarScreen != null) {
-			Inventory inventory = currentBazaarScreen.getScreenHandler().getInventory();
-			int currentHash = ContainerScreenUtils.navButtonHash(inventory);
-			if (currentHash != -1) {
-				if (lastNavButtonHash != -1 && currentHash != lastNavButtonHash) {
-					scrapedThisPage = false;
-					System.out.println("[BazaarManager] Page change detected, will scrape new page");
-				}
-				lastNavButtonHash = currentHash;
+	// Determine value text (scraping now happens via tick handler, not per-render)
+	String valueText = "";
+	int valueColor = COLOR_TEXT_GREY;
+
+	// Check if warning should be displayed
+	if (lastWarningTime > 0) {
+		long elapsed = System.currentTimeMillis() - lastWarningTime;
+		if (elapsed < WARNING_DISPLAY_MS) {
+			valueText = "⚠ Go to page 1 first";
+			valueColor = ModConfig.bzColorWarning;
+		} else {
+			lastWarningTime = 0; // Clear warning flag
+		}
+	}
+
+	// Show normal display if no warning
+	if (valueText.isEmpty() && collectionState == CollectionState.COLLECTING) {
+		// Show appropriate message based on collection progress
+		if (ticksUntilScrape > 0) {
+			// Still waiting for initial load
+			valueText = "Loading prices... (" + ((ticksUntilScrape + 19) / 20) + "s)";
+		} else if (!scrapedThisPage) {
+			// Reading prices on current page
+			valueText = "Reading prices...";
+		} else {
+			// Page is scanned - check if there are more pages to scan
+			boolean hasNextPage = currentBazaarScreen != null ?
+				ContainerScreenUtils.hasActiveNextPageButton(currentBazaarScreen.getScreenHandler().getInventory(), 53) :
+				false;
+
+			if (hasNextPage) {
+				valueText = "✓ Scanned " + cropSellPrices.size() + " crops • Turn page →";
+			} else {
+				// On last page - still collecting or about to finish
+				valueText = "✓ Scanning last page... (" + cropSellPrices.size() + " total)";
 			}
 		}
-
-		// Determine value text
-		String valueText = "";
-		int valueColor = COLOR_TEXT_GREY;
-
-		long now = System.currentTimeMillis();
-		long timeSinceBazaarOpened = now - bazaarOpenedTimeMs;
-		// Only show initial wait message if bazaar was JUST opened (not on page changes)
-		if (bazaarOpenedTimeMs > 0 && timeSinceBazaarOpened < INITIAL_WAIT_MS && isFreshBazaarOpen) {
-			long remainingMs = INITIAL_WAIT_MS - timeSinceBazaarOpened;
-			valueText = "Loading prices... (" + (remainingMs / 1000 + 1) + "s)";
-			valueColor = ModConfig.bzColorLoading;
-		} else if (bazaarOpenedTimeMs > 0 && !initialWaitScrapeScheduled && collectionState == CollectionState.COLLECTING) {
-			initialWaitScrapeScheduled = true;
-			System.out.println("[BazaarManager] 1-second wait complete, starting price scrape");
-			scrapeItemsFromScreen((GenericContainerScreen) currentScreen);
-			valueText = "Scanning page 1... Found " + cropSellPrices.size() + " crops";
-			valueColor = ModConfig.bzColorLoading;
-		} else if (!scrapedThisPage && collectionState == CollectionState.COLLECTING && initialWaitScrapeScheduled) {
-			System.out.println("[BazaarManager] Scraping new page");
-			scrapeItemsFromScreen((GenericContainerScreen) currentScreen);
-			valueText = "Scanning pages... Found " + cropSellPrices.size() + " crops total";
-			valueColor = ModConfig.bzColorLoading;
-		} else if (collectionState == CollectionState.COLLECTING) {
-			valueText = "Scanning bazaar... Found " + cropSellPrices.size() + " crops (turn the page →)";
-			valueColor = ModConfig.bzColorLoading;
-		} else if (collectionState == CollectionState.COMPLETE) {
-			String priceStr = String.format("%.3f", bestSellPrice).replaceAll("0+$", "").replaceAll("\\.$", "");
-			valueText = "✓ Best: " + bestCrop + " ⛁" + priceStr + "/unit";
-			valueColor = ModConfig.bzColorComplete;
-		}
+		valueColor = ModConfig.bzColorLoading;
+	} else if (valueText.isEmpty() && collectionState == CollectionState.COMPLETE) {
+		String priceStr = String.format("%.3f", bestSellPrice).replaceAll("0+$", "").replaceAll("\\.$", "");
+		valueText = "✓ Best: " + bestCrop + " ⛁" + priceStr + "/unit";
+		valueColor = ModConfig.bzColorComplete;
+	}
 
 	if (valueText.isEmpty()) {
 		return;
@@ -629,6 +619,7 @@ public class BazaarManager {
 							}
 							if (!bestCrop.isEmpty()) {
 								collectionState = CollectionState.COMPLETE;
+							finishedThisCollection = true;
 								System.out.println("[BazaarManager] Loaded cached best crop: " + bestCrop + " at ⛁" + bestSellPrice);
 							}
 						}
@@ -701,20 +692,35 @@ public class BazaarManager {
 
 	/**
 	 * Clear the bazaar cache, forcing recalculation on current page.
+	 * Prevents accidental cache clear on last page (which would skip earlier pages).
 	 */
 	public static void clearCache() {
+		// Check if we're on the last page but NOT the first page
+		if (currentBazaarScreen != null && isBazaarScreenOpen) {
+			Inventory inventory = currentBazaarScreen.getScreenHandler().getInventory();
+			boolean hasNextPage = ContainerScreenUtils.hasActiveNextPageButton(inventory, 53);
+			boolean hasPrevPage = ContainerScreenUtils.hasActivePreviousPageButton(inventory, 45);
+
+		if (!hasNextPage && hasPrevPage) {
+			// We're on the last page and not on the first page - trigger warning display
+			lastWarningTime = System.currentTimeMillis();
+			System.out.println("[BazaarManager] Attempted cache clear on last page - must start from page 1");
+			return;
+		}
+		}
+
+		// Safe to clear - proceed with cache reset
 		cropSellPrices.clear();
 		bestCrop = "";
 		bestSellPrice = 0.0;
 		scrapedThisPage = false;
+		noNextPageTicks = 0;
+		lastCropContentHash = -1;
+		ticksUntilScrape = INITIAL_WAIT_TICKS; // Use same initial wait as AFTER_INIT for consistency
 		finishedThisCollection = false;
-		initialWaitScrapeScheduled = false;
-		lastNavButtonHash = -1;
-		// Set to COLLECTING and skip the initial wait - start scanning immediately
+		// Set to COLLECTING to start fresh scan
 		collectionState = CollectionState.COLLECTING;
-		// Set bazaarOpenedTimeMs to past so initial wait is skipped
-		bazaarOpenedTimeMs = System.currentTimeMillis() - INITIAL_WAIT_MS - 1;
-		System.out.println("[BazaarManager] Cache cleared! Starting fresh scan on current page...");
+		System.out.println("[BazaarManager] Cache cleared! Starting fresh scan from page 1...");
 	}
 
 	public static int getHudX() {

@@ -3,6 +3,7 @@ package com.jandbdavenport.cobblestonehelper;
 import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.features.AutoRespawnManager;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
+import com.jandbdavenport.cobblestonehelper.features.DiscordRpcManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.features.ItemGlowManager;
 import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
@@ -58,6 +59,7 @@ public class CobblestoneHelper implements ClientModInitializer {
 				customCategory
 			));
 			System.out.println("[CobblestoneHelper] ✓ Registered 'Farm Warps' keybind (R)");
+
 
 			// Initialize player hiding feature with keybind
 			System.out.println("[CobblestoneHelper] Initializing PlayerHidingManager...");

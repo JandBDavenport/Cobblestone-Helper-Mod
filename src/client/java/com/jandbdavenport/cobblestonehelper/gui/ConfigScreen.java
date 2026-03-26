@@ -2,6 +2,7 @@ package com.jandbdavenport.cobblestonehelper.gui;
 
 import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
+import com.jandbdavenport.cobblestonehelper.features.DiscordRpcManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.util.ThemeLoader;
 import net.minecraft.client.gui.DrawContext;
@@ -122,6 +123,7 @@ public class ConfigScreen extends Screen {
 		sectionExpanded.put("plantHitbox", false);
 		sectionExpanded.put("uiColors", false);
 		sectionExpanded.put("themes", false);
+		sectionExpanded.put("discordRpc", false);
 	}
 
 	// Section Y positions for rendering background cards
@@ -143,6 +145,8 @@ public class ConfigScreen extends Screen {
 	private int uiColorsSectionEnd = 0;
 	private int themesSectionStart = 0;
 	private int themesSectionEnd = 0;
+	private int discordRpcSectionStart = 0;
+	private int discordRpcSectionEnd = 0;
 
 	// Theme presets header position for rendering
 	private int themePresetsHeaderY = 0;
@@ -226,6 +230,8 @@ public class ConfigScreen extends Screen {
 		int customThemeCount = (int) allThemes.stream().filter(t -> !t.name().equals("Default")).count();
 		int themeRows = Math.max(0, (customThemeCount + 4) / 5);
 		estimatedHeight += sectionExpanded.get("themes") ? (62 + themeRows * 25 + 35) : 0;
+		estimatedHeight += 30; // Discord RPC section header
+		estimatedHeight += sectionExpanded.get("discordRpc") ? 30 : 0; // 1 toggle
 
 		// Content box height is fixed; content scrolls inside it
 		int contentBottomY = this.height - CONTENT_BOTTOM_MARGIN;
@@ -279,6 +285,11 @@ public class ConfigScreen extends Screen {
 		themesSectionStart = yPos;
 		yPos = buildThemesSection(centerX, yPos);
 		themesSectionEnd = yPos;
+
+		// DISCORD RPC SECTION
+		discordRpcSectionStart = yPos;
+		yPos = buildDiscordRpcSection(centerX, yPos);
+		discordRpcSectionEnd = yPos;
 
 		// Add all color picker fields as drawable children (including duplicates from different sections)
 		for (ColorPickerEntry entry : colorPickerEntries) {
@@ -450,6 +461,10 @@ public class ConfigScreen extends Screen {
 			ModConfig.bzColorComplete = color;
 			ModConfig.saveConfig();
 		});
+	yPos = drawColorPicker(centerX, yPos, "Warning Color:", "bzColorWarning", ModConfig.bzColorWarning, color -> {
+		ModConfig.bzColorWarning = color;
+		ModConfig.saveConfig();
+	});
 
 		// Clear Cache button
 		addStyledButton(centerX - 140, yPos, 280, 20, Text.literal("Clear Bazaar Cache"), button -> {
@@ -1671,6 +1686,29 @@ public class ConfigScreen extends Screen {
 						this.getX() + 6, this.getY() - 12, TEXT_PRIMARY);
 			}
 		}
+	}
+
+	private int buildDiscordRpcSection(int centerX, int yPos) {
+		boolean expanded = sectionExpanded.get("discordRpc");
+		addHeaderButton(centerX - 140, yPos, 280, 20,
+			Text.literal((expanded ? "▼" : "▶") + " Discord Rich Presence"), button -> {
+				sectionExpanded.put("discordRpc", !expanded);
+				this.init();
+			});
+		yPos += 25;
+		if (!expanded) return yPos;
+
+		addToggleButton(centerX - 140, yPos, 280, 20,
+			Text.literal(ModConfig.discordRpcEnabled ? "✓ Enabled" : "✗ Disabled"),
+			ModConfig.discordRpcEnabled, button -> {
+				ModConfig.discordRpcEnabled = !ModConfig.discordRpcEnabled;
+				ModConfig.saveConfig();
+				if (!ModConfig.discordRpcEnabled) DiscordRpcManager.disable();
+				this.init();
+			});
+		yPos += 25;
+
+		return yPos;
 	}
 
 	@Override

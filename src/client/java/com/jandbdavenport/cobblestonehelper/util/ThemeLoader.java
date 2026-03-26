@@ -52,6 +52,7 @@ public class ThemeLoader {
 		// Bazaar colors
 		reg("bzColorLoading",    c -> ModConfig.bzColorLoading = c,    () -> ModConfig.bzColorLoading);
 		reg("bzColorComplete",   c -> ModConfig.bzColorComplete = c,   () -> ModConfig.bzColorComplete);
+	reg("bzColorWarning",    c -> ModConfig.bzColorWarning = c,    () -> ModConfig.bzColorWarning);
 
 		// Guild Quests colors
 		reg("gqColorHeader",     c -> ModConfig.gqColorHeader = c,     () -> ModConfig.gqColorHeader);
@@ -196,6 +197,7 @@ public class ThemeLoader {
 			Map.entry("ssColorUnknown", "FF888888"),
 			Map.entry("bzColorLoading", "FFFFCC00"),
 			Map.entry("bzColorComplete", "FF00CC00"),
+			Map.entry("bzColorWarning", "FFFF5555"),
 			Map.entry("gqColorHeader", "FF55FF55"),
 			Map.entry("gqColorLabel", "FF55FF55"),
 			Map.entry("gqColorTarget", "FFFFFFFF"),
@@ -217,6 +219,7 @@ public class ThemeLoader {
 			Map.entry("bzColorLoading", "FFBB77FF"),
 			Map.entry("bzColorComplete", "FF00CC00"),
 			Map.entry("gqColorHeader", "FFBB77FF"),
+			Map.entry("bzColorWarning", "FFFF5555"),
 			Map.entry("gqColorLabel", "FFBB77FF"),
 			Map.entry("gqColorTarget", "FFFFFFFF"),
 			Map.entry("gqColorUnknown", "FFFF4444"),
@@ -238,6 +241,7 @@ public class ThemeLoader {
 			Map.entry("bzColorComplete", "FF00AA00"),
 			Map.entry("gqColorHeader", "FF55FF55"),
 			Map.entry("gqColorLabel", "FF55FF55"),
+			Map.entry("bzColorWarning", "FFFF5555"),
 			Map.entry("gqColorTarget", "FFFFFFFF"),
 			Map.entry("gqColorUnknown", "FF00AA00"),
 			Map.entry("fwColorBackground", "F2111111"),
@@ -259,6 +263,7 @@ public class ThemeLoader {
 			Map.entry("gqColorHeader", "FF5599FF"),
 			Map.entry("gqColorLabel", "FF5599FF"),
 			Map.entry("gqColorTarget", "FFFFFFFF"),
+			Map.entry("bzColorWarning", "FFFF5555"),
 			Map.entry("gqColorUnknown", "FF00CCFF"),
 			Map.entry("fwColorBackground", "F2111111"),
 			Map.entry("fwColorAccent", "FF0099FF"),
@@ -280,6 +285,7 @@ public class ThemeLoader {
 			Map.entry("gqColorLabel", "FFFFDD00"),
 			Map.entry("gqColorTarget", "FFFFFFFF"),
 			Map.entry("gqColorUnknown", "FFFF6600"),
+			Map.entry("bzColorWarning", "FFFF5555"),
 			Map.entry("fwColorBackground", "F2111111"),
 			Map.entry("fwColorAccent", "FFFF6600"),
 			Map.entry("fwColorSlot", "FF222222"),

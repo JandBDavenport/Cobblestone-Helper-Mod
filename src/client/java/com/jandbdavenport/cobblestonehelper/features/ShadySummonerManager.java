@@ -383,9 +383,7 @@ public class ShadySummonerManager {
 
 		// Draw crop info on second line
 		String cropText = getCropText();
-		if (!cropText.isEmpty()) {
-			context.drawTextWithShadow(client.textRenderer, Text.literal(cropText), 0, 10, ModConfig.ssColorLabel);
-		}
+		context.drawTextWithShadow(client.textRenderer, Text.literal(cropText), 0, 10, ModConfig.ssColorLabel);
 
 		context.getMatrices().popMatrix();
 	}
@@ -461,20 +459,21 @@ public class ShadySummonerManager {
 
 	/**
 	 * Get the crop text for the second line of the HUD.
-	 * Shows "Next: [crop]" when spawned, "Last: [crop]" when not spawned.
+	 * Shows "Next: [crop]" when spawned, "Last: [crop]" when not spawned, "Unknown" when not yet known.
 	 */
 	private static String getCropText() {
-		if (affectedCrop == null || affectedCrop.isEmpty()) {
-			return "";
-		}
+		String cropDisplay = (affectedCrop != null && !affectedCrop.isEmpty()) ? affectedCrop : "Unknown";
 
-		if (state == State.ACTIVE) {
-			return "Next: " + affectedCrop;
-		} else if (state == State.COUNTDOWN || state == State.SOON) {
-			return "Last: " + affectedCrop;
+		switch (state) {
+			case ACTIVE:
+				return "Next: " + cropDisplay;
+			case COUNTDOWN:
+			case SOON:
+				return "Last: " + cropDisplay;
+			case UNKNOWN:
+			default:
+				return cropDisplay;
 		}
-
-		return "";
 	}
 
 	/**

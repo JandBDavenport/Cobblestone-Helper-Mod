@@ -212,8 +212,6 @@ public class DiscordRpcManager {
 				if (line == null) continue;
 
 				String cleanedLine = line.replaceAll("§[0-9a-fA-Fk-oK-Or-tR-T]", "");
-			System.out.println("[DiscordRpcManager] Raw sidebar line: " + line);
-			System.out.println("[DiscordRpcManager] Cleaned line: " + cleanedLine);
 
 				if (world.isEmpty()) {
 					Matcher worldMatcher = WORLD_PATTERN.matcher(cleanedLine);

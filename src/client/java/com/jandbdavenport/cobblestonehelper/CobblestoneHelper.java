@@ -62,34 +62,34 @@ public class CobblestoneHelper implements ClientModInitializer {
 
 
 			// Initialize player hiding feature with keybind
-			System.out.println("[CobblestoneHelper] Initializing PlayerHidingManager...");
+			System.out.println("[PlayerHidingManager] Initializing...");
 			PlayerHidingManager.init(hidePlayersKey);
-			System.out.println("[CobblestoneHelper] ✓ PlayerHidingManager initialized");
+			System.out.println("[PlayerHidingManager] ✓ Initialized");
 
 			// Initialize Shady Summoner manager
-			System.out.println("[CobblestoneHelper] Initializing ShadySummonerManager...");
+			System.out.println("[ShadySummonerManager] Initializing...");
 			ShadySummonerManager.init();
-			System.out.println("[CobblestoneHelper] ✓ ShadySummonerManager initialized");
+			System.out.println("[ShadySummonerManager] ✓ Initialized");
 
 			// Initialize Bazaar manager
-			System.out.println("[CobblestoneHelper] Initializing BazaarManager...");
+			System.out.println("[BazaarManager] Initializing...");
 			BazaarManager.init();
-			System.out.println("[CobblestoneHelper] ✓ BazaarManager initialized");
+			System.out.println("[BazaarManager] ✓ Initialized");
 
 			// Initialize Guild Quests manager
-			System.out.println("[CobblestoneHelper] Initializing GuildQuestsManager...");
+			System.out.println("[GuildQuestsManager] Initializing...");
 			GuildQuestsManager.init();
-			System.out.println("[CobblestoneHelper] ✓ GuildQuestsManager initialized");
+			System.out.println("[GuildQuestsManager] ✓ Initialized");
 
 			// Initialize Auto Respawn manager
-			System.out.println("[CobblestoneHelper] Initializing AutoRespawnManager...");
+			System.out.println("[AutoRespawnManager] Initializing...");
 			AutoRespawnManager.init();
-			System.out.println("[CobblestoneHelper] ✓ AutoRespawnManager initialized");
+			System.out.println("[AutoRespawnManager] ✓ Initialized");
 
 			// Initialize Item Glow manager
-			System.out.println("[CobblestoneHelper] Initializing ItemGlowManager...");
+			System.out.println("[ItemGlowManager] Initializing...");
 			ItemGlowManager.init();
-			System.out.println("[CobblestoneHelper] ✓ ItemGlowManager initialized");
+			System.out.println("[ItemGlowManager] ✓ Initialized");
 		} catch (Exception e) {
 			System.out.println("[CobblestoneHelper] ✗ Error during feature initialization!");
 			e.printStackTrace();

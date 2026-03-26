@@ -6,6 +6,8 @@
     "entity.HideHiddenEntitiesMixin",
     "rendering.SuppressPlayerFeaturesMixin",
     "rendering.SuppressEntityFeaturesMixin",
+    "rendering.SuppressNameplateMixin",
+    "rendering.RenderBodySafeguardMixin",
     "rendering.SuppressGlowOutlineMixin",
     "rendering.ShadySummonerHudMixin",
     "rendering.GuildQuestsHudMixin",

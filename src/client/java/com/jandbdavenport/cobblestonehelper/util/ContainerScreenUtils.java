@@ -118,9 +118,41 @@ public final class ContainerScreenUtils {
 	}
 
 	/**
+	 * Compute a hash of crop item names in the stable probe slots (10, 11, 12).
+	 * These slots are always in the middle crop columns, never fillers or nav buttons.
+	 * Used to detect page changes reliably. Returns a consistent hash even if some
+	 * slots are empty (empty slots contribute "EMPTY" to the hash).
+	 */
+	public static int getCropContentHash(Inventory inventory) {
+		int[] probeSlots = {10, 11, 12};
+		StringBuilder sb = new StringBuilder();
+		try {
+			for (int slot : probeSlots) {
+				if (slot >= inventory.size()) {
+					sb.append("OOB");
+					continue;
+				}
+				ItemStack stack = inventory.getStack(slot);
+				if (stack.isEmpty()) {
+					sb.append("EMPTY");
+				} else {
+					sb.append(stack.getName().getString());
+				}
+				sb.append("|");
+			}
+		} catch (Exception ignored) {}
+		return sb.toString().hashCode();
+	}
+
+	/**
 	 * Compute a hash of the first itemsadder NBT string found in the inventory.
 	 * Used for detecting page changes. Returns -1 if no itemsadder button is found.
+	 *
+	 * @deprecated Use {@link #getCropContentHash(Inventory)} instead. This method
+	 * hashes a filler item that is identical on all pages, so page changes are not
+	 * reliably detected.
 	 */
+	@Deprecated
 	public static int navButtonHash(Inventory inventory) {
 		try {
 			for (int i = 0; i < inventory.size(); i++) {

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.jandbdavenport.cobblestonehelper.ModConfig;
 import com.jandbdavenport.cobblestonehelper.util.ContainerScreenUtils;
 import com.jandbdavenport.cobblestonehelper.util.HudRepositionHelper;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
@@ -91,9 +92,13 @@ public class BazaarManager {
 	private static long lastCompleteMs = System.currentTimeMillis(); // Start fresh (not stale)
 	private static boolean scrapedThisPage = false;
 	private static boolean finishedThisCollection = false; // Prevent finishCollection from being called multiple times
-	private static long bazaarOpenedTimeMs = 0; // Track when bazaar was opened to implement 1-second wait
-	private static final long INITIAL_WAIT_MS = 1000; // Wait 1 second for prices to load
-	private static boolean initialWaitScrapeScheduled = false; // Track if we've already scheduled the post-wait scrape
+
+	// Tick-based scraping and page detection
+	private static int ticksUntilScrape = 0;        // Countdown before scraping allowed (replaces wall-clock INITIAL_WAIT_MS)
+	private static int noNextPageTicks = 0;         // Consecutive ticks where next-page button is absent (debounce)
+	private static int lastCropContentHash = -1;    // Hash of crop items for page-change detection
+	private static final int INITIAL_WAIT_TICKS = 20;      // ~1 second at 20 ticks/sec
+	private static final int NO_NEXT_PAGE_THRESHOLD = 3;   // ~150 ms debounce
 
 	// HUD position (saved to config)
 	private static int hudX = 5;
@@ -108,12 +113,6 @@ public class BazaarManager {
 	// Track if bazaar screen is currently open
 	private static boolean isBazaarScreenOpen = false;
 	private static GenericContainerScreen currentBazaarScreen = null;
-
-	// Per-render page-change detection via nav button hash
-	private static int lastNavButtonHash = -1;
-
-	// Track if this is a fresh bazaar open (not a page change)
-	private static boolean isFreshBazaarOpen = false;
 
 	// Colors (ARGB format)
 	private static final int COLOR_ORANGE = 0xFFFF8C00;

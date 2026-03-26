@@ -47,8 +47,8 @@ public class DiscordRpcManager {
 	// Regex patterns for scoreboard parsing
 	// Matches "FARMING (Location)" format, e.g. "FARMING (Icy Outpost)"
 	private static final Pattern WORLD_PATTERN = Pattern.compile("FARMING\\s*\\(([^)]+)\\)", Pattern.CASE_INSENSITIVE);
-	// Matches "crop CropName" or "ᴄʀᴏᴘ CropName" (handles small-caps unicode variant)
-	private static final Pattern CROP_PATTERN = Pattern.compile("[cC][rR][oO][pP]\\s+([^§|]+)", Pattern.CASE_INSENSITIVE);
+	// Matches "crop CropName" or "ᴄʀᴏᴘ CropName" (handles small-caps unicode variants)
+	private static final Pattern CROP_PATTERN = Pattern.compile("[cCᴄ][rRʀ][oOᴏ][pPᴘ]\\s+([^§|]+)", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Initialize Discord RPC system.

@@ -84,13 +84,17 @@ public class ShadySummonerManager {
 	private static long bellSequence5xStartMs = 0; // Track when the 5x bell sequence started
 	private static int bells5xPlayed = 0; // Track how many bells have been played in 5x sequence
 
+	// Crop tracking (what crop will be affected by Shady Summoner's market change)
+	private static String affectedCrop = null; // Crop affected in current/last cycle
+	private static long lastDespawnTimeMs = 0; // When the Shady Summoner last despawned
+
 	// HUD position (saved to config)
 	private static int hudX = 5;
 	private static int hudY = 5;
 
 	// HUD widget dimensions (approximate for text-based display)
-	private static final int WIDGET_WIDTH = 160; // ~"Shady Summoner: countdown"
-	private static final int WIDGET_HEIGHT = 10;  // Single line of text
+	private static final int WIDGET_WIDTH = 180; // ~"Shady Summoner: countdown" + "Next: crop"
+	private static final int WIDGET_HEIGHT = 20;  // Two lines of text
 
 	// Flag to disable HUD rendering when positioning screen is open
 	private static boolean hudRenderingDisabled = false;
@@ -118,14 +122,15 @@ public class ShadySummonerManager {
 		// Load config from disk
 		loadConfig();
 
-		// Register chat message listener for spawn/despawn events
+		// Register chat message listener for spawn/despawn events and crop info
 		ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
 			if (overlay) return; // Only process game messages, not chat
 			String text = message.getString().toLowerCase();
+			String rawText = message.getString();
 
 			// Check for spawn message
 			if (text.contains("shady summoner has appeared in")) {
-				String world = extractWorldName(message.getString());
+				String world = extractWorldName(rawText);
 				if (world != null) {
 					setState(State.ACTIVE, world);
 				}
@@ -133,6 +138,14 @@ public class ShadySummonerManager {
 			// Check for despawn message
 			else if (text.contains("shady summoner has disappeared")) {
 				setState(State.COUNTDOWN, null);
+			}
+			// Check for crop affection message: "He knows something about [crop]..."
+			else if (text.contains("he knows something about")) {
+				String crop = extractCropName(rawText);
+				if (crop != null) {
+					affectedCrop = crop;
+					System.out.println("[ShadySummonerManager] Detected affected crop: " + crop);
+				}
 			}
 		});
 
@@ -249,6 +262,33 @@ public class ShadySummonerManager {
 	}
 
 	/**
+	 * Extract crop name from "He knows something about [crop]..." message.
+	 */
+	private static String extractCropName(String message) {
+		String lowerMsg = message.toLowerCase();
+		int startIdx = lowerMsg.indexOf("he knows something about ");
+		if (startIdx == -1) return null;
+
+		startIdx += "he knows something about ".length();
+
+		// Find the end of the crop name (usually followed by "..." or end of message)
+		int endIdx = message.indexOf(".", startIdx);
+		if (endIdx == -1) {
+			endIdx = message.length();
+		} else {
+			// Go back to find where the word actually ends (before the punctuation)
+			while (endIdx > startIdx && (message.charAt(endIdx - 1) == '.' || message.charAt(endIdx - 1) == ' ')) {
+				endIdx--;
+			}
+		}
+
+		String crop = message.substring(startIdx, endIdx).trim();
+		// Remove any trailing punctuation
+		crop = crop.replaceAll("[.!?]+$", "").trim();
+		return crop.isEmpty() ? null : crop;
+	}
+
+	/**
 	 * Update the state machine.
 	 */
 	private static void setState(State newState, String world) {
@@ -274,6 +314,7 @@ public class ShadySummonerManager {
 				activeSpawnTimeMs = System.currentTimeMillis(); // Start 2-minute timer
 				break;
 			case COUNTDOWN:
+			lastDespawnTimeMs = System.currentTimeMillis(); // Mark when despawn happened
 				activeWorld = null;
 				countdownEndMs = System.currentTimeMillis() + (30 * 60 * 1000); // 30 minutes
 				activeSpawnTimeMs = 0;
@@ -326,24 +367,28 @@ public class ShadySummonerManager {
 			return;
 		}
 
-	MinecraftClient client = MinecraftClient.getInstance();
-	String stateText = getStateText();
-	int stateColor = getStateColor();
+		MinecraftClient client = MinecraftClient.getInstance();
+		String stateText = getStateText();
+		int stateColor = getStateColor();
 
-	// Apply scaling transformation
-	context.getMatrices().pushMatrix();
-	context.getMatrices().translate((float)hudX, (float)hudY);
-	context.getMatrices().scale(ModConfig.ssScale, ModConfig.ssScale);
+		// Apply scaling transformation
+		context.getMatrices().pushMatrix();
+		context.getMatrices().translate((float)hudX, (float)hudY);
+		context.getMatrices().scale(ModConfig.ssScale, ModConfig.ssScale);
 
-	// Draw label
-	int labelWidth = client.textRenderer.getWidth("Shady Summoner: ");
-	context.drawTextWithShadow(client.textRenderer, Text.literal("Shady Summoner: "), 0, 0, ModConfig.ssColorLabel);
+		// Draw label and state on first line
+		int labelWidth = client.textRenderer.getWidth("Shady Summoner: ");
+		context.drawTextWithShadow(client.textRenderer, Text.literal("Shady Summoner: "), 0, 0, ModConfig.ssColorLabel);
+		context.drawTextWithShadow(client.textRenderer, Text.literal(stateText), labelWidth, 0, stateColor);
 
-	// Draw state in appropriate color right after the label (use relative offset)
-	context.drawTextWithShadow(client.textRenderer, Text.literal(stateText), labelWidth, 0, stateColor);
+		// Draw crop info on second line
+		String cropText = getCropText();
+		if (!cropText.isEmpty()) {
+			context.drawTextWithShadow(client.textRenderer, Text.literal(cropText), 0, 10, ModConfig.ssColorLabel);
+		}
 
-	context.getMatrices().popMatrix();
-}
+		context.getMatrices().popMatrix();
+	}
 
 	/**
 	 * Get the text representation of the current state.
@@ -415,6 +460,24 @@ public class ShadySummonerManager {
 	}
 
 	/**
+	 * Get the crop text for the second line of the HUD.
+	 * Shows "Next: [crop]" when spawned, "Last: [crop]" when not spawned.
+	 */
+	private static String getCropText() {
+		if (affectedCrop == null || affectedCrop.isEmpty()) {
+			return "";
+		}
+
+		if (state == State.ACTIVE) {
+			return "Next: " + affectedCrop;
+		} else if (state == State.COUNTDOWN || state == State.SOON) {
+			return "Last: " + affectedCrop;
+		}
+
+		return "";
+	}
+
+	/**
 	 * Load HUD position and offline timer state from config file.
 	 */
 	private static void loadConfig() {
@@ -480,6 +543,20 @@ public class ShadySummonerManager {
 						}
 					}
 				}
+
+				// Load crop data with 40-minute offline timeout
+				if (json.has("shadySummonerAffectedCrop") && json.has("shadySummonerLastDespawnTime")) {
+					affectedCrop = json.get("shadySummonerAffectedCrop").getAsString();
+					long savedDespawnTime = json.get("shadySummonerLastDespawnTime").getAsLong();
+					long now = System.currentTimeMillis();
+					long elapsedSinceDespawn = now - savedDespawnTime;
+					long fortyMinutesMs = 40 * 60 * 1000;
+
+					// If more than 40 minutes have passed, clear the crop data
+					if (elapsedSinceDespawn > fortyMinutesMs) {
+						affectedCrop = null;
+					}
+				}
 			}
 		} catch (Exception e) {
 			// If loading fails, use defaults
@@ -529,7 +606,13 @@ public class ShadySummonerManager {
 				}
 			}
 
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		// Save crop data
+		if (affectedCrop != null && !affectedCrop.isEmpty()) {
+			json.addProperty("shadySummonerAffectedCrop", affectedCrop);
+			json.addProperty("shadySummonerLastDespawnTime", lastDespawnTimeMs);
+		}
+
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			String content = gson.toJson(json);
 
 			Files.write(configPath, content.getBytes(StandardCharsets.UTF_8));

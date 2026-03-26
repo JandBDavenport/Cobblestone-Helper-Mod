@@ -11,9 +11,6 @@
 	"icon": "assets/cobblestonehelper/icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"main": [
-
-		],
 		"client": [
 			"com.jandbdavenport.cobblestonehelper.CobblestoneHelper"
 		]
@@ -30,8 +27,5 @@
 		"minecraft": "1.21.11",
 		"java": ">=21",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }

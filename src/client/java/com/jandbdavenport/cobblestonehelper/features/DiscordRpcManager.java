@@ -43,6 +43,7 @@ public class DiscordRpcManager {
 	private static String lastDetails = "";
 	private static String lastState = "";
 	private static int tickCount = 0;
+	private static boolean wasDisabled = false;
 
 	// Regex patterns for scoreboard parsing
 	// Matches "FARMING (Location)" format, e.g. "FARMING (Icy Outpost)"
@@ -56,11 +57,20 @@ public class DiscordRpcManager {
 	public static void init() {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (!ModConfig.discordRpcEnabled) {
+				wasDisabled = true;
 				if (tickCount++ % 600 == 0) {
 					System.out.println("[DiscordRpcManager] Discord RPC is disabled in config");
 				}
 				return;
 			}
+
+			// Reset retry counter when re-enabling
+			if (wasDisabled) {
+				wasDisabled = false;
+				ticksSinceLastRetry = RETRY_INTERVAL_TICKS - 1;
+				System.out.println("[DiscordRpcManager] Discord RPC re-enabled, attempting reconnection");
+			}
+
 			tick(client);
 		});
 

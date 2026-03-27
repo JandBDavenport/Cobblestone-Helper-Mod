@@ -18,6 +18,9 @@ public class KickLoggerManager {
 	private static String lastServerName = null;
 	private static String lastDimensionName = null;
 	private static BlockPos lastPlayerPos = null;
+	private static boolean wasContainerOpen = false;
+	private static int ticksSinceContainerClosed = Integer.MAX_VALUE; // Track intentional teleports via containers
+	private static final int CONTAINER_TELEPORT_GRACE_PERIOD = 20; // 1 second (20 ticks) after container close to ignore dimension changes
 
 	public static void init() {
 		// Listen to disconnect events (hard disconnect to multiplayer menu)
@@ -31,11 +34,14 @@ public class KickLoggerManager {
 		});
 
 		// Monitor for world changes (soft kick transfers)
+		// Also track container open/close for intentional teleports
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
+			checkForContainerChange(client);
 			checkForWorldChange(client);
 		});
 
 		System.out.println("[KickLogger] ✓ Initialized - monitoring disconnects, transfers, and kick messages");
+		System.out.println("[KickLogger] Note: Dimension changes within 1 second of closing a container are ignored (legitimate teleports)");
 	}
 
 	private static void onDisconnect(ClientPlayNetworkHandler handler, MinecraftClient client) {
@@ -138,6 +144,28 @@ public class KickLoggerManager {
 		System.out.println("[KickLogger] ========== END DISCONNECT LOG ==========");
 	}
 
+	private static void checkForContainerChange(MinecraftClient client) {
+		if (client.player == null) {
+			return;
+		}
+
+		// Check if player has an open container (GUI that's not the normal inventory)
+		boolean containerOpen = client.player.currentScreenHandler != null &&
+			!(client.player.currentScreenHandler instanceof net.minecraft.screen.PlayerScreenHandler);
+
+		// If container was open and is now closed, start grace period for teleport
+		if (wasContainerOpen && !containerOpen) {
+			ticksSinceContainerClosed = 0; // Reset grace period counter
+		}
+
+		// If we're in grace period, increment counter
+		if (ticksSinceContainerClosed < CONTAINER_TELEPORT_GRACE_PERIOD) {
+			ticksSinceContainerClosed++;
+		}
+
+		wasContainerOpen = containerOpen;
+	}
+
 	private static void checkForWorldChange(MinecraftClient client) {
 		if (client.player == null || client.world == null) {
 			return;
@@ -149,7 +177,13 @@ public class KickLoggerManager {
 
 		// Detect dimension/world change (soft kick indicator in multi-server systems)
 		if (lastDimensionName != null && !lastDimensionName.equals(currentDimension)) {
-			logWorldChange(currentServer, lastDimensionName, currentDimension, currentPos);
+			// Skip logging if this is likely a legitimate teleport via container
+			if (ticksSinceContainerClosed < CONTAINER_TELEPORT_GRACE_PERIOD) {
+				System.out.println("[KickLogger] Dimension change detected within grace period - treating as legitimate teleport");
+				ticksSinceContainerClosed = Integer.MAX_VALUE; // Reset grace period
+			} else {
+				logWorldChange(currentServer, lastDimensionName, currentDimension, currentPos);
+			}
 		}
 
 		// Detect server change

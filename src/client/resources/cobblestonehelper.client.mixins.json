@@ -15,7 +15,8 @@
     "rendering.ItemGlowMixin",
     "screen.AutoRespawnMixin",
     "particles.SuppressHiddenEntityParticlesMixin",
-    "network.ScoreboardTeamSyncMixin"
+    "network.ScoreboardTeamSyncMixin",
+    "network.DisconnectPacketMixin"
   ],
   "injectors": {
     "defaultRequire": 1

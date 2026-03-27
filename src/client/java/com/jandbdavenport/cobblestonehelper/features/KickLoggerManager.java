@@ -3,6 +3,8 @@ package com.jandbdavenport.cobblestonehelper.features;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Diagnostic tool for logging player disconnects and kicks.
@@ -43,6 +45,67 @@ public class KickLoggerManager {
 	public static volatile DisconnectType lastDisconnectType = DisconnectType.NONE;
 	public static volatile String lastErrorDetail = null;
 
+	// Ring buffer for packet history diagnostics
+	private static final int PACKET_BUFFER_SIZE = 100;
+	private static final Deque<String> packetRingBuffer = new ArrayDeque<>(PACKET_BUFFER_SIZE);
+
+	// Filter out high-frequency, low-diagnostic-value packets
+	private static final String[] FILTERED_PACKET_SUBSTRINGS = {
+		"PlayerMove", "LightUpdate", "ChunkDelta", "EntityPosition",
+		"EntityVelocity", "EntityAttributes", "BlockEntityUpdate",
+		"UnloadChunk", "ChunkData", "WorldEvent", "Particle"
+	};
+
+	/**
+	 * Records a packet into the diagnostic ring buffer.
+	 * Called from Netty IO thread (S2C) and game thread (C2S).
+	 * High-frequency packets are silently discarded before acquiring the lock.
+	 *
+	 * IMPORTANT: Never call packet.toString() here. Use getSimpleName() only.
+	 */
+	public static void logPacket(String direction, String packetSimpleName) {
+		// Filter check — no lock needed, read-only access to constant array
+		for (String fragment : FILTERED_PACKET_SUBSTRINGS) {
+			if (packetSimpleName.contains(fragment)) {
+				return; // Drop silently, never reaches the lock
+			}
+		}
+
+		String entry = "[" + direction + "] " + packetSimpleName;
+
+		synchronized (packetRingBuffer) {
+			if (packetRingBuffer.size() >= PACKET_BUFFER_SIZE) {
+				packetRingBuffer.pollFirst(); // Evict oldest
+			}
+			packetRingBuffer.addLast(entry);
+		}
+	}
+
+	/**
+	 * Drains the ring buffer to stdout, then clears it.
+	 * Must be called BEFORE any other logging in a disconnect handler,
+	 * so the packet history appears first in the log.
+	 *
+	 * Safe to call from any thread.
+	 */
+	public static void flushPacketLog() {
+		String[] snapshot;
+		synchronized (packetRingBuffer) {
+			snapshot = packetRingBuffer.toArray(new String[0]);
+			packetRingBuffer.clear();
+		}
+
+		System.out.println("[KickLogger] ===== LAST " + snapshot.length + " PACKETS (pre-disconnect) =====");
+		if (snapshot.length == 0) {
+			System.out.println("[KickLogger] (no packets recorded)");
+		} else {
+			for (int i = 0; i < snapshot.length; i++) {
+				System.out.println("[KickLogger]   " + (i + 1) + ". " + snapshot[i]);
+			}
+		}
+		System.out.println("[KickLogger] ===== END PACKET HISTORY =====");
+	}
+
 	public static void init() {
 		// Fallback listener for hard disconnects (raw TCP close, server crash, etc)
 		// The mixins (packet + network) are the primary detection mechanisms
@@ -62,6 +125,7 @@ public class KickLoggerManager {
 	 */
 	public static void notifyKickPacketReceived(String reason) {
 		lastDisconnectType = DisconnectType.INTENTIONAL_KICK;
+		flushPacketLog();
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		System.out.println("[KickLogger] ========== DISCONNECT PACKET RECEIVED ==========");
@@ -125,6 +189,7 @@ public class KickLoggerManager {
 	 * @param cause The exception from Netty's exception handler
 	 */
 	public static void notifyNetworkException(Throwable cause) {
+		flushPacketLog();
 		if (cause instanceof io.netty.handler.timeout.TimeoutException) {
 			lastDisconnectType = DisconnectType.TIMEOUT;
 			lastErrorDetail = "ReadTimeout (no data received for 30 seconds)";
@@ -174,6 +239,7 @@ public class KickLoggerManager {
 		if (lastDisconnectType == DisconnectType.NONE) {
 			// channelInactive fired with no prior exception or disconnect packet
 			lastDisconnectType = DisconnectType.RAW_TCP_CLOSE;
+			flushPacketLog();
 			System.out.println("[KickLogger] ========== RAW TCP CLOSE DETECTED ==========");
 			System.out.println("[KickLogger] Timestamp: " + System.currentTimeMillis());
 			System.out.println("[KickLogger] Type: Channel closed with no prior disconnect packet or network exception");

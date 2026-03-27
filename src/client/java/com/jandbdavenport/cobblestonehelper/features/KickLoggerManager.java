@@ -1,6 +1,7 @@
 package com.jandbdavenport.cobblestonehelper.features;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import java.util.ArrayDeque;
@@ -57,21 +58,44 @@ public class KickLoggerManager {
 	};
 
 	/**
+	 * Get the human-readable name of a packet class.
+	 * Uses Fabric's mapping resolver to convert obfuscated names to Yarn-mapped names.
+	 * Falls back to simple name if mapping fails.
+	 */
+	private static String getPacketName(Class<?> packetClass) {
+		try {
+			String className = packetClass.getName();
+			var mappingResolver = FabricLoader.getInstance().getMappingResolver();
+			String mappedName = mappingResolver.mapClassName("intermediary", className);
+			// Extract simple name from fully qualified: "net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket" -> "BlockUpdateS2CPacket"
+			int lastDot = mappedName.lastIndexOf('.');
+			return lastDot >= 0 ? mappedName.substring(lastDot + 1) : mappedName;
+		} catch (Exception e) {
+			// Fallback: try to use the simple name, which may still contain obfuscation
+			String simple = packetClass.getSimpleName();
+			return simple.isEmpty() ? packetClass.getName() : simple;
+		}
+	}
+
+	/**
 	 * Records a packet into the diagnostic ring buffer.
 	 * Called from Netty IO thread (S2C) and game thread (C2S).
 	 * High-frequency packets are silently discarded before acquiring the lock.
 	 *
-	 * IMPORTANT: Never call packet.toString() here. Use getSimpleName() only.
+	 * @param direction "S2C" or "C2S"
+	 * @param packetClass The packet's class object
 	 */
-	public static void logPacket(String direction, String packetSimpleName) {
+	public static void logPacket(String direction, Class<?> packetClass) {
+		String packetName = getPacketName(packetClass);
+
 		// Filter check — no lock needed, read-only access to constant array
 		for (String fragment : FILTERED_PACKET_SUBSTRINGS) {
-			if (packetSimpleName.contains(fragment)) {
+			if (packetName.contains(fragment)) {
 				return; // Drop silently, never reaches the lock
 			}
 		}
 
-		String entry = "[" + direction + "] " + packetSimpleName;
+		String entry = "[" + direction + "] " + packetName;
 
 		synchronized (packetRingBuffer) {
 			if (packetRingBuffer.size() >= PACKET_BUFFER_SIZE) {

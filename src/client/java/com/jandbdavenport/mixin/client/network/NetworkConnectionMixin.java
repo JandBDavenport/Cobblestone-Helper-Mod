@@ -43,7 +43,7 @@ public class NetworkConnectionMixin {
 		at = @At("HEAD")
 	)
 	private void onChannelRead0(ChannelHandlerContext ctx, Packet<?> packet, CallbackInfo ci) {
-		KickLoggerManager.logPacket("S2C", packet.getClass().getSimpleName());
+		KickLoggerManager.logPacket("S2C", packet.getClass());
 	}
 
 	@Inject(
@@ -51,6 +51,6 @@ public class NetworkConnectionMixin {
 		at = @At("HEAD")
 	)
 	private void onSend(Packet<?> packet, CallbackInfo ci) {
-		KickLoggerManager.logPacket("C2S", packet.getClass().getSimpleName());
+		KickLoggerManager.logPacket("C2S", packet.getClass());
 	}
 }

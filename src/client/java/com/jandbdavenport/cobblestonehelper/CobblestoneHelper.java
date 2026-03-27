@@ -6,6 +6,7 @@ import com.jandbdavenport.cobblestonehelper.features.BazaarManager;
 import com.jandbdavenport.cobblestonehelper.features.DiscordRpcManager;
 import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.features.ItemGlowManager;
+import com.jandbdavenport.cobblestonehelper.features.KickLoggerManager;
 import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
 import com.jandbdavenport.cobblestonehelper.features.ShadySummonerManager;
 import com.jandbdavenport.cobblestonehelper.gui.ConfigScreen;
@@ -39,6 +40,11 @@ public class CobblestoneHelper implements ClientModInitializer {
 
 		// Initialize config first
 		ModConfig.init();
+
+		// Initialize kick logger early for diagnostic purposes
+		System.out.println("[KickLoggerManager] Initializing...");
+		KickLoggerManager.init();
+		System.out.println("[KickLoggerManager] ✓ Initialized");
 
 		try {
 			// Create custom keybinding category

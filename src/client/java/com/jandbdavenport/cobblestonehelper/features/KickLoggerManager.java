@@ -1,23 +1,41 @@
 package com.jandbdavenport.cobblestonehelper.features;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 /**
  * Diagnostic tool for logging player disconnects and kicks.
- * Helps identify why players are being kicked from the server.
+ * Tracks both hard disconnects (to multiplayer menu) and soft kicks (transfers to hub server).
+ * In multi-server systems, soft kicks happen without explicit disconnect - just world/server changes.
  */
 public class KickLoggerManager {
+	private static String lastServerName = null;
+	private static String lastDimensionName = null;
+	private static BlockPos lastPlayerPos = null;
 
 	public static void init() {
-		// Listen to disconnect events
+		// Listen to disconnect events (hard disconnect to multiplayer menu)
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			onDisconnect(handler, client);
 		});
 
-		System.out.println("[KickLogger] ✓ Initialized - monitoring disconnect events");
+		// Listen to chat messages for kick indicators (soft kicks to hub)
+		ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+			onChatMessage(message);
+		});
+
+		// Monitor for world changes (soft kick transfers)
+		ClientTickEvents.START_CLIENT_TICK.register(client -> {
+			checkForWorldChange(client);
+		});
+
+		System.out.println("[KickLogger] ✓ Initialized - monitoring disconnects, transfers, and kick messages");
 	}
 
 	private static void onDisconnect(ClientPlayNetworkHandler handler, MinecraftClient client) {
@@ -118,5 +136,66 @@ public class KickLoggerManager {
 		}
 
 		System.out.println("[KickLogger] ========== END DISCONNECT LOG ==========");
+	}
+
+	private static void checkForWorldChange(MinecraftClient client) {
+		if (client.player == null || client.world == null) {
+			return;
+		}
+
+		String currentServer = client.getCurrentServerEntry() != null ? client.getCurrentServerEntry().name : "Unknown";
+		String currentDimension = client.world.getRegistryKey().getValue().toString();
+		BlockPos currentPos = client.player.getBlockPos();
+
+		// Detect dimension/world change (soft kick indicator in multi-server systems)
+		if (lastDimensionName != null && !lastDimensionName.equals(currentDimension)) {
+			logWorldChange(currentServer, lastDimensionName, currentDimension, currentPos);
+		}
+
+		// Detect server change
+		if (lastServerName != null && !lastServerName.equals(currentServer)) {
+			logServerChange(lastServerName, currentServer);
+		}
+
+		lastServerName = currentServer;
+		lastDimensionName = currentDimension;
+		lastPlayerPos = currentPos;
+	}
+
+	private static void logWorldChange(String currentServer, String oldDimension, String newDimension, BlockPos newPos) {
+		System.out.println("[KickLogger] ========== WORLD/DIMENSION CHANGE DETECTED (Possible Soft Kick) ==========");
+		System.out.println("[KickLogger] Timestamp: " + System.currentTimeMillis());
+		System.out.println("[KickLogger] Server: " + currentServer);
+		System.out.println("[KickLogger] Old Dimension: " + oldDimension);
+		System.out.println("[KickLogger] New Dimension: " + newDimension);
+		System.out.println("[KickLogger] New Position: X=" + newPos.getX() + " Y=" + newPos.getY() + " Z=" + newPos.getZ());
+		System.out.println("[KickLogger] Note: World change without disconnect suggests transfer to hub/another server");
+		System.out.println("[KickLogger] ========== END WORLD CHANGE LOG ==========");
+	}
+
+	private static void logServerChange(String oldServer, String newServer) {
+		System.out.println("[KickLogger] ========== SERVER CHANGE DETECTED ==========");
+		System.out.println("[KickLogger] Timestamp: " + System.currentTimeMillis());
+		System.out.println("[KickLogger] Old Server: " + oldServer);
+		System.out.println("[KickLogger] New Server: " + newServer);
+		System.out.println("[KickLogger] ========== END SERVER CHANGE LOG ==========");
+	}
+
+	private static void onChatMessage(Text message) {
+		String messageText = message.getString();
+
+		// Detect kick-related messages (case-insensitive)
+		String lowerMessage = messageText.toLowerCase();
+		if (lowerMessage.contains("kicked") || lowerMessage.contains("disconnected") ||
+			lowerMessage.contains("removed from") || lowerMessage.contains("banned") ||
+			lowerMessage.contains("connection closed") || lowerMessage.contains("you were") ||
+			lowerMessage.contains("transferred")) {
+
+			System.out.println("[KickLogger] ========== KICK/TRANSFER MESSAGE DETECTED ==========");
+			System.out.println("[KickLogger] Timestamp: " + System.currentTimeMillis());
+			System.out.println("[KickLogger] Message: " + messageText);
+			System.out.println("[KickLogger] Raw (with formatting): " + message);
+			System.out.println("[KickLogger] ========== END KICK MESSAGE LOG ==========");
+		}
 	}
 }

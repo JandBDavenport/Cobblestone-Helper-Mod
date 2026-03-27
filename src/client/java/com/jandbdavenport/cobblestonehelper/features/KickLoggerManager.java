@@ -87,6 +87,7 @@ public class KickLoggerManager {
 	 */
 	public static void logPacket(String direction, Class<?> packetClass) {
 		String packetName = getPacketName(packetClass);
+		String fullClassName = packetClass.getName();
 
 		// Filter check — no lock needed, read-only access to constant array
 		for (String fragment : FILTERED_PACKET_SUBSTRINGS) {
@@ -95,7 +96,8 @@ public class KickLoggerManager {
 			}
 		}
 
-		String entry = "[" + direction + "] " + packetName;
+		// Entry format: "[DIRECTION] SimpleClassName (fully.qualified.ClassName)"
+		String entry = "[" + direction + "] " + packetName + " (" + fullClassName + ")";
 
 		synchronized (packetRingBuffer) {
 			if (packetRingBuffer.size() >= PACKET_BUFFER_SIZE) {

@@ -140,6 +140,8 @@ public class KickLoggerManager {
 		});
 
 		System.out.println("[KickLogger] ✓ Initialized - packet + network mixins are primary, DISCONNECT event is fallback");
+		System.out.println("[KickLogger] To decode intermediary class names: search for 'class_XXXX' in Yarn repository");
+		System.out.println("[KickLogger] Or check the log output for full qualified names (net.minecraft.class_XXXX)");
 	}
 
 	/**

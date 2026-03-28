@@ -28,7 +28,6 @@ public class HeraldsmarkCursorRenderHandledScreenMixin {
 	private void renderHeraldsmarkFallbackCursor(DrawContext context, int mouseX, int mouseY, CallbackInfo ci) {
 		ItemStack fallbackStack = HeraldsmarkCursorState.getFallbackCursor();
 		if (fallbackStack.isEmpty()) return;
-		System.out.println("[HeraldsmarkCursorRenderHandledScreenMixin] Rendering fallback at (" + mouseX + ", " + mouseY + ")");
 		// createNewRootLayer() ensures we render on top of all prior draws,
 		// same as vanilla does for the real cursor item
 		context.createNewRootLayer();

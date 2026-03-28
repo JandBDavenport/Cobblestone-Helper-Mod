@@ -16,7 +16,6 @@ public class HeraldsmarkScreenCloseMixin {
 	@Inject(method = "close", at = @At("HEAD"))
 	private void clearFallbackOnClose(CallbackInfo ci) {
 		if (!HeraldsmarkCursorState.getFallbackCursor().isEmpty()) {
-			System.out.println("[HeraldsmarkScreenCloseMixin] Screen closed, clearing fallback");
 			HeraldsmarkCursorState.clearFallbackCursor();
 		}
 	}

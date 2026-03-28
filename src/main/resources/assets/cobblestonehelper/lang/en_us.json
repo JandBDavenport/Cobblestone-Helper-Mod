@@ -1,5 +1,6 @@
 {
   "key.category.cobblestonehelper.category": "Cobblestone Helper",
   "key.cobblestonehelper.hideplayers": "Toggle Hide Players",
-  "key.cobblestonehelper.farmwarps": "Open Farm Warps"
+  "key.cobblestonehelper.farmwarps": "Open Farm Warps",
+  "cobblestonehelper.heraldsmark.blocked": "CobblestoneHelper just prevented a kick! Please dont shift-click or use hotkeys to move the item."
 }

@@ -1,6 +1,8 @@
 package com.jandbdavenport.cobblestonehelper.util;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -14,7 +16,6 @@ public class HeraldsmarkCursorState {
 	public static void setFallbackCursor(ItemStack stack) {
 		fallbackCursorStack = stack.copy();
 		shouldClearOnNextTick = false;
-		System.out.println("[HeraldsmarkCursorState] Set fallback: " + stack.getItem().getName().getString());
 	}
 
 	public static ItemStack getFallbackCursor() {
@@ -22,13 +23,11 @@ public class HeraldsmarkCursorState {
 	}
 
 	public static void clearFallbackCursor() {
-		System.out.println("[HeraldsmarkCursorState] Cleared fallback");
 		fallbackCursorStack = ItemStack.EMPTY;
 		shouldClearOnNextTick = false;
 	}
 
 	public static void clearFallbackCursorOnNextTick() {
-		System.out.println("[HeraldsmarkCursorState] Scheduled fallback clear for next tick");
 		shouldClearOnNextTick = true;
 	}
 
@@ -40,5 +39,20 @@ public class HeraldsmarkCursorState {
 
 	public static void init() {
 		ClientTickEvents.START_CLIENT_TICK.register(client -> tickClear());
+	}
+
+	public static boolean isHeraldsmark(ItemStack stack) {
+		if (stack.isEmpty()) return false;
+		NbtComponent nbtComp = stack.get(DataComponentTypes.CUSTOM_DATA);
+		if (nbtComp == null) return false;
+		try {
+			var nbt = nbtComp.copyNbt();
+			if (nbt.contains("id")) {
+				var idOpt = nbt.getString("id");
+				return idOpt.isPresent() && "heraldsmark".equals(idOpt.get());
+			}
+		} catch (Exception ignored) {
+		}
+		return false;
 	}
 }

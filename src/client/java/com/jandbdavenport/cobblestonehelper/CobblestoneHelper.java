@@ -42,7 +42,12 @@ public class CobblestoneHelper implements ClientModInitializer {
 		ModConfig.init();
 
 		// Initialize heraldsmark component strip workaround
-		HeraldsmarkComponentStripMixin.init();
+		try {
+			HeraldsmarkComponentStripMixin.init();
+		} catch (Exception e) {
+			System.out.println("[CobblestoneHelper] ✗ Error initializing heraldsmark component strip!");
+			e.printStackTrace();
+		}
 
 		try {
 			// Create custom keybinding category

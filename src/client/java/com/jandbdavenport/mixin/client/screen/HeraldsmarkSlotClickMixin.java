@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class HeraldsmarkSlotClickMixin {
 
 	@Inject(method = "mouseClicked", at = @At("HEAD"))
-	private void clearFallbackOnClick(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+	private void clearFallbackOnClick(Object slot, boolean boolean1, CallbackInfoReturnable<Boolean> cir) {
 		if (!HeraldsmarkCursorState.getFallbackCursor().isEmpty()) {
 			System.out.println("[HeraldsmarkSlotClickMixin] Mouse clicked, clearing fallback");
 			HeraldsmarkCursorState.clearFallbackCursor();

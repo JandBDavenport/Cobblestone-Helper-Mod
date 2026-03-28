@@ -11,6 +11,7 @@ public class HeraldsmarkCursorState {
 
 	public static void setFallbackCursor(ItemStack stack) {
 		fallbackCursorStack = stack.copy();
+		System.out.println("[HeraldsmarkCursorState] Set fallback: " + stack.getItem().getName().getString());
 	}
 
 	public static ItemStack getFallbackCursor() {
@@ -18,6 +19,7 @@ public class HeraldsmarkCursorState {
 	}
 
 	public static void clearFallbackCursor() {
+		System.out.println("[HeraldsmarkCursorState] Cleared fallback");
 		fallbackCursorStack = ItemStack.EMPTY;
 	}
 }

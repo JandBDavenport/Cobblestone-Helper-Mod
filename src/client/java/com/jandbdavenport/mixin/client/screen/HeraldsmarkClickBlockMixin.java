@@ -27,16 +27,20 @@ public class HeraldsmarkClickBlockMixin {
 		cancellable = true
 	)
 	private void blockHeraldsmarkCursorStack(ItemStack stack, CallbackInfo ci) {
+		System.out.println("[HeraldsmarkClickBlockMixin] setCursorStack called with: " + (stack.isEmpty() ? "EMPTY" : stack.getItem().getName().getString()));
 		if (stack.isEmpty()) {
 			// Cursor is being cleared, clear the fallback too
+			System.out.println("[HeraldsmarkClickBlockMixin] Clearing fallback (empty cursor)");
 			HeraldsmarkCursorState.clearFallbackCursor();
 		} else if (isHeraldsmark(stack)) {
 			// Block the actual cursor stack update
+			System.out.println("[HeraldsmarkClickBlockMixin] Blocking heraldsmark, setting fallback");
 			ci.cancel();
 			// But show a visual fallback on the cursor
 			HeraldsmarkCursorState.setFallbackCursor(stack);
 		} else {
 			// A different item is being placed on cursor, clear the fallback
+			System.out.println("[HeraldsmarkClickBlockMixin] Different item on cursor, clearing fallback");
 			HeraldsmarkCursorState.clearFallbackCursor();
 		}
 	}

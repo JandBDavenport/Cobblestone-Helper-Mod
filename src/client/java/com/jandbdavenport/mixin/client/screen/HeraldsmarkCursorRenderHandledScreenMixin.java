@@ -1,12 +1,11 @@
 package com.jandbdavenport.mixin.client.screen;
 
 import com.jandbdavenport.cobblestonehelper.util.HeraldsmarkCursorState;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,8 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(HandledScreen.class)
 public class HeraldsmarkCursorRenderHandledScreenMixin {
 
-	@Shadow protected TextRenderer textRenderer;
-
 	@Inject(
 		method = "renderCursorStack(Lnet/minecraft/client/gui/DrawContext;II)V",
 		at = @At("TAIL")
@@ -36,6 +33,9 @@ public class HeraldsmarkCursorRenderHandledScreenMixin {
 		// same as vanilla does for the real cursor item
 		context.createNewRootLayer();
 		context.drawItem(fallbackStack, mouseX - 8, mouseY - 8);
-		context.drawStackOverlay(textRenderer, fallbackStack, mouseX - 8, mouseY - 8);
+		Screen screen = (Screen)(Object)this;
+		if (screen != null && screen.getTextRenderer() != null) {
+			context.drawStackOverlay(screen.getTextRenderer(), fallbackStack, mouseX - 8, mouseY - 8);
+		}
 	}
 }

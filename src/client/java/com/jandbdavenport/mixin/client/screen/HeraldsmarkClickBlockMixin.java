@@ -27,8 +27,10 @@ public class HeraldsmarkClickBlockMixin {
 	)
 	private void blockHeraldsmarkCursorStack(ItemStack stack, CallbackInfo ci) {
 		if (!stack.isEmpty() && isHeraldsmark(stack)) {
-			System.out.println("[HeraldsmarkClickBlockMixin] Blocked cursor stack set for heraldsmark");
+			// Block the actual cursor stack update
 			ci.cancel();
+			// But show a visual fallback on the cursor
+			HeraldsmarkCursorRenderMixin.setFallbackCursor(stack);
 		}
 	}
 

@@ -24,6 +24,18 @@ Displays incomplete guild quests and a timer until next quest refresh.
 Enlarges raycast and outline shapes for select plant blocks, making them easier to target and break.
 THIS FEATURE IS DISABLED BY DEFAULT, USE AT YOUR OWN RISK.
 
+###  Auto Respawn
+Automatically respawns the player upon death with a configurable delay. Disabled by default.
+
+###  Item Glow
+Highlights items on the ground with a glow effect for easier visibility. Items do not glow if behind a wall or otherwise occluded to maintain fair play.
+
+###  Discord Rich Presence
+Shows your current game status in Discord Rich Presence. Displays your current dimension and what crop you are currently farming.
+
+###  Patches for Several Kicks
+Prevents or works around several things that would typically cause you to get kicked from the server due to bugs.
+
 ## Installation
 
 1. Download the latest JAR from [Releases](https://github.com/JandBDavenport/Cobblestone-Helper-Mod/releases)

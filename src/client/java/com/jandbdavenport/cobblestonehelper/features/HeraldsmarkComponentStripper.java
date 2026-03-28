@@ -17,16 +17,9 @@ import net.minecraft.item.ItemStack;
  */
 public class HeraldsmarkComponentStripper {
 
-	private static int tickCount = 0;
-
 	public static void init() {
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
 			if (client.player != null && client.player.getInventory() != null) {
-				// Only log every 100 ticks to avoid spam
-				if (tickCount++ % 100 == 0) {
-					System.out.println("[HeraldsmarkComponentStrip] Tick check #" + tickCount);
-				}
-
 				// Strip from player inventory
 				Inventory inv = client.player.getInventory();
 				for (int i = 0; i < inv.size(); i++) {
@@ -34,8 +27,6 @@ public class HeraldsmarkComponentStripper {
 				}
 			}
 		});
-
-		System.out.println("[HeraldsmarkComponentStrip] Tick listener registered");
 	}
 
 	private static void stripIfHeraldsmark(ItemStack stack) {
@@ -48,20 +39,11 @@ public class HeraldsmarkComponentStripper {
 				var idOpt = nbt.getString("id");
 				String id = idOpt.isPresent() ? idOpt.get() : "";
 				if ("heraldsmark".equals(id)) {
-					boolean hadSwing = stack.get(DataComponentTypes.SWING_ANIMATION) != null;
-					boolean hadUse = stack.get(DataComponentTypes.USE_EFFECTS) != null;
-
-					System.out.println("[HeraldsmarkComponentStrip] Found heraldsmark! SWING_ANIMATION=" + hadSwing + " USE_EFFECTS=" + hadUse);
-					if (hadSwing || hadUse) {
-						System.out.println("[HeraldsmarkComponentStrip] Stripping components");
-						stack.remove(DataComponentTypes.SWING_ANIMATION);
-						stack.remove(DataComponentTypes.USE_EFFECTS);
-					}
+					stack.remove(DataComponentTypes.SWING_ANIMATION);
+					stack.remove(DataComponentTypes.USE_EFFECTS);
 				}
 			}
-		} catch (Exception e) {
-			System.out.println("[HeraldsmarkComponentStrip] Error: " + e);
-			e.printStackTrace();
+		} catch (Exception ignored) {
 		}
 	}
 }

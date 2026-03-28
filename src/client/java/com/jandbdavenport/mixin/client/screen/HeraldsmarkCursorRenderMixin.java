@@ -19,10 +19,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(HandledScreen.class)
 public class HeraldsmarkCursorRenderMixin {
 
+	private static int renderCount = 0;
+
 	@Inject(method = "render", at = @At("TAIL"))
 	private void renderHeraldsmarkCursor(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		ItemStack fallbackStack = HeraldsmarkCursorState.getFallbackCursor();
+		// Log every 100 renders to see if method is being called
+		if (renderCount++ % 100 == 0) {
+			System.out.println("[HeraldsmarkCursorRenderMixin] Render #" + renderCount + ", fallback stack empty: " + fallbackStack.isEmpty());
+		}
 		if (!fallbackStack.isEmpty()) {
+			System.out.println("[HeraldsmarkCursorRenderMixin] Rendering fallback at (" + mouseX + ", " + mouseY + ")");
 			// Render the item at cursor position
 			context.drawItem(fallbackStack, mouseX - 8, mouseY - 8);
 		}

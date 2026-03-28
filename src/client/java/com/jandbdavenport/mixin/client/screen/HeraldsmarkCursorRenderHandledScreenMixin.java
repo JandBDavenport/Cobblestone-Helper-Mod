@@ -1,42 +1,41 @@
 package com.jandbdavenport.mixin.client.screen;
 
 import com.jandbdavenport.cobblestonehelper.util.HeraldsmarkCursorState;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Renders the heraldsmark fallback item on inventory screens.
+ * Renders the heraldsmark fallback item at the same depth as the vanilla cursor item.
  *
- * Injects into Screen.render at every RETURN point. On HandledScreen,
- * one of these RETURN points fires after all inventory rendering is complete,
- * ensuring the fallback renders on top of overlays.
+ * Injects into HandledScreen.renderCursorStack, which is called after all slot items
+ * and overlays (including the white slot-hover highlight) have been drawn.
+ * renderCursorStack calls createNewRootLayer() before drawing, placing items on top
+ * of everything else. By injecting here, our fallback gets identical visual depth.
  */
-@Mixin(Screen.class)
+@Mixin(HandledScreen.class)
 public class HeraldsmarkCursorRenderHandledScreenMixin {
 
-	private static int renderCount = 0;
+	@Shadow protected TextRenderer textRenderer;
 
-	@Inject(method = "render", at = @At("RETURN"))
-	private void renderHeraldsmarkCursor(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-		// Only render on inventory screens
-		if (!(((Screen)(Object)this) instanceof HandledScreen)) {
-			return;
-		}
+	@Inject(
+		method = "renderCursorStack(Lnet/minecraft/client/gui/DrawContext;II)V",
+		at = @At("TAIL")
+	)
+	private void renderHeraldsmarkFallbackCursor(DrawContext context, int mouseX, int mouseY, CallbackInfo ci) {
 		ItemStack fallbackStack = HeraldsmarkCursorState.getFallbackCursor();
-		// Log every 100 renders to see if method is being called
-		if (renderCount++ % 100 == 0) {
-			System.out.println("[HeraldsmarkCursorRenderHandledScreenMixin] Render #" + renderCount + ", fallback stack empty: " + fallbackStack.isEmpty());
-		}
-		if (!fallbackStack.isEmpty()) {
-			System.out.println("[HeraldsmarkCursorRenderHandledScreenMixin] Rendering fallback at (" + mouseX + ", " + mouseY + ")");
-			// Render the item at cursor position
-			context.drawItem(fallbackStack, mouseX - 8, mouseY - 8);
-		}
+		if (fallbackStack.isEmpty()) return;
+		System.out.println("[HeraldsmarkCursorRenderHandledScreenMixin] Rendering fallback at (" + mouseX + ", " + mouseY + ")");
+		// createNewRootLayer() ensures we render on top of all prior draws,
+		// same as vanilla does for the real cursor item
+		context.createNewRootLayer();
+		context.drawItem(fallbackStack, mouseX - 8, mouseY - 8);
+		context.drawStackOverlay(textRenderer, fallbackStack, mouseX - 8, mouseY - 8);
 	}
 }

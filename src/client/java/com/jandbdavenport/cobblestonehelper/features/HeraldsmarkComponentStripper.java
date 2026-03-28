@@ -1,4 +1,4 @@
-package com.jandbdavenport.mixin.client.network;
+package com.jandbdavenport.cobblestonehelper.features;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.component.DataComponentTypes;
@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
  * the player. Stripping them client-side prevents this without affecting any
  * other items.
  */
-public class HeraldsmarkComponentStripMixin {
+public class HeraldsmarkComponentStripper {
 
 	public static void init() {
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {

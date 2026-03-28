@@ -1,5 +1,6 @@
 package com.jandbdavenport.mixin.client.screen;
 
+import com.jandbdavenport.cobblestonehelper.util.HeraldsmarkCursorState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -30,7 +31,7 @@ public class HeraldsmarkClickBlockMixin {
 			// Block the actual cursor stack update
 			ci.cancel();
 			// But show a visual fallback on the cursor
-			HeraldsmarkCursorRenderMixin.setFallbackCursor(stack);
+			HeraldsmarkCursorState.setFallbackCursor(stack);
 		}
 	}
 

@@ -8,6 +8,7 @@ import com.jandbdavenport.cobblestonehelper.features.GuildQuestsManager;
 import com.jandbdavenport.cobblestonehelper.features.ItemGlowManager;
 import com.jandbdavenport.cobblestonehelper.features.PlayerHidingManager;
 import com.jandbdavenport.cobblestonehelper.features.ShadySummonerManager;
+import com.jandbdavenport.mixin.client.network.HeraldsmarkComponentStripMixin;
 import com.jandbdavenport.cobblestonehelper.gui.ConfigScreen;
 import com.jandbdavenport.cobblestonehelper.gui.FarmWarpScreen;
 import com.jandbdavenport.cobblestonehelper.gui.HudPositionScreen;
@@ -39,6 +40,9 @@ public class CobblestoneHelper implements ClientModInitializer {
 
 		// Initialize config first
 		ModConfig.init();
+
+		// Initialize heraldsmark component strip workaround
+		HeraldsmarkComponentStripMixin.init();
 
 		try {
 			// Create custom keybinding category

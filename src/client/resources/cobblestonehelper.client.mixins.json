@@ -16,8 +16,7 @@
     "screen.AutoRespawnMixin",
     "particles.SuppressHiddenEntityParticlesMixin",
     "network.ScoreboardTeamSyncMixin",
-    "network.TalismanForgeClickMixin",
-    "network.HeraldsmarkComponentStripMixin"
+    "network.TalismanForgeClickMixin"
   ],
   "injectors": {
     "defaultRequire": 1

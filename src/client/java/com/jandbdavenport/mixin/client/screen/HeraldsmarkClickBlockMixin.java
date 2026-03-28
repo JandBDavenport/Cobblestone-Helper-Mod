@@ -1,38 +1,38 @@
 package com.jandbdavenport.mixin.client.screen;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Blocks clicks on heraldsmark talismans to prevent kicks when moving them.
+ * Blocks cursor stack updates for heraldsmark talismans to prevent kicks.
  *
- * Heraldsmark talismans cause the server to kick the player when moved due to
- * problematic components. This mixin prevents the client from sending the click
- * packet to the server in the first place.
+ * Heraldsmark talismans cause the server to kick the player when the item is
+ * placed on the cursor (either by clicking or hotkey). This mixin prevents
+ * the cursor from being set to a heraldsmark item, similar to the
+ * TalismanForgeClickMixin but applying to all heraldsmark items.
  */
-@Mixin(HandledScreen.class)
+@Mixin(ScreenHandler.class)
 public class HeraldsmarkClickBlockMixin {
 
 	@Inject(
-		method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V",
+		method = "setCursorStack(Lnet/minecraft/item/ItemStack;)V",
 		at = @At("HEAD"),
 		cancellable = true
 	)
-	private void blockHeraldsmarkClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-		if (slot != null && isHeraldsmark(slot.getStack())) {
-			System.out.println("[HeraldsmarkClickBlockMixin] Blocked click on heraldsmark");
+	private void blockHeraldsmarkCursorStack(ItemStack stack, CallbackInfo ci) {
+		if (!stack.isEmpty() && isHeraldsmark(stack)) {
+			System.out.println("[HeraldsmarkClickBlockMixin] Blocked cursor stack set for heraldsmark");
 			ci.cancel();
 		}
 	}
 
-	private static boolean isHeraldsmark(net.minecraft.item.ItemStack stack) {
+	private static boolean isHeraldsmark(ItemStack stack) {
 		if (stack.isEmpty()) return false;
 		NbtComponent nbtComp = stack.get(DataComponentTypes.CUSTOM_DATA);
 		if (nbtComp == null) return false;

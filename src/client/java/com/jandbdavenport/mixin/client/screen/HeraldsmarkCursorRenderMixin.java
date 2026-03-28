@@ -2,7 +2,7 @@ package com.jandbdavenport.mixin.client.screen;
 
 import com.jandbdavenport.cobblestonehelper.util.HeraldsmarkCursorState;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * HeraldsmarkClickBlockMixin), we render it visually at the cursor position
  * so the player sees they're moving it, even though the server doesn't.
  */
-@Mixin(HandledScreen.class)
+@Mixin(Screen.class)
 public class HeraldsmarkCursorRenderMixin {
 
 	private static int renderCount = 0;

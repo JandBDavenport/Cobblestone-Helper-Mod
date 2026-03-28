@@ -44,18 +44,24 @@ public class HeraldsmarkComponentStripper {
 		if (nbtComp == null) return;
 		try {
 			var nbt = nbtComp.copyNbt();
-			if (nbt.contains("id") && nbt.getString("id").equals("heraldsmark")) {
-				boolean hadSwing = stack.get(DataComponentTypes.SWING_ANIMATION) != null;
-				boolean hadUse = stack.get(DataComponentTypes.USE_EFFECTS) != null;
+			if (nbt.contains("id")) {
+				var idOpt = nbt.getString("id");
+				String id = idOpt.isPresent() ? idOpt.get() : "";
+				if ("heraldsmark".equals(id)) {
+					boolean hadSwing = stack.get(DataComponentTypes.SWING_ANIMATION) != null;
+					boolean hadUse = stack.get(DataComponentTypes.USE_EFFECTS) != null;
 
-				if (hadSwing || hadUse) {
-					System.out.println("[HeraldsmarkComponentStrip] Found heraldsmark with SWING_ANIMATION=" + hadSwing + " USE_EFFECTS=" + hadUse + ", stripping");
-					stack.remove(DataComponentTypes.SWING_ANIMATION);
-					stack.remove(DataComponentTypes.USE_EFFECTS);
+					System.out.println("[HeraldsmarkComponentStrip] Found heraldsmark! SWING_ANIMATION=" + hadSwing + " USE_EFFECTS=" + hadUse);
+					if (hadSwing || hadUse) {
+						System.out.println("[HeraldsmarkComponentStrip] Stripping components");
+						stack.remove(DataComponentTypes.SWING_ANIMATION);
+						stack.remove(DataComponentTypes.USE_EFFECTS);
+					}
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("[HeraldsmarkComponentStrip] Error processing stack: " + e);
+			System.out.println("[HeraldsmarkComponentStrip] Error: " + e);
+			e.printStackTrace();
 		}
 	}
 }

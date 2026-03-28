@@ -13,16 +13,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Renders the heraldsmark fallback item on inventory screens.
  *
- * Injects into Screen.render but only renders on HandledScreen instances
- * to avoid rendering on main menu. Note: renders behind white slot hover
- * overlay due to 1.21.11 render method signature changes in HandledScreen.
+ * Injects into Screen.render at every RETURN point. On HandledScreen,
+ * one of these RETURN points fires after all inventory rendering is complete,
+ * ensuring the fallback renders on top of overlays.
  */
 @Mixin(Screen.class)
 public class HeraldsmarkCursorRenderHandledScreenMixin {
 
 	private static int renderCount = 0;
 
-	@Inject(method = "render", at = @At("TAIL"))
+	@Inject(method = "render", at = @At("RETURN"))
 	private void renderHeraldsmarkCursor(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		// Only render on inventory screens
 		if (!(((Screen)(Object)this) instanceof HandledScreen)) {

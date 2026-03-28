@@ -47,12 +47,19 @@ public class HeraldsmarkComponentStripMixin {
 		NbtComponent nbtComp = stack.get(DataComponentTypes.CUSTOM_DATA);
 		if (nbtComp == null) return;
 		try {
-			if ("heraldsmark".equals(nbtComp.copyNbt().getString("id"))) {
+			var nbt = nbtComp.copyNbt();
+			if (nbt.contains("id") && "heraldsmark".equals(nbt.getString("id"))) {
+				System.out.println("[HeraldsmarkComponentStrip] Found heraldsmark, stripping components");
+				System.out.println("[HeraldsmarkComponentStrip] Has SWING_ANIMATION before: " + (stack.get(DataComponentTypes.SWING_ANIMATION) != null));
+				System.out.println("[HeraldsmarkComponentStrip] Has USE_EFFECTS before: " + (stack.get(DataComponentTypes.USE_EFFECTS) != null));
 				stack.remove(DataComponentTypes.SWING_ANIMATION);
 				stack.remove(DataComponentTypes.USE_EFFECTS);
+				System.out.println("[HeraldsmarkComponentStrip] Has SWING_ANIMATION after: " + (stack.get(DataComponentTypes.SWING_ANIMATION) != null));
+				System.out.println("[HeraldsmarkComponentStrip] Has USE_EFFECTS after: " + (stack.get(DataComponentTypes.USE_EFFECTS) != null));
 			}
-		} catch (Exception ignored) {
-			// Malformed NBT: leave the stack untouched
+		} catch (Exception e) {
+			System.out.println("[HeraldsmarkComponentStrip] Error processing stack: " + e);
+			e.printStackTrace();
 		}
 	}
 }

@@ -27,11 +27,17 @@ public class HeraldsmarkClickBlockMixin {
 		cancellable = true
 	)
 	private void blockHeraldsmarkCursorStack(ItemStack stack, CallbackInfo ci) {
-		if (!stack.isEmpty() && isHeraldsmark(stack)) {
+		if (stack.isEmpty()) {
+			// Cursor is being cleared, clear the fallback too
+			HeraldsmarkCursorState.clearFallbackCursor();
+		} else if (isHeraldsmark(stack)) {
 			// Block the actual cursor stack update
 			ci.cancel();
 			// But show a visual fallback on the cursor
 			HeraldsmarkCursorState.setFallbackCursor(stack);
+		} else {
+			// A different item is being placed on cursor, clear the fallback
+			HeraldsmarkCursorState.clearFallbackCursor();
 		}
 	}
 

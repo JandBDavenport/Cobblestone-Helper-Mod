@@ -15,9 +15,8 @@
     "rendering.ItemGlowMixin",
     "screen.AutoRespawnMixin",
     "screen.HeraldsmarkClickBlockMixin",
-    "screen.HeraldsmarkCursorRenderMixin",
     "screen.HeraldsmarkCursorRenderHandledScreenMixin",
-    "screen.HeraldsmarkSlotClickMixin",
+    "screen.HeraldsmarkScreenCloseMixin",
     "particles.SuppressHiddenEntityParticlesMixin",
     "network.ScoreboardTeamSyncMixin",
     "network.TalismanForgeClickMixin"

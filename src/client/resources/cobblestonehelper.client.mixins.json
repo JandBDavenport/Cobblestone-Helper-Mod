@@ -17,6 +17,7 @@
     "screen.HeraldsmarkClickBlockMixin",
     "screen.HeraldsmarkCursorRenderHandledScreenMixin",
     "screen.HeraldsmarkScreenCloseMixin",
+    "screen.HeraldsmarkSlotClickMixin",
     "particles.SuppressHiddenEntityParticlesMixin",
     "network.ScoreboardTeamSyncMixin",
     "network.TalismanForgeClickMixin"

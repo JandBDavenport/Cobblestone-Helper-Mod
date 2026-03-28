@@ -17,9 +17,16 @@ import net.minecraft.item.ItemStack;
  */
 public class HeraldsmarkComponentStripper {
 
+	private static int tickCount = 0;
+
 	public static void init() {
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
 			if (client.player != null && client.player.getInventory() != null) {
+				// Only log every 100 ticks to avoid spam
+				if (tickCount++ % 100 == 0) {
+					System.out.println("[HeraldsmarkComponentStrip] Tick check #" + tickCount);
+				}
+
 				// Strip from player inventory
 				Inventory inv = client.player.getInventory();
 				for (int i = 0; i < inv.size(); i++) {

@@ -27,8 +27,8 @@ public class HeraldsmarkSlotClickMixin {
 	)
 	private void clearFallbackOnSlotClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
 		if (slot != null && !HeraldsmarkCursorState.getFallbackCursor().isEmpty()) {
-			System.out.println("[HeraldsmarkSlotClickMixin] Slot " + slotId + " clicked (" + actionType + "), clearing fallback");
-			HeraldsmarkCursorState.clearFallbackCursor();
+			System.out.println("[HeraldsmarkSlotClickMixin] Slot " + slotId + " clicked (" + actionType + "), scheduling fallback clear");
+			HeraldsmarkCursorState.clearFallbackCursorOnNextTick();
 		}
 	}
 }

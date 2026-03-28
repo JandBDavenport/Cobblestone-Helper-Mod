@@ -12,6 +12,7 @@ import com.jandbdavenport.cobblestonehelper.features.HeraldsmarkComponentStrippe
 import com.jandbdavenport.cobblestonehelper.gui.ConfigScreen;
 import com.jandbdavenport.cobblestonehelper.gui.FarmWarpScreen;
 import com.jandbdavenport.cobblestonehelper.gui.HudPositionScreen;
+import com.jandbdavenport.cobblestonehelper.util.HeraldsmarkCursorState;
 import com.mojang.brigadier.Command;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -48,6 +49,14 @@ public class CobblestoneHelper implements ClientModInitializer {
 			System.out.println("[CobblestoneHelper] ✗ Error initializing heraldsmark component strip!");
 			e.printStackTrace();
 		}
+
+	// Initialize heraldsmark cursor state tick events
+	try {
+		HeraldsmarkCursorState.init();
+	} catch (Exception e) {
+		System.out.println("[CobblestoneHelper] ✗ Error initializing heraldsmark cursor state!");
+		e.printStackTrace();
+	}
 
 		try {
 			// Create custom keybinding category
